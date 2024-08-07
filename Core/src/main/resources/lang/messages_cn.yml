@@ -1,0 +1,311 @@
+Command:
+  AddExp:
+    Usage: <player> <amount> [tier] [pet]
+    Desc: 给玩家的[已激活的]宠物添加经验值.
+    Done: '#d4d9d8已添加 #aefd5e%amount% 经验值#d4d9d8给 #aefd5e%player_name%#d4d9d8 的 #aefd5e%pet_name%#d4d9d8 宠物.'
+  AddPoints:
+    Usage: <player> <amount> [tier] [pet]
+    Desc: 给玩家的[已激活的]宠物添加属性点.
+    Done: '#d4d9d8已添加 #aefd5e%amount%#d4d9d8 属性点给 #aefd5e%player_name%#d4d9d8 的 #aefd5e%pet_name%#d4d9d8 宠物.'
+  Collection:
+    Desc: 列出你已拥有的宠物.
+    Usage: '[tier]'
+  Add:
+    Usage: <player> <tier> <pet>
+    Desc: 向玩家的收藏中添加宠物.
+    Done: '#d4d9d8已添加 #aefd5e%pet_tier_name% %pet_config_name%#d4d9d8 到 #aefd5e%player_name%#d4d9d8 的收藏中!'
+    Error:
+      AlreadyHave: '#fd5e5e%player_name%#d4d9d8 已经拥有 #fd5e5e%pet_tier_name% %pet_config_name%#d4d9d8!'
+  Remove:
+    Usage: <player> <tier> <pet>
+    Desc: 从玩家的收藏中移除宠物.
+    Done: '#d4d9d8已从 #aefd5e%player_name%#d4d9d8 的收藏中移除 #aefd5e%pet_tier_name% %pet_config_name%#d4d9d8!'
+  CatchItem:
+    Usage: <player> <tier> [amount]
+    Desc: 给予宠物捕捉道具.
+    Done: '#d4d9d8给予 #aefd5e%player_name%#d4d9d8 #aefd5ex%amount% %item%#d4d9d8!'
+  Food:
+    Usage: <pet> <amount> [player]
+    Desc: 给予宠物食物道具.
+    Error:
+      Invalid: '#fd5e5e提供的食物无效!'
+    Done: '#d4d9d8给予 #aefd5e%player_name%#d4d9d8 #aefd5ex%amount% %item%#d4d9d8!'
+  Egg:
+    Usage: <tier> <pet> [player]
+    Desc: 给予宠物蛋 [给某个玩家].
+    Done: '#d4d9d8给予 #aefd5e%player_name%#d4d9d8 #aefd5e%pet_tier_name% %pet_config_name%#d4d9d8 宠物蛋.'
+  Rename:
+    Usage: <player> <tier> <pet> <name>
+    Desc: 重命名玩家的宠物.
+    Done: '已将 #aefd5e%player_name%#d4d9d8 的宠物重命名为 #aefd5e%pet_name%#d4d9d8.'
+  ResetProgress:
+    Usage: <player> [tier] [pet]
+    Desc: 重置玩家的宠物的等级进度.
+    Done: '#d4d9d8重置 #fdba5e%player_name%#d4d9d8 的 #fdba5e%pet_name%#d4d9d8 宠物的等级进度.'
+  Menu:
+    Desc: 打开你的宠物菜单.
+  EggShop:
+    Desc: 打开蛋商店.
+  Customizations:
+    Desc: 打开宠物自定义商店.
+Pet:
+  Despawn:
+    Death:
+      - <! type:"titles:20:60:20" sound:"ENTITY_GENERIC_DEATH" !>
+      - '#fd5e5e&l你的宠物死了!'
+      - '#d4d9d8在你的收藏中复活它.'
+    Default: '#d4d9d8宠物已消失.'
+  Claim:
+    Error:
+      AlreadyHave: '#fd5e5e你已经拥有这个宠物了!'
+      ReachedLimit: '#fd5e5e你不能拥有超过 #fdba5e%amount% %pet_tier_name%#fd5e5e 宠物!'
+    Success:
+      - <! type:"titles:20:60:20" sound:"ENTITY_PLAYER_LEVELUP" !>
+      - '#aefd5e&l宠物已领取!'
+      - '#d4d9d8查看你的收藏：#aefd5e/pet collection'
+  Catch:
+    Process:
+      Progress:
+        - <! type:"titles:0:20:0" !>
+        - '#fdf35e&l捕捉中...'
+        - '#aefd5e&l成功 #d4d9d8→ #aefd5e%success%% #d4d9d8| #fd5e5e%failure%% #d4d9d8← #fd5e5e&l失败'
+      Success:
+        - <! type:"titles:0:50:30" sound:"ENTITY_PLAYER_LEVELUP" !>
+        - '#aefd5e&l成功捕获生物!'
+        - '#d4d9d8你捕获了 &f%pet_config_default_name% #d4d9d8(%pet_tier_color%%pet_tier_name%#d4d9d8)'
+      Escaped:
+        - <! type:"titles:0:50:30" sound:"ENTITY_VILLAGER_NO" !>
+        - '#fdba5e&l生物逃跑了!'
+        - '#d4d9d8它似乎不想成为你的宠物...'
+      Failure:
+        - <! type:"titles:0:50:30" sound:"ENTITY_VILLAGER_NO" !>
+        - '#fd5e5e&l生物未被捕获!'
+        - '#d4d9d8你无法捕获它.再试一次吧!'
+      TooFarAway:
+        - <! type:"titles:0:50:30" sound:"ENTITY_VILLAGER_NO" !>
+        - '#fd5e5e&l生物未被捕获!'
+        - '#d4d9d8你离生物太远了!'
+    Error:
+      NotCatchable: '#fd5e5e你不能捕获这个生物.'
+      NotPermitted: '#fd5e5e你没有权限捕获这个生物.'
+      Conditions: '#fd5e5e这个生物还没有准备好捕获.'
+  Leveling:
+    LevelUp:
+      - <! type:"titles:20:40:20" sound:"ENTITY_PLAYER_LEVELUP" !>
+      - '#aefd5e&l宠物升级!'
+      - '#aefd5e%pet_name%#d4d9d8 现在等级为 #aefd5e%pet_level%#d4d9d8!'
+    LevelDown:
+      - <! type:"titles:20:40:20" sound:"ENTITY_BLAZE_DEATH" !>
+      - '#fd5e5e&l宠物降级!'
+      - '#fd5e5e%pet_name%#d4d9d8 现在等级为 #fd5e5e%pet_level%#d4d9d8 :('
+  XP:
+    Lose:
+      ByDeath: '#fd5e5e[!] #d4d9d8你的宠物因死亡失去了 #fd5e5e%amount%#d4d9d8 经验值.'
+  Rename:
+    Prompt:
+      - <! type:"titles:20:-1:20" sound:"BLOCK_LAVA_POP" !>
+      - '#fdf35e&l改名中'
+      - '#d4d9d8请输入新的宠物名称.'
+    Error:
+      NoNametag:
+        - <! type:"titles:20:60:20" sound:"ENTITY_VILLAGER_NO" !>
+        - '#fd5e5e&l无法改名!'
+        - '#d4d9d8你需要一个 #fd5e5e命名牌#d4d9d8.'
+      TooLong:
+        - <! type:"titles:20:60:20" sound:"ENTITY_VILLAGER_NO" !>
+        - '#fd5e5e&l名称过长!'
+        - '#d4d9d8最大名称长度为 #fd5e5e%amount%#d4d9d8 个字符!'
+      TooShort:
+        - <! type:"titles:20:60:20" sound:"ENTITY_VILLAGER_NO" !>
+        - '#fd5e5e&l名称过短!'
+        - '#d4d9d8最小名称长度为 #fd5e5e%amount%#d4d9d8 个字符!'
+      Forbidden:
+        - <! type:"titles:20:60:20" sound:"ENTITY_VILLAGER_NO" !>
+        - '#fd5e5e&l名称不可接受!'
+        - '#d4d9d8名称包含 #fd5e5e禁止#d4d9d8 字符!'
+    Success:
+      - <! type:"titles:20:60:20" sound:"BLOCK_NOTE_BLOCK_BELL" !>
+      - '#aefd5e&l宠物已改名!'
+      - '#d4d9d8你将你的宠物改名为 #aefd5e%pet_name%'
+  Revive:
+    Error:
+      NotEnoughFunds:
+        - <! type:"titles:20:60:20" sound:"BLOCK_ANVIL_PLACE" !>
+        - '#fd5e5e&l资金不足!'
+        - '#d4d9d8你需要 #fd5e5e$%amount%#d4d9d8 来复活 #fd5e5e%pet_name%#d4d9d8.'
+    Success:
+      - <! type:"titles:20:60:20" sound:"ITEM_TOTEM_USE" !>
+      - '#aefd5e&l宠物已复活!'
+      - '#d4d9d8你复活了 #aefd5e%pet_name%#d4d9d8,花费了 #aefd5e$%amount%#d4d9d8.'
+  Ride:
+    Error:
+      Disabled: '&c你的宠物无法骑乘!'
+  Error:
+    InvalidTier: '#fd5e5e该等级不存在!'
+    InvalidConfig: '#fd5e5e该宠物不存在!'
+    NoActivePet:
+      - <! type:"titles:20:60:20" sound:"ENTITY_VILLAGER_NO" !>
+      - '#fd5e5e&l没有活跃的宠物!'
+      - '#d4d9d8你必须先召唤一个宠物.'
+    NotYour: <! sound:"ENTITY_VILLAGER_NO" !>#fd5e5e这不是你的宠物!
+    BadWorld: '#fd5e5e此世界禁止使用宠物.'
+    NotCollected: '#fd5e5e玩家的收藏中没有这样的宠物!'
+    NotSummoned: '#fd5e5e玩家没有召唤宠物!'
+  Spawn:
+    Error:
+      Dead:
+        - <! type:"titles:20:60:20" sound:"ENTITY_VILLAGER_NO" !>
+        - '#fd5e5e&l宠物已死亡!'
+        - '#d4d9d8你必须先复活它才能召唤!'
+      Already:
+        - <! type:"titles:20:60:20" sound:"ENTITY_VILLAGER_NO" !>
+        - '#fd5e5e&l已经召唤了宠物!'
+        - '#d4d9d8你只能召唤一个宠物.'
+      BadPlace:
+        - <! type:"titles:20:60:20" sound:"ENTITY_VILLAGER_NO" !>
+        - '#fd5e5e&l召唤位置不合适!'
+        - '#d4d9d8此处没有足够的空间召唤宠物.'
+  Release:
+    Success: '#d4d9d8你释放了 #ffeea2%pet_name%#d4d9d8!'
+    Error:
+      BadWorld: '#fd5e5e你不能在此世界释放宠物!'
+EggShop:
+  Buy:
+    Error:
+      NoMoney: <! sound:"ENTITY_VILLAGER_NO" !>#fd5e5e你没有足够的钱!
+    Success:
+      - <! type:"titles:20:60:20" sound:"BLOCK_NOTE_BLOCK_BELL" !>
+      - '#aefd5e&l购买成功!'
+      - '#d4d9d8你购买了 #aefd5e%pet_config_default_name%#d4d9d8 的蛋,花费了 #aefd5e$%cost%#d4d9d8.'
+Customizer:
+  Interact:
+    Pet:
+      Error:
+        NotYour: '&c你不能修改其他玩家的宠物!'
+        WrongType: '&c这个自定义不适用于这个宠物!'
+        AlreadyHas: '&c这个自定义已经应用在这个宠物上了!'
+  Shop:
+    Purchase:
+      Error:
+        NotEnoughMoney: '&c你没有足够的钱来购买它!'
+      Success: 你购买了 &a%customization_name% %customization_type%&7,花费了 &a$%customization_price%&7!
+PetCombatMode:
+  PASSIVE: 被动
+  PROTECTIVE: 防御
+  SUPPORTIVE: 支援
+  PROTECTIVE_AND_SUPPORTIVE: 防御和支援
+CustomizerType:
+  AGE: 年龄
+  SHEEP_COLOR: 绵羊颜色
+  HORSE_COLOR: 马颜色
+  HORSE_STYLE: 马样式
+  FOX_TYPE: 狐狸类型
+  CREEPER_CHARGE: 爬行者充能
+  SLIME_SIZE: 史莱姆大小
+  LLAMA_COLOR: 驼羊颜色
+  PARROT_VARIANT: 鹦鹉变种
+  RABBIT_TYPE: 兔子类型
+  CAT_TYPE: 猫类型
+  MUSHROOM_VARIANT: 蘑菇变种
+  VILLAGER_PROFESSION: 村民职业
+  ZOMBIE_VILLAGER_PROFESSION: 僵尸村民职业
+AgeType:
+  BABY: 婴儿
+  ADULT: 成年
+CreeperCharge:
+  UNCHARGED: 未充能
+  CHARGED: 已充能
+Type:
+  RED: 红色
+  SNOW: 雪色
+  BROWN: 棕色
+  WHITE: 白色
+  BLACK: 黑色
+  BLACK_AND_WHITE: 黑白相间
+  GOLD: 金色
+  SALT_AND_PEPPER: 盐和胡椒
+  THE_KILLER_BUNNY: 杀手兔
+  TABBY: 花斑猫
+  SIAMESE: 暹罗猫
+  BRITISH_SHORTHAIR: 英国短毛猫
+  CALICO: 卡利科猫
+  PERSIAN: 波斯猫
+  RAGDOLL: 布偶猫
+  JELLIE: 果冻猫
+  ALL_BLACK: 全黑
+SlimeSize:
+  VERY_SMALL: 非常小
+  SMALL: 小
+  NORMAL: 正常
+  MEDIUM: 中等
+  BIG: 大
+  VERY_BIG: 非常大
+  LARGE: 大型
+  GIANT: 巨大
+Style:
+  NONE: 无
+  WHITE: 白色
+  WHITEFIELD: 白斑
+  WHITE_DOTS: 白点
+  BLACK_DOTS: 黑点
+Color:
+  WHITE: 白色
+  CREAMY: 奶油色
+  CHESTNUT: 栗色
+  BROWN: 棕色
+  BLACK: 黑色
+  GRAY: 灰色
+  DARK_BROWN: 深棕色
+Variant:
+  RED: 红色
+  BLUE: 蓝色
+  GREEN: 绿色
+  CYAN: 青色
+  GRAY: 灰色
+  BROWN: 棕色
+DyeColor:
+  WHITE: 白色
+  ORANGE: 橙色
+  MAGENTA: 品红色
+  LIGHT_BLUE: 淡蓝色
+  YELLOW: 黄色
+  LIME: 酸橙色
+  PINK: 粉红色
+  GRAY: 灰色
+  LIGHT_GRAY: 浅灰色
+  CYAN: 青色
+  PURPLE: 紫色
+  BLUE: 蓝色
+  BROWN: 棕色
+  GREEN: 绿色
+  RED: 红色
+  BLACK: 黑色
+Profession:
+  NONE: 无
+  ARMORER: 盔甲制作师
+  BUTCHER: 屠夫
+  CARTOGRAPHER: 制图师
+  CLERIC: 牧师
+  FARMER: 农民
+  FISHERMAN: 渔夫
+  FLETCHER: 制箭师
+  LEATHERWORKER: 皮革工匠
+  LIBRARIAN: 图书管理员
+  MASON: 石匠
+  NITWIT: 笨蛋
+  SHEPHERD: 牧羊人
+  TOOLSMITH: 工具制作师
+  WEAPONSMITH: 武器制作师
+Attributes:
+  max_health: 最大生命值
+  knockback_resistance: 击退抗性
+  movement_speed: 移动速度
+  flying_speed: 飞行速度
+  attack_damage: 攻击伤害
+  attack_knockback: 攻击击退
+  attack_speed: 攻击速度
+  armor: 护甲
+  horse_jump_strength: 马跳跃强度
+  max_saturation: 最大饱和度
+  health_regeneration_force: 生命恢复力
+  health_regeneration_speed: 生命恢复速度

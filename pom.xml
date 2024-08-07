@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>su.nightexpress.combatpets</groupId>
+    <artifactId>CombatPets</artifactId>
+    <packaging>pom</packaging>
+    <version>2.0.0</version>
+    <modules>
+        <module>Core</module>
+        <module>API</module>
+        <module>NMS</module>
+        <module>V1_19_R1</module>
+        <module>V1_20</module>
+        <module>MC_1_21</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>placeholderapi</id>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.20.4-R0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.10.10</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>su.nightexpress.nightcore</groupId>
+            <artifactId>nightcore</artifactId>
+            <version>2.6.3</version>
+        </dependency>
+    </dependencies>
+</project>

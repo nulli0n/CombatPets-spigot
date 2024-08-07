@@ -1,0 +1,207 @@
+Placeholders:
+  '%red%': '#fd5e5e'
+  '%green%': '#aefd5e'
+  '%gray%': '#d4d9d8'
+Command:
+  AddExp:
+    Usage: <player> <amount> [tier] [id]
+    Desc: Agrega experiencia a la mascota del jugador.
+    Done: '#d4d9d8Agregado #aefd5e%amount% XP #d4d9d8a la mascota de #aefd5e%player_name%#d4d9d8''s #aefd5e%pet_name%#d4d9d8.'
+  AddPoints:
+    Usage: <player> <amount> / <player> <pet> <amount>
+    Desc: Agrega puntos de aspecto a la mascota del jugador.
+    Done: Se agregaron &a%amount% puntos de aspecto &7a la mascota de &a%jugador%&7's &a%mascota_nombre_datos%&7.
+  Collection:
+    Desc: Lista de mascotas que has reclamado.
+    Usage: '[tier]'
+  Add:
+    Usage: <player> <tier> <id>
+    Desc: Agrega una mascota a la colección del jugador.
+    Done: '#d4d9d8Agregado #aefd5e%pet_tier_name% %pet_config_name%#d4d9d8 a la colección de #aefd5e%player_name%#d4d9d8!'
+    Error:
+      AlreadyHave: '#fd5e5e%player_name%#d4d9d8 ya tiene #fd5e5e%pet_tier_name% %pet_config_name%#d4d9d8!'
+  Remove:
+    Usage: <player> <tier> <id>
+    Desc: Elimina la mascota de la colección del jugador.
+    Done: '#d4d9d8Eliminado #aefd5e%pet_tier_name% %pet_config_name%#d4d9d8 de la colección de #aefd5e%player_name%#d4d9d8!'
+  CatchItem:
+    Usage: <player> <tier> [amount]
+    Desc: Da un objeto de captura de mascotas.
+    Done: '#d4d9d8Dado #aefd5ex%amount% %item%#d4d9d8 a #aefd5e%player_name%#d4d9d8!'
+  Food:
+    Usage: <pet> <amount> [player]
+    Desc: Da un objeto de comida para mascotas.
+    Error:
+      Invalid: '#fd5e5e¡Comida inválida proporcionada!'
+    Done: '#d4d9d8Dado #aefd5ex%amount% %item%#d4d9d8 a #aefd5e%player_name%#d4d9d8!'
+  Egg:
+    Usage: <tier> <id> [player]
+    Desc: Da un huevo de mascota [to a player].
+    Done: '#d4d9d8Dado un huevo de mascota #aefd5e%pet_tier_name% %pet_config_name%#d4d9d8 a #aefd5e%player_name%#d4d9d8.'
+  Rename:
+    Usage: <player> <tier> <id> <name>
+    Desc: Cambia el nombre de la mascota del jugador.
+    Done: '#d4d9d8Renombrada la mascota de #aefd5e%player_name%#d4d9d8 a #aefd5e%pet_name%#d4d9d8.'
+  ResetProgress:
+    Usage: <player> [pet]
+    Desc: Restablece todas las estadísticas/experiencia/nivel de la mascota.
+    Done: Estadísticas restablecidas para &c%jugador%'s %mascota% &7mascota.
+  Menu:
+    Desc: Abre el menú de tu mascota.
+  EggShop:
+    Desc: Abre la tienda de huevos de mascota.
+  Customizations:
+    Desc: Abre la tienda de personalizaciones de mascotas.
+Pet:
+  Despawn:
+    Death:
+      - <! type:"titles:20:60:20" sound:"ENTITY_GENERIC_DEATH" !>
+      - '#fd5e5e&l¡Tu mascota murió!'
+      - '#d4d9d8Revívela en tu colección.'
+    Default: '#d4d9d8Mascota guardada.'
+  Claim:
+    Error:
+      AlreadyHave: '#fd5e5e¡Ya tienes esta mascota!'
+      ReachedLimit: '#fd5e5e¡No puedes reclamar más de #fdba5e%amount% mascotas %pet_tier_name%#fd5e5e!'
+    Success:
+      - <! type:"titles:20:60:20" sound:"ENTITY_PLAYER_LEVELUP" !>
+      - '#aefd5e&l¡Mascota reclamada!'
+      - '#d4d9d8Encuéntrala en la colección: #aefd5e/pet collection'
+  Catch:
+    Process:
+      Progress:
+        - <! type:"titles:0:20:0" !>
+        - '#fdf35e&lCapturando...'
+        - '#aefd5e&lÉxito #d4d9d8→ #aefd5e%success%% #d4d9d8| #fd5e5e%failure%% #d4d9d8← #fd5e5e&lFracaso'
+      Success:
+        - <! type:"titles:0:50:30" sound:"ENTITY_PLAYER_LEVELUP" !>
+        - '#aefd5e&l¡Criatura atrapada!'
+        - '#d4d9d8Has atrapado &f%pet_config_default_name% #d4d9d8(%pettier_color%%pet_tier_name%#d4d9d8)'
+      Escaped:
+        - <! type:"titles:0:50:30" sound:"ENTITY_VILLAGER_NO" !>
+        - '#fdba5e&l¡La criatura escapó!'
+        - '#d4d9d8Parece que no quiere ser tu mascota...'
+      Failure:
+        - <! type:"titles:0:50:30" sound:"ENTITY_VILLAGER_NO" !>
+        - '#fd5e5e&l¡Criatura no atrapada!'
+        - '#d4d9d8No pudiste atraparla. ¡Inténtalo de nuevo!'
+      TooFarAway:
+        - <! type:"titles:0:50:30" sound:"ENTITY_VILLAGER_NO" !>
+        - '#fd5e5e&l¡Criatura no atrapada!'
+        - '#d4d9d8¡Te alejaste demasiado de la criatura!'
+    Error:
+      NotCatchable: '#fd5e5eNo puedes atrapar esta criatura.'
+      NotPermitted: '#fd5e5eNo tienes permiso para atrapar esta criatura.'
+      Conditions: '#fd5e5eEsta criatura no está lista para ser atrapada.'
+  Leveling:
+    LevelUp:
+      - <! type:"titles:20:40:20" sound:"ENTITY_PLAYER_LEVELUP" !>
+      - '#aefd5e&l¡Mascota subió de nivel!'
+      - '#aefd5e%pet_name%#d4d9d8 ahora es nivel #aefd5e%pet_level%#d4d9d8!'
+  Level:
+    Points: '&aTu mascota ha ganado %amount% puntos de estadística!'
+  Rename:
+    Prompt:
+      - <! type:"titles:20:-1:20" sound:"BLOCK_LAVA_POP" !>
+      - '#fdf35e&lRenombrando'
+      - '#d4d9d8Ingresa el nuevo nombre de la mascota.'
+    Error:
+      NoNametag:
+        - <! type:"titles:20:60:20" sound:"ENTITY_VILLAGER_NO" !>
+        - '#fd5e5e&l¡No se pudo renombrar!'
+        - '#d4d9d8Necesitas una #fd5e5eEtiqueta#d4d9d8.'
+      TooLong:
+        - <! type:"titles:20:60:20" sound:"ENTITY_VILLAGER_NO" !>
+        - '#fd5e5e&l¡Nombre demasiado largo!'
+        - '#d4d9d8La longitud máxima del nombre es #fd5e5e%amount%#d4d9d8 caracteres.'
+      TooShort:
+        - <! type:"titles:20:60:20" sound:"ENTITY_VILLAGER_NO" !>
+        - '#fd5e5e&l¡Nombre demasiado corto!'
+        - '#d4d9d8La longitud mínima del nombre es #fd5e5e%amount%#d4d9d8 caracteres.'
+      Forbidden:
+        - <! type:"titles:20:60:20" sound:"ENTITY_VILLAGER_NO" !>
+        - '#fd5e5e&l¡Nombre no aceptable!'
+        - '#d4d9d8El nombre contiene caracteres #fd5e5eprohibidos#d4d9d8.'
+    Success:
+      - <! type:"titles:20:60:20" sound:"BLOCK_NOTE_BLOCK_BELL" !>
+      - '#aefd5e&l¡Mascota renombrada!'
+      - '#d4d9d8Has renombrado tu mascota como #aefd5e%pet_name%'
+  Revive:
+    Error:
+      NotEnoughFunds:
+        - <! type:"titles:20:60:20" sound:"BLOCK_ANVIL_PLACE" !>
+        - '#fd5e5e&l¡Fondos insuficientes!'
+        - '#d4d9d8Necesitas #fd5e5e$%amount%#d4d9d8 para revivir a #fd5e5e%pet_name%#d4d9d8.'
+    Success:
+      - <! type:"titles:20:60:20" sound:"ITEM_TOTEM_USE" !>
+      - '#aefd5e&l¡Mascota revivida!'
+      - '#d4d9d8Has revivido a #aefd5e%pet_name%#d4d9d8 por #aefd5e$%amount%#d4d9d8.'
+  Ride:
+    Error:
+      Disabled: '&c¡Tu mascota no es montable!'
+  Error:
+    InvalidTier: '#fd5e5e¡El nivel no existe!'
+    InvalidConfig: '#fd5e5e¡La mascota no existe!'
+    NoActivePet:
+      - <! type:"titles:20:60:20" sound:"ENTITY_VILLAGER_NO" !>
+      - '#fd5e5e¡Sin mascota activa!'
+      - '#d4d9d8Debes invocar una mascota para hacer eso.'
+    NotYour: <! sound:"ENTITY_VILLAGER_NO" !>#fd5e5e¡No es tu mascota!
+    Spawn:
+      Dead: Tu mascota está muerta. Necesitas revivirla.
+      Already: ¡Ya tienes una mascota activa!
+    BadWorld: '#fd5e5eLas mascotas están desactivadas en este mundo.'
+    NotCollected: '#fd5e5e¡El jugador no tiene esa mascota en su colección!'
+    NotSummoned: '#fd5e5e¡El jugador no tiene una mascota invocada!'
+Shop:
+  Buy:
+    NoMoney: '&c¡No tienes suficiente dinero para comprar este huevo!'
+    Success: '&7Has comprado un huevo de mascota &a%pet_config_name% &7por &a$%egg_price%&7!'
+Customizer:
+  Interact:
+    Pet:
+      Error:
+        NotYour: '&c¡No puedes personalizar mascotas de otros jugadores!'
+        WrongType: '&c¡Esta personalización no se aplica a esta mascota!'
+        AlreadyHas: '&c¡Esta personalización ya está aplicada a esta mascota!'
+  Shop:
+    Purchase:
+      Error:
+        NotEnoughMoney: '&c¡No tienes suficiente dinero para comprarlo!'
+      Success: ¡Has comprado &a%customization_name% %customization_type%&7 por &a$%customization_price%&7!
+PetStatus:
+  DEAD: Muerto
+  ALIVE: Vivo
+PetCombatMode:
+  PASSIVE: Pasivo
+  PROTECTIVE: Protector
+  SUPPORTIVE: De Apoyo
+  PROTECTIVE_AND_SUPPORTIVE: Protector y de Apoyo
+PetCustomizerType:
+  AGE: Edad
+  SHEEP_COLOR: Color de Oveja
+  HORSE_COLOR: Color de Caballo
+  HORSE_STYLE: Estilo de Caballo
+  FOX_TYPE: Tipo de Zorro
+  CREEPER_CHARGE: Carga de Creeper
+  SLIME_SIZE: Tamaño de Slime
+  LLAMA_COLOR: Color de Llama
+  PARROT_VARIANT: Variante de Loro
+  RABBIT_TYPE: Tipo de Conejo
+  CAT_TYPE: Tipo de Gato
+  MUSHROOM_VARIANT: Variante de Hongo
+  VILLAGER_PROFESSION: Profesión de Aldeano
+  ZOMBIE_VILLAGER_PROFESSION: Profesión de Aldeano Zombi
+Attributes:
+  max_health: Salud Máxima
+  knockback_resistance: Resistencia al Empuje
+  movement_speed: Velocidad de Movimiento
+  flying_speed: Velocidad de Vuelo
+  attack_damage: Daño de Ataque
+  attack_knockback: Empuje de Ataque
+  attack_speed: Velocidad de Ataque
+  armor: Armadura
+  horse_jump_strength: Fuerza de Salto de Caballo
+  max_saturation: Saturación Máxima
+  health_regeneration_force: Fuerza de Regeneración de Salud
+  health_regeneration_speed: Velocidad de Regeneración de Salud
