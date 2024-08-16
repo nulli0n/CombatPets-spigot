@@ -12,6 +12,7 @@ import su.nightexpress.combatpets.data.serialize.PetDataSerializer;
 import su.nightexpress.combatpets.util.PetUtils;
 import su.nightexpress.nightcore.database.AbstractUserDataHandler;
 import su.nightexpress.nightcore.database.sql.SQLColumn;
+import su.nightexpress.nightcore.database.sql.SQLCondition;
 import su.nightexpress.nightcore.database.sql.SQLValue;
 import su.nightexpress.nightcore.database.sql.column.ColumnType;
 import su.nightexpress.nightcore.util.Lists;
@@ -72,7 +73,7 @@ public class DataHandler extends AbstractUserDataHandler<PetsPlugin, PetUser> {
             }
         };
 
-        this.load(this.tableUsers, function, Lists.newList(COLUMN_PETS), Lists.newList()).ifPresent(user::load);
+        this.load(this.tableUsers, function, Lists.newList(COLUMN_PETS), Lists.newList(SQLCondition.equal(COLUMN_USER_ID.toValue(user.getId())))).ifPresent(user::load);
 
         this.plugin.info("Pets loaded for " + user.getName());
     }
