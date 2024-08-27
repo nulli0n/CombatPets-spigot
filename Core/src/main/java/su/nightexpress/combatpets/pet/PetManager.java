@@ -31,8 +31,10 @@ import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.config.Perms;
 import su.nightexpress.combatpets.data.impl.PetData;
 import su.nightexpress.combatpets.data.impl.PetUser;
+import su.nightexpress.combatpets.hook.HookId;
 import su.nightexpress.combatpets.pet.impl.*;
 import su.nightexpress.combatpets.pet.listener.CombatListener;
+import su.nightexpress.combatpets.pet.listener.LevelledMobsListener;
 import su.nightexpress.combatpets.pet.listener.PetGenericListener;
 import su.nightexpress.combatpets.pet.listener.PlayerGenericListener;
 import su.nightexpress.combatpets.pet.menu.*;
@@ -84,6 +86,9 @@ public class PetManager extends AbstractManager<PetsPlugin> {
         this.addListener(new PetGenericListener(this.plugin, this));
         this.addListener(new CombatListener(this.plugin, this));
         this.addListener(new PlayerGenericListener(this.plugin, this));
+        if (Plugins.isInstalled(HookId.LEVELLED_MOBS)) {
+            this.addListener(new LevelledMobsListener(this.plugin));
+        }
 
         this.addTask(this.plugin.createTask(this::tickPets).setSecondsInterval(1));
         this.addTask(this.plugin.createTask(this::regeneratePets).setTicksInterval(5L));
@@ -676,7 +681,7 @@ public class PetManager extends AbstractManager<PetsPlugin> {
                 Lang.PET_RENAME_ERROR_NO_NAMETAG.getMessage().send(player);
                 return false;
             }
-            Players.takeItem(player, Material.NAME_TAG);
+            Players.takeItem(player, Material.NAME_TAG, 1);
         }
 
         Lang.PET_RENAME_PROMPT.getMessage().send(player);

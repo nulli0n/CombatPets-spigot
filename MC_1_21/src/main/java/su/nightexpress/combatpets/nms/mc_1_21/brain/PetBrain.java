@@ -1,11 +1,14 @@
 package su.nightexpress.combatpets.nms.mc_1_21.brain;
 
 import com.google.common.collect.ImmutableList;
+import it.unimi.dsi.fastutil.doubles.DoubleDoubleImmutablePair;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -16,6 +19,8 @@ import net.minecraft.world.entity.ai.sensing.Sensor;
 import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.nightcore.util.Reflex;
 
@@ -86,21 +91,23 @@ public class PetBrain {
         return Brain.provider(memoryTypes, getSensorTypes(entity));
     }
 
-    private static final Method ACTUALLY_HURT      = Reflex.getMethod(LivingEntity.class, "actuallyHurt", DamageSource.class, Float.TYPE);
-    private static final Method ACTUALLY_HURT_FIX  = Reflex.getMethod(LivingEntity.class, "damageEntity0", DamageSource.class, Float.TYPE);
-    private static final Field  NO_ACTION_TIME     = Reflex.getField(LivingEntity.class, "bf");
-    private static final Field  LAST_DAMAGE_TIME   = Reflex.getField(LivingEntity.class, "cm");
-    private static final Field  LAST_DAMAGE_SOURCE = Reflex.getField(LivingEntity.class, "cl");
+    private static final Method HANDLE_ENTITY_DAMAGE = Reflex.getMethod(LivingEntity.class, "handleEntityDamage", DamageSource.class, Float.TYPE);
+    private static final Method ACTUALLY_HURT        = Reflex.getMethod(LivingEntity.class, "actuallyHurt", DamageSource.class, Float.TYPE, EntityDamageEvent.class);
+    private static final Method ACTUALLY_HURT_FIX    = Reflex.getMethod(LivingEntity.class, "damageEntity0", DamageSource.class, Float.TYPE, EntityDamageEvent.class);
+    private static final Field  NO_ACTION_TIME       = Reflex.getField(LivingEntity.class, "bf");
+    private static final Field  LAST_DAMAGE_TIME     = Reflex.getField(LivingEntity.class, "cm");
+    private static final Field  LAST_DAMAGE_SOURCE   = Reflex.getField(LivingEntity.class, "cl");
 
+    @SuppressWarnings("deprecation")
     public static boolean hurt(LivingEntity pet, DamageSource damagesource, float damage) {
         Method hurtMethod = ACTUALLY_HURT == null ? ACTUALLY_HURT_FIX : ACTUALLY_HURT;
 
         if (hurtMethod == null) return false;
+        if (HANDLE_ENTITY_DAMAGE == null) return false;
         if (pet.isInvulnerableTo(damagesource)) return false;
         if (pet.level().isClientSide) return false;
-        if (!pet.isAlive()) return false;
+        if (pet.isRemoved() || !pet.isAlive()) return false;
         if (damagesource.is(DamageTypeTags.IS_FIRE) && pet.hasEffect(MobEffects.FIRE_RESISTANCE)) return false;
-
         if (pet.isSleeping() && !pet.level().isClientSide) {
             pet.stopSleeping();
         }
@@ -115,22 +122,28 @@ public class PetBrain {
             }
         }
 
-        float originDamage = damage;
-        boolean blocked = damage > 0.0F && pet.isDamageSourceBlocked(damagesource);
-        //float f2 = 0.0F;
-        if (damagesource.is(DamageTypeTags.IS_FREEZING) && pet.getType().is(EntityTypeTags.FREEZE_HURTS_EXTRA_TYPES)) {
-            damage *= 5.0F;
-        }
+        float f1 = damage;
+        boolean attackBlocked = damage > 0.0F && pet.isDamageSourceBlocked(damagesource);
+        float f2 = 0.0F;
+        EntityDamageEvent event = (EntityDamageEvent) Reflex.invokeMethod(HANDLE_ENTITY_DAMAGE, pet, damagesource, damage);
+        if (event == null) return false;
 
+
+        damage = 0.0F;
+        damage += (float) event.getDamage(EntityDamageEvent.DamageModifier.BASE);
+        damage += (float) event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING);
+        damage += (float) event.getDamage(EntityDamageEvent.DamageModifier.FREEZING);
+        damage += (float) event.getDamage(EntityDamageEvent.DamageModifier.HARD_HAT);
         pet.walkAnimation.setSpeed(1.5F);
         boolean punch = true;
+
         if ((float) pet.invulnerableTime > (float) pet.invulnerableDuration / 2.0F && !damagesource.is(DamageTypeTags.BYPASSES_COOLDOWN)) {
             if (damage <= pet.lastHurt) {
                 return false;
             }
 
-            Object val = Reflex.invokeMethod(hurtMethod, pet, damagesource, damage - pet.lastHurt);
-            if (val != null && !(boolean) val) {
+            Object hurtResult = Reflex.invokeMethod(hurtMethod, pet, damagesource, (float) event.getFinalDamage() - pet.lastHurt, event);
+            if (hurtResult != null && !(boolean) hurtResult) {
                 return false;
             }
 
@@ -138,10 +151,11 @@ public class PetBrain {
             punch = false;
         }
         else {
-            Object val = Reflex.invokeMethod(hurtMethod, pet, damagesource, damage);
-            if (val != null && !(boolean) val) {
+            Object hurtResult = Reflex.invokeMethod(hurtMethod, pet, damagesource, (float) event.getFinalDamage() - pet.lastHurt, event);
+            if (hurtResult != null && !(boolean) hurtResult) {
                 return false;
             }
+
             pet.lastHurt = damage;
             pet.invulnerableTime = pet.invulnerableDuration;
             pet.hurtDuration = 10;
@@ -150,9 +164,9 @@ public class PetBrain {
 
         Entity damager = damagesource.getEntity();
         if (damager != null) {
-            if (damager instanceof LivingEntity entityliving1) {
-                if (!damagesource.is(DamageTypeTags.NO_ANGER)) {
-                    pet.setLastHurtByMob(entityliving1);
+            if (damager instanceof LivingEntity livingEntity) {
+                if (!damagesource.is(DamageTypeTags.NO_ANGER) && (!damagesource.is(DamageTypes.WIND_CHARGE) || !pet.getType().is(EntityTypeTags.NO_ANGER_FROM_WIND_CHARGE))) {
+                    pet.setLastHurtByMob(livingEntity);
                 }
             }
 
@@ -162,12 +176,12 @@ public class PetBrain {
                 pet.setLastHurtByPlayer(player);
                 pet.tickCount = ticksHas;
             }
-            else if (damager instanceof Wolf entitywolf) {
-                if (entitywolf.isTame()) {
-                    LivingEntity entityliving = entitywolf.getOwner();
-                    if (entityliving instanceof Player player) {
+            else if (damager instanceof Wolf wolf) {
+                if (wolf.isTame()) {
+                    LivingEntity wolfOwner = wolf.getOwner();
+                    if (wolfOwner instanceof Player playerOwner) {
                         pet.tickCount = 100;
-                        pet.setLastHurtByPlayer(player);
+                        pet.setLastHurtByPlayer(playerOwner);
                         pet.tickCount = ticksHas;
                     }
                     else pet.lastHurtByPlayer = null;
@@ -176,28 +190,35 @@ public class PetBrain {
         }
 
         if (punch) {
-            if (blocked) {
+            if (attackBlocked) {
                 pet.level().broadcastEntityEvent(pet, (byte) 29);
             }
             else {
                 pet.level().broadcastDamageEvent(pet, damagesource);
             }
 
-            if (!damagesource.is(DamageTypeTags.NO_IMPACT) && (!blocked || damage > 0.0F)) {
+            if (!damagesource.is(DamageTypeTags.NO_IMPACT) && !attackBlocked) {
                 pet.hurtMarked = true;
             }
 
-            if (damager != null && !damagesource.is(DamageTypeTags.IS_EXPLOSION)) {
-                double d0 = damager.getX() - pet.getX();
-
-                double d1;
-                for (d1 = damager.getZ() - pet.getZ(); d0 * d0 + d1 * d1 < 1.0E-4D; d1 = (Math.random() - Math.random()) * 0.01D) {
-                    d0 = (Math.random() - Math.random()) * 0.01D;
+            if (!damagesource.is(DamageTypeTags.NO_KNOCKBACK)) {
+                double x = 0.0;
+                double z = 0.0;
+                Entity directDamager = damagesource.getDirectEntity();
+                if (directDamager instanceof Projectile projectile) {
+                    DoubleDoubleImmutablePair doubledoubleimmutablepair = projectile.calculateHorizontalHurtKnockbackDirection(pet, damagesource);
+                    x = -doubledoubleimmutablepair.leftDouble();
+                    z = -doubledoubleimmutablepair.rightDouble();
+                }
+                else if (damagesource.getSourcePosition() != null) {
+                    x = damagesource.getSourcePosition().x() - pet.getX();
+                    z = damagesource.getSourcePosition().z() - pet.getZ();
                 }
 
-                pet.knockback(0.4000000059604645D, d0, d1);
-                if (!blocked) {
-                    pet.indicateDamage(d0, d1);
+                //pet.knockback(0.4, x, z, damager, damager == null ? EntityKnockbackEvent.KnockbackCause.DAMAGE : EntityKnockbackEvent.KnockbackCause.ENTITY_ATTACK);
+                pet.knockback(0.4, x, z);
+                if (!attackBlocked) {
+                    pet.indicateDamage(x, z);
                 }
             }
         }
@@ -205,9 +226,12 @@ public class PetBrain {
         if (pet.isDeadOrDying()) {
             pet.die(damagesource);
         }
+//        else if (punch) {
+//            pet.playHurtSound(damagesource);
+//        }
 
-        boolean damaged = !blocked || damage > 0.0F;
-        if (damaged) {
+        boolean hurtResult = !attackBlocked;
+        if (hurtResult) {
             if (LAST_DAMAGE_TIME != null && LAST_DAMAGE_SOURCE != null) {
                 try {
                     LAST_DAMAGE_SOURCE.trySetAccessible();
@@ -216,16 +240,20 @@ public class PetBrain {
                     LAST_DAMAGE_TIME.trySetAccessible();
                     LAST_DAMAGE_TIME.set(pet, pet.level().getGameTime());
                 }
-                catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                catch (IllegalAccessException exception) {
+                    exception.printStackTrace();
                 }
+            }
+
+            for (MobEffectInstance mobeffect : pet.getActiveEffects()) {
+                mobeffect.onMobHurt(pet, damagesource, damage);
             }
         }
 
         if (damager instanceof ServerPlayer) {
-            CriteriaTriggers.PLAYER_HURT_ENTITY.trigger((ServerPlayer) damager, pet, damagesource, originDamage, damage, blocked);
+            CriteriaTriggers.PLAYER_HURT_ENTITY.trigger((ServerPlayer) damager, pet, damagesource, f1, damage, attackBlocked);
         }
 
-        return damaged;
+        return hurtResult;
     }
 }

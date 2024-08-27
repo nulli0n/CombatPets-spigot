@@ -17,6 +17,7 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.Unit;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -127,11 +128,14 @@ public class BreezePet extends Breeze implements PetEntity {
     @Override
     protected void customServerAiStep() {
         //super.customServerAiStep();
-        this.level().getProfiler().push("breezeBrain");
+        ProfilerFiller profiler = this.level().getProfiler();
+        if (profiler != null) profiler.push("breezeBrain");
+
         this.getBrain().tick((ServerLevel) this.level(), this);
-        this.level().getProfiler().popPush("breezeActivityUpdate");
+        if (profiler != null) profiler.popPush("breezeActivityUpdate");
+
         this.updateActivity();
-        this.level().getProfiler().pop();
+        if (profiler != null) profiler.pop();
     }
 
     protected void updateActivity() {
