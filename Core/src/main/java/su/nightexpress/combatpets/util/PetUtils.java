@@ -51,12 +51,17 @@ public class PetUtils {
     }
 
     @NotNull
-    public static ItemStack getRawEggItem(@NotNull Template petConfig) {
+    public static ItemStack getRawEggItem(@NotNull Template template) {
         ItemStack item = new ItemStack(Config.PET_EGG_ITEM.get());
-        if (!petConfig.getEggTexture().isEmpty()) {
-            ItemUtil.setHeadSkin(item, petConfig.getEggTexture());
+        if (!template.getEggTexture().isEmpty()) {
+            ItemUtil.setHeadSkin(item, template.getEggTexture());
         }
         return item;
+    }
+
+    @NotNull
+    public static ItemStack getRawMysteryEgg(@NotNull Template template) {
+        return new ItemStack(Config.ITEM_MYSTERY_EGG.get());
     }
 
     @SuppressWarnings("UnstableApiUsage")
@@ -120,7 +125,7 @@ public class PetUtils {
     }
 
     public static void populateDefaultEquipment(@NotNull PetData petData) {
-        EntityType type = petData.getConfig().getEntityType();
+        EntityType type = petData.getTemplate().getEntityType();
 
         if (type == EntityType.SKELETON || type == EntityType.STRAY || (Version.isAtLeast(Version.MC_1_21) && type.name().equalsIgnoreCase("bogged"))) {
             petData.setEquipment(EquipmentSlot.HAND, new ItemStack(Material.BOW));

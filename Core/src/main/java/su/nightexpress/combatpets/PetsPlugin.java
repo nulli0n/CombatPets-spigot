@@ -10,6 +10,7 @@ import su.nightexpress.combatpets.config.Keys;
 import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.config.Perms;
 import su.nightexpress.combatpets.currency.CurrencyManager;
+import su.nightexpress.combatpets.item.ItemManager;
 import su.nightexpress.combatpets.level.LevelingManager;
 import su.nightexpress.combatpets.wardrobe.WardrobeManager;
 import su.nightexpress.combatpets.data.DataHandler;
@@ -34,6 +35,7 @@ public class PetsPlugin extends NightDataPlugin<PetUser> implements ImprovedComm
     private UserManager userManager;
 
     private CurrencyManager currencyManager;
+    private ItemManager itemManager;
     private PetManager      petManager;
     private LevelingManager levelingManager;
     private CaptureManager  captureManager;
@@ -73,6 +75,9 @@ public class PetsPlugin extends NightDataPlugin<PetUser> implements ImprovedComm
 
         this.currencyManager = new CurrencyManager(this);
         this.currencyManager.setup();
+
+        this.itemManager = new ItemManager(this);
+        this.itemManager.setup();
 
         this.petManager = new PetManager(this);
         this.petManager.setup();
@@ -129,6 +134,7 @@ public class PetsPlugin extends NightDataPlugin<PetUser> implements ImprovedComm
         if (this.petManager != null) this.petManager.shutdown();
         if (this.wardrobeManager != null) this.wardrobeManager.shutdown();
         if (this.currencyManager != null) this.currencyManager.shutdown();
+        if (this.itemManager != null) this.itemManager.shutdown();
 
         PetAPI.shutdown();
     }
@@ -167,6 +173,11 @@ public class PetsPlugin extends NightDataPlugin<PetUser> implements ImprovedComm
     @NotNull
     public CurrencyManager getCurrencyManager() {
         return currencyManager;
+    }
+
+    @NotNull
+    public ItemManager getItemManager() {
+        return itemManager;
     }
 
     @NotNull

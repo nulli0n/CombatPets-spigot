@@ -94,7 +94,7 @@ public class AspectPointsCommands {
                 .localized(Lang.COMMAND_ARGUMENT_NAME_AMOUNT)
                 .withSamples(context -> Lists.newList("1", "10", "100"))
             )
-            .withArgument(ArgumentTypes.playerName(CommandArguments.PLAYER))
+            .withArgument(ArgumentTypes.player(CommandArguments.PLAYER))
             .executes((context, arguments) -> rewardPoints(plugin, context, arguments, mode));
     }
 

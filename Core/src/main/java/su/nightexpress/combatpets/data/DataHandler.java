@@ -41,8 +41,6 @@ public class DataHandler extends AbstractUserDataHandler<PetsPlugin, PetUser> {
                 long dateCreated = resultSet.getLong(COLUMN_USER_DATE_CREATED.getName());
                 long lastOnline = resultSet.getLong(COLUMN_USER_LAST_ONLINE.getName());
 
-                //Map<String, PetData> pets = this.gson.fromJson(resultSet.getString(COLUMN_PETS.getName()), new TypeToken<Map<String, PetData>>(){}.getType());
-
                 PetUser user = new PetUser(plugin, uuid, name, dateCreated, lastOnline, new HashMap<>());
 
                 this.plugin.info("Start loading pets for " + user.getName());
@@ -79,22 +77,23 @@ public class DataHandler extends AbstractUserDataHandler<PetsPlugin, PetUser> {
     }
 
     private void synchronizePets(@NotNull PetUser user) {
-        PetUser freshUser = this.getUser(user.getId());
-        if (freshUser == null) return;
+        if (plugin.getUserManager().isScheduledToSave(user)) return;
 
-        if (!freshUser.isSyncReady()) return;
+        PetUser fresh = this.getUser(user.getId());
+        if (fresh == null) return;
+        if (!user.isSyncReady()) return;
 
         String activeId = null;
         Player player = user.getPlayer();
         if (player != null) {
-            ActivePet holder = this.plugin.getPetManager().getPlayerPet(player);
-            if (holder != null) activeId = holder.getTemplate().getId();
+            ActivePet pet = this.plugin.getPetManager().getPlayerPet(player);
+            if (pet != null) activeId = pet.getTemplate().getId();
         }
 
-        for (PetData petData : freshUser.getPets().values()) {
-            if (petData.getConfig().getId().equalsIgnoreCase(activeId)) continue;
+        for (PetData petData : fresh.getPets().values()) {
+            if (petData.getTemplate().getId().equalsIgnoreCase(activeId)) continue;
 
-            user.getPets().put(PetUtils.getPetKey(petData.getTier(), petData.getConfig()), petData);
+            user.getPets().put(PetUtils.getPetKey(petData.getTier(), petData.getTemplate()), petData);
         }
     }
 

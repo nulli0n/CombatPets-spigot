@@ -39,7 +39,10 @@ public class Lang extends CoreLang {
     public static final LangString COMMAND_CAPTURE_ITEM_DESC          = LangString.of("Command.CatchItem.Desc", "Give capture item.");
     public static final LangString COMMAND_FOOD_DESC                  = LangString.of("Command.Food.Desc", "Give food item.");
     public static final LangString COMMAND_EGG_DESC                   = LangString.of("Command.Egg.Desc", "Give pet egg.");
+    public static final LangString COMMAND_MYSTERY_EGG_DESC           = LangString.of("Command.MysteryEgg.Desc", "Give mystery egg.");
     public static final LangString COMMAND_RENAME_DESC                = LangString.of("Command.Rename.Desc", "Rename player's pet.");
+    public static final LangString COMMAND_REVIVE_DESC                = LangString.of("Command.Revive.Desc", "Revive player's pet.");
+    public static final LangString COMMAND_CLEAR_INVENTORY_DESC       = LangString.of("Command.ClearInventory.Desc", "Clear player's pet inventory.");
     public static final LangString COMMAND_MENU_DESC                  = LangString.of("Command.Menu.Desc", "Open pet menu.");
     public static final LangString COMMAND_SHOP_DESC                  = LangString.of("Command.Shop.Desc", "Open shop.");
     public static final LangString COMMAND_ACCESSORY_DESC             = LangString.of("Command.Accessory.Desc", "Give accessory item.");
@@ -131,9 +134,29 @@ public class Lang extends CoreLang {
         LIGHT_GRAY.enclose("Given " + LIGHT_YELLOW.enclose(TIER_NAME + " " + TEMPLATE_NAME) + " pet egg to " + LIGHT_YELLOW.enclose(PLAYER_NAME) + ".")
     );
 
+    public static final LangText COMMAND_MYSTERY_EGG_DONE = LangText.of("Command.MysteryEgg.Done",
+        LIGHT_GRAY.enclose("Given " + LIGHT_YELLOW.enclose(TEMPLATE_NAME) + " mystery egg to " + LIGHT_YELLOW.enclose(PLAYER_NAME) + ".")
+    );
+
 
     public static final LangText COMMAND_RENAME_DONE = LangText.of("Command.Rename.Done",
         LIGHT_GRAY.enclose("Renamed " + LIGHT_YELLOW.enclose(PLAYER_NAME) + "'s pet to " + LIGHT_YELLOW.enclose(PET_NAME) + ".")
+    );
+
+
+
+    public static final LangText COMMAND_REVIVE_ERROR_ALIVE = LangText.of("Command.Revive.Error.Alive",
+        LIGHT_GRAY.enclose(LIGHT_YELLOW.enclose(PLAYER_NAME) + "'s " + LIGHT_YELLOW.enclose(PET_NAME) + " pet is not dead!")
+    );
+
+    public static final LangText COMMAND_REVIVE_DONE = LangText.of("Command.Revive.Done",
+        LIGHT_GRAY.enclose("Revived " + LIGHT_YELLOW.enclose(PLAYER_NAME) + "'s " + LIGHT_YELLOW.enclose(PET_NAME) + " pet.")
+    );
+
+
+
+    public static final LangText COMMAND_CLEAR_INVENTORY_DONE = LangText.of("Command.ClearInventory.Done",
+        LIGHT_GRAY.enclose("Cleared " + LIGHT_YELLOW.enclose(PLAYER_NAME) + "'s " + LIGHT_YELLOW.enclose(PET_NAME) + " pet inventory.")
     );
 
 
@@ -169,6 +192,11 @@ public class Lang extends CoreLang {
         OUTPUT.enclose(20, 60) + SOUND.enclose(Sound.ENTITY_PLAYER_LEVELUP),
         LIGHT_GREEN.enclose(BOLD.enclose("Pet Claimed!")),
         LIGHT_GRAY.enclose("Check out your collection: " + LIGHT_GREEN.enclose("/pet collection"))
+    );
+
+    public static final LangText PET_MYSTERY_EGG_HATCH = LangText.of("Pet.MysteryEgg.Hatch",
+        SOUND.enclose(Sound.ENTITY_EVOKER_PREPARE_ATTACK),
+        LIGHT_GRAY.enclose("You hatched " + LIGHT_PURPLE.enclose("Mystery Egg") + " into " + LIGHT_PURPLE.enclose(TIER_NAME + " " + TEMPLATE_DEFAULT_NAME) + " !")
     );
 
 

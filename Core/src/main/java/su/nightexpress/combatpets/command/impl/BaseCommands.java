@@ -71,6 +71,14 @@ public class BaseCommands {
             .executes((context, arguments) -> addEgg(plugin, context, arguments))
         );
 
+        rootNode.addChildren(DirectNode.builder(plugin, "mysteryegg")
+            .description(Lang.COMMAND_MYSTERY_EGG_DESC)
+            .permission(Perms.COMMAND_MYSTERY_EGG)
+            .withArgument(CommandArguments.templateArgument(plugin).required())
+            .withArgument(ArgumentTypes.player(CommandArguments.PLAYER))
+            .executes((context, arguments) -> addMysteryEgg(plugin, context, arguments))
+        );
+
         rootNode.addChildren(DirectNode.builder(plugin, "food")
             .description(Lang.COMMAND_FOOD_DESC)
             .permission(Perms.COMMAND_FOOD)
@@ -115,6 +123,24 @@ public class BaseCommands {
             .withArgument(CommandArguments.templateArgument(plugin).required())
             .withArgument(ArgumentTypes.string(CommandArguments.NAME).required().complex().localized(Lang.COMMAND_ARGUMENT_NAME_NAME))
             .executes((context, arguments) -> renamePet(plugin, context, arguments))
+        );
+
+        rootNode.addChildren(DirectNode.builder(plugin, "revive")
+            .description(Lang.COMMAND_REVIVE_DESC)
+            .permission(Perms.COMMAND_REVIVE)
+            .withArgument(ArgumentTypes.playerName(CommandArguments.PLAYER).required())
+            .withArgument(CommandArguments.tierArgument(plugin).required())
+            .withArgument(CommandArguments.templateArgument(plugin).required())
+            .executes((context, arguments) -> revivePet(plugin, context, arguments))
+        );
+
+        rootNode.addChildren(DirectNode.builder(plugin, "clearinventory")
+            .description(Lang.COMMAND_CLEAR_INVENTORY_DESC)
+            .permission(Perms.COMMAND_CLEAR_INVENTORY)
+            .withArgument(ArgumentTypes.playerName(CommandArguments.PLAYER).required())
+            .withArgument(CommandArguments.tierArgument(plugin).required())
+            .withArgument(CommandArguments.templateArgument(plugin).required())
+            .executes((context, arguments) -> clearInventory(plugin, context, arguments))
         );
     }
 
@@ -202,6 +228,24 @@ public class BaseCommands {
         Lang.COMMAND_EGG_DONE.getMessage()
             .replace(Placeholders.PLAYER_NAME, player.getName())
             .replace(tier.replacePlaceholders())
+            .replace(template.replacePlaceholders())
+            .send(context.getSender());
+        return true;
+    }
+
+    public static boolean addMysteryEgg(@NotNull PetsPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+        Player player = CommandUtil.getPlayerOrSender(context, arguments, CommandArguments.PLAYER);
+        if (player == null) {
+            context.errorBadPlayer();
+            return false;
+        }
+
+        Template template = arguments.getArgument(CommandArguments.PET, Template.class);
+        ItemStack itemStack = plugin.getItemManager().createMysteryEgg(template);
+        Players.addItem(player, itemStack);
+
+        Lang.COMMAND_MYSTERY_EGG_DONE.getMessage()
+            .replace(Placeholders.PLAYER_NAME, player.getName())
             .replace(template.replacePlaceholders())
             .send(context.getSender());
         return true;
@@ -296,6 +340,80 @@ public class BaseCommands {
                 .send(context.getSender());
         });
 
+        return true;
+    }
+
+    public static boolean revivePet(@NotNull PetsPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+        String name = arguments.getStringArgument(CommandArguments.PLAYER, context.getSender().getName());
+
+        plugin.getUserManager().manageUser(name, user -> {
+            if (user == null) {
+                context.errorBadPlayer();
+                return;
+            }
+            if (!user.isLoaded()) return;
+
+            Tier tier = arguments.getArgument(CommandArguments.TIER, Tier.class);
+            Template template = arguments.getArgument(CommandArguments.PET, Template.class);
+
+            PetData petData = user.getPet(template, tier);
+            if (petData == null) {
+                Lang.PET_USER_ERROR_NOT_COLLECTED.getMessage().send(context.getSender());
+                return;
+            }
+
+            if (petData.isAlive()) {
+                Lang.COMMAND_REVIVE_ERROR_ALIVE.getMessage()
+                    .replace(Placeholders.PLAYER_NAME, user.getName())
+                    .replace(Placeholders.PET_NAME, petData.getName())
+                    .send(context.getSender());
+                return;
+            }
+
+            petData.revive();
+
+            plugin.getUserManager().scheduleSave(user);
+
+            Lang.COMMAND_REVIVE_DONE.getMessage()
+                .replace(Placeholders.PLAYER_NAME, user.getName())
+                .replace(Placeholders.PET_NAME, petData.getName())
+                .replace(tier.replacePlaceholders())
+                .replace(template.replacePlaceholders())
+                .send(context.getSender());
+        });
+        return true;
+    }
+
+    public static boolean clearInventory(@NotNull PetsPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+        String name = arguments.getStringArgument(CommandArguments.PLAYER, context.getSender().getName());
+
+        plugin.getUserManager().manageUser(name, user -> {
+            if (user == null) {
+                context.errorBadPlayer();
+                return;
+            }
+            if (!user.isLoaded()) return;
+
+            Tier tier = arguments.getArgument(CommandArguments.TIER, Tier.class);
+            Template template = arguments.getArgument(CommandArguments.PET, Template.class);
+
+            PetData petData = user.getPet(template, tier);
+            if (petData == null) {
+                Lang.PET_USER_ERROR_NOT_COLLECTED.getMessage().send(context.getSender());
+                return;
+            }
+
+            petData.getInventory().clear();
+
+            plugin.getUserManager().scheduleSave(user);
+
+            Lang.COMMAND_CLEAR_INVENTORY_DONE.getMessage()
+                .replace(Placeholders.PLAYER_NAME, user.getName())
+                .replace(Placeholders.PET_NAME, petData.getName())
+                .replace(tier.replacePlaceholders())
+                .replace(template.replacePlaceholders())
+                .send(context.getSender());
+        });
         return true;
     }
 }

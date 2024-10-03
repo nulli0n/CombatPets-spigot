@@ -42,7 +42,7 @@ public class ZombifiedPiglinPet extends ZombifiedPiglin implements PetEntity {
 
     @Override
     protected void customServerAiStep() {
-        Reflex.setFieldValue(this, "ce", Integer.MAX_VALUE);
+        Reflex.setFieldValue(this, "cn", Integer.MAX_VALUE);
         super.customServerAiStep();
     }
 

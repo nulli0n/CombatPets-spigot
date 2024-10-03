@@ -11,7 +11,6 @@ import su.nightexpress.combatpets.api.pet.FoodItem;
 import su.nightexpress.combatpets.api.pet.Template;
 import su.nightexpress.combatpets.api.pet.Tier;
 import su.nightexpress.combatpets.api.pet.type.ExhaustReason;
-import su.nightexpress.combatpets.config.Keys;
 import su.nightexpress.combatpets.config.Perms;
 import su.nightexpress.combatpets.pet.AttributeRegistry;
 import su.nightexpress.combatpets.util.PetUtils;
@@ -19,9 +18,6 @@ import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.language.LangAssets;
 import su.nightexpress.nightcore.manager.AbstractFileData;
-import su.nightexpress.nightcore.util.ItemReplacer;
-import su.nightexpress.nightcore.util.ItemUtil;
-import su.nightexpress.nightcore.util.PDCUtil;
 import su.nightexpress.nightcore.util.placeholder.PlaceholderMap;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
@@ -40,7 +36,6 @@ public class PetTemplate extends AbstractFileData<PetsPlugin> implements Templat
     private String      eggTexture;
     private boolean     canHaveInventory;
     private boolean     canHaveEquipment;
-    private boolean     isRideable;
     private boolean     capturable;
     private double      captureEscapeChance;
     private double      captureChance;
@@ -228,18 +223,19 @@ public class PetTemplate extends AbstractFileData<PetsPlugin> implements Templat
     @Override
     @NotNull
     public ItemStack createEgg(@NotNull Tier tier) {
-        ItemStack item = PetUtils.getRawEggItem(this);
-        ItemUtil.editMeta(item, meta -> {
-            PDCUtil.set(meta, Keys.eggPetId, this.getId());
-            PDCUtil.set(meta, Keys.eggTierId, tier.getId());
-        });
-
-        ItemReplacer.create(item).readMeta()
-            .replace(this.getPlaceholders())
-            .replace(tier.getPlaceholders())
-            .writeMeta();
-
-        return item;
+        return this.plugin.getItemManager().createEgg(this, tier);
+//        ItemStack item = PetUtils.getRawEggItem(this);
+//        ItemUtil.editMeta(item, meta -> {
+//            PDCUtil.set(meta, Keys.eggPetId, this.getId());
+//            PDCUtil.set(meta, Keys.eggTierId, tier.getId());
+//        });
+//
+//        ItemReplacer.create(item).readMeta()
+//            .replace(this.getPlaceholders())
+//            .replace(tier.getPlaceholders())
+//            .writeMeta();
+//
+//        return item;
     }
 
     @Override

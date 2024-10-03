@@ -2,7 +2,7 @@ main: su.nightexpress.combatpets.PetsPlugin
 name: CombatPets
 version: '${project.version}'
 author: NightExpress
-description: Great pets with many cool features for your server!
+description: Customizable pets with many cool features!
 depend: [ nightcore ]
 softdepend: [ MythicMobs, PlaceholderAPI, Vault ]
 api-version: 1.19

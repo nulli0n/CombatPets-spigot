@@ -21,7 +21,7 @@ public class WardrobeConfig {
     );
 
     public static final ConfigValue<ItemStack> WARDROBE_ACCESSORY_ITEM = ConfigValue.create("Customizer.Item",
-        PetCreator.getAccessoryItem(),
+        PetCreator.getDefaultAccessory(),
         "Item used to give and apply pet customizations."
     );
 

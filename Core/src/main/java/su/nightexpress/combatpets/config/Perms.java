@@ -21,12 +21,15 @@ public class Perms {
     public static final UniPermission COMMAND_REMOVE_ALL            = new UniPermission(PREFIX_COMMAND + "removeall");
     public static final UniPermission COMMAND_FOOD                  = new UniPermission(PREFIX_COMMAND + "food");
     public static final UniPermission COMMAND_EGG                   = new UniPermission(PREFIX_COMMAND + "egg");
+    public static final UniPermission COMMAND_MYSTERY_EGG           = new UniPermission(PREFIX_COMMAND + "mysteryegg");
     public static final UniPermission COMMAND_SHOP                  = new UniPermission(PREFIX_COMMAND + "shop");
     public static final UniPermission COMMAND_CAPTURE_ITEM          = new UniPermission(PREFIX_COMMAND + "captureitem");
     public static final UniPermission COMMAND_COLLECTION            = new UniPermission(PREFIX_COMMAND + "collection");
     public static final UniPermission COMMAND_ACCESSORY             = new UniPermission(PREFIX_COMMAND + "accessory");
     public static final UniPermission COMMAND_MENU                  = new UniPermission(PREFIX_COMMAND + "menu");
     public static final UniPermission COMMAND_RENAME                = new UniPermission(PREFIX_COMMAND + "rename");
+    public static final UniPermission COMMAND_REVIVE                = new UniPermission(PREFIX_COMMAND + "revive");
+    public static final UniPermission COMMAND_CLEAR_INVENTORY       = new UniPermission(PREFIX_COMMAND + "clearinventory");
     public static final UniPermission COMMAND_RELOAD                = new UniPermission(PREFIX_COMMAND + "reload");
     public static final UniPermission COMMAND_RESET_PROGRESS        = new UniPermission(PREFIX_COMMAND + "resetprogress");
     public static final UniPermission COMMAND_XP                    = new UniPermission(PREFIX_COMMAND + "xp");
@@ -55,12 +58,16 @@ public class Perms {
             COMMAND_REMOVE,
             COMMAND_REMOVE_ALL,
             COMMAND_FOOD,
-            COMMAND_EGG, COMMAND_SHOP,
+            COMMAND_EGG,
+            COMMAND_MYSTERY_EGG,
+            COMMAND_SHOP,
             COMMAND_CAPTURE_ITEM,
             COMMAND_COLLECTION,
             COMMAND_ACCESSORY,
             COMMAND_MENU,
             COMMAND_RENAME,
+            COMMAND_REVIVE,
+            COMMAND_CLEAR_INVENTORY,
             COMMAND_RELOAD,
             COMMAND_RESET_PROGRESS,
             COMMAND_XP,

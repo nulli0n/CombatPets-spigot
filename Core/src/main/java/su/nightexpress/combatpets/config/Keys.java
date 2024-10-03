@@ -6,6 +6,8 @@ import su.nightexpress.combatpets.PetsPlugin;
 
 public class Keys {
 
+    public static NamespacedKey itemType;
+
     public static NamespacedKey eggPetId;
     public static NamespacedKey eggTierId;
 
@@ -22,6 +24,8 @@ public class Keys {
     public static NamespacedKey levelingNoXP;
 
     public static void load(@NotNull PetsPlugin plugin) {
+        itemType = new NamespacedKey(plugin, "item.type");
+
         eggPetId = new NamespacedKey(plugin, "item.config_id");
         eggTierId = new NamespacedKey(plugin, "item.tier_id");
 

@@ -57,8 +57,6 @@ public class PetCreator {
     private static final String FOOD_WITHER_ROSES  = "wither_roses";
 
     public static void createTiers(@NotNull PetsPlugin plugin) {
-        PetNMS nms = plugin.getPetNMS();
-
         createTier(plugin, "common", tier -> {
             tier.setName(WHITE.enclose("Common"));
             tier.setIcon(ItemUtil.getSkinHead("6cedec04d2380cd77027f9d44455c98b7edc5f664ca0dd30a6106903915391db"));
@@ -304,7 +302,7 @@ public class PetCreator {
     }
 
     @NotNull
-    public static ItemStack getEggItem() {
+    public static ItemStack getDefaultEgg() {
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
 
         ItemUtil.editMeta(itemStack, meta -> {
@@ -312,7 +310,7 @@ public class PetCreator {
             meta.setLore(Lists.newList(
                 DARK_GRAY.enclose("Tier: " + GRAY.enclose(TIER_NAME)),
                 "",
-                LIGHT_GRAY.enclose(LIGHT_YELLOW.enclose("[▶]") + " " + "Right-Click to " + LIGHT_YELLOW.enclose("claim") + ".")
+                LIGHT_GRAY.enclose(LIGHT_YELLOW.enclose("[▶]") + " Right-Click to " + LIGHT_YELLOW.enclose("claim") + ".")
             ));
         });
 
@@ -320,7 +318,23 @@ public class PetCreator {
     }
 
     @NotNull
-    public static ItemStack getAccessoryItem() {
+    public static ItemStack getDefaultMysteryEgg() {
+        ItemStack itemStack = ItemUtil.getSkinHead("e6ba9987f738e6d75d3b02c30d1480a360593ddb464bd1c81abb9d71d9e656c0");
+
+        ItemUtil.editMeta(itemStack, meta -> {
+            meta.setDisplayName(LIGHT_PURPLE.enclose(BOLD.enclose("Mystery Pet Egg")) + " " + GRAY.enclose("(" + WHITE.enclose(TEMPLATE_DEFAULT_NAME) + ")"));
+            meta.setLore(Lists.newList(
+                DARK_GRAY.enclose("Hatches into egg with random tier."),
+                "",
+                LIGHT_GRAY.enclose(LIGHT_PURPLE.enclose("[▶]") + " Right-Click to " + LIGHT_PURPLE.enclose("hatch") + ".")
+            ));
+        });
+
+        return itemStack;
+    }
+
+    @NotNull
+    public static ItemStack getDefaultAccessory() {
         ItemStack itemStack = new ItemStack(Material.FLOWER_BANNER_PATTERN);
 
         ItemUtil.editMeta(itemStack, meta -> {
@@ -451,11 +465,6 @@ public class PetCreator {
         if (!(entity instanceof LivingEntity livingEntity)) return;
 
         double maxHealth = Math.max(10D, EntityUtil.getAttribute(livingEntity, Attribute.GENERIC_MAX_HEALTH));
-//        double atkDamage = Math.max(2D, EntityUtil.getAttribute(livingEntity, Attribute.GENERIC_ATTACK_DAMAGE));
-//        double armor = Math.max(0.5, EntityUtil.getAttribute(livingEntity, Attribute.GENERIC_ARMOR));
-//        double movSpeed = Math.max(0.1, EntityUtil.getAttribute(livingEntity, Attribute.GENERIC_MOVEMENT_SPEED));
-//        double flySpeed = EntityUtil.getAttribute(livingEntity, Attribute.GENERIC_FLYING_SPEED);
-//        double atkSpeed = 0.5D;
 
         for (Stat petAttribute : AttributeRegistry.values()) {
             String name = petAttribute.getId();
@@ -516,27 +525,5 @@ public class PetCreator {
 
             petTemplate.getAttributesPerAspect().put(name, perAspectValue);
         }
-
-//        petTemplate.getAttributesStart().put(AttributeRegistry.MAX_HEALTH, maxHealth);
-//        petTemplate.getAttributesStart().put(AttributeRegistry.ATTACK_DAMAGE, atkDamage);
-//        petTemplate.getAttributesStart().put(AttributeRegistry.ARMOR, armor);
-//        petTemplate.getAttributesStart().put(AttributeRegistry.MOVEMENT_SPEED, movSpeed);
-//        petTemplate.getAttributesStart().put(AttributeRegistry.FLYING_SPEED, flySpeed);
-//        petTemplate.getAttributesStart().put(AttributeRegistry.ATTACK_SPEED, atkSpeed);
-//        petTemplate.getAttributesStart().put(AttributeRegistry.HEALTH_REGENEATION_FORCE, 0.5);
-//        petTemplate.getAttributesStart().put(AttributeRegistry.HEALTH_REGENEATION_SPEED, 1.0);
-//        petTemplate.getAttributesPerAspect().put(AttributeRegistry.MAX_HEALTH, maxHealth * 0.05);
-//        petTemplate.getAttributesPerAspect().put(AttributeRegistry.ATTACK_DAMAGE, atkDamage * 0.05);
-//        petTemplate.getAttributesPerAspect().put(AttributeRegistry.ARMOR, armor * 0.1);
-//        petTemplate.getAttributesPerAspect().put(AttributeRegistry.MOVEMENT_SPEED, movSpeed * 0.01);
-//        petTemplate.getAttributesPerAspect().put(AttributeRegistry.FLYING_SPEED, flySpeed * 0.01);
-//        petTemplate.getAttributesPerAspect().put(AttributeRegistry.ATTACK_SPEED, atkSpeed * 0.05);
-//        petTemplate.getAttributesPerAspect().put(AttributeRegistry.HEALTH_REGENEATION_FORCE, 0.05);
-//        petTemplate.getAttributesPerAspect().put(AttributeRegistry.HEALTH_REGENEATION_SPEED, 0.02);
-
-//        if (!petTemplate.getFoodCategories().isEmpty()) {
-//            petTemplate.getAttributesStart().put(AttributeRegistry.MAX_SATURATION, maxHealth * 0.75);
-//            petTemplate.getAttributesPerAspect().put(AttributeRegistry.MAX_SATURATION, maxHealth * 0.1);
-//        }
     }
 }

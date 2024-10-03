@@ -26,7 +26,6 @@ import su.nightexpress.combatpets.api.currency.Currency;
 import su.nightexpress.combatpets.api.pet.*;
 import su.nightexpress.combatpets.api.pet.event.generic.PetReleaseEvent;
 import su.nightexpress.combatpets.config.Config;
-import su.nightexpress.combatpets.config.Keys;
 import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.config.Perms;
 import su.nightexpress.combatpets.data.impl.PetData;
@@ -263,12 +262,6 @@ public class PetManager extends AbstractManager<PetsPlugin> {
     }
 
     @NotNull
-    public Optional<Tier> getTierByItem(@NotNull ItemStack item) {
-        String tierId = PDCUtil.getString(item, Keys.eggTierId).orElse(null);
-        return tierId == null ? Optional.empty() : Optional.ofNullable(this.getTier(tierId));
-    }
-
-    @NotNull
     public Tier getTierByWeight() {
         Map<Tier, Double> map = new HashMap<>();
         this.getTiers().forEach(tier -> {
@@ -295,12 +288,6 @@ public class PetManager extends AbstractManager<PetsPlugin> {
     @Nullable
     public Template getTemplate(@NotNull String id) {
         return this.templateMap.get(id.toLowerCase());
-    }
-
-    @Nullable
-    public Template getTemplate(@NotNull ItemStack item) {
-        String id = PDCUtil.getString(item, Keys.eggPetId).orElse(null);
-        return id == null ? null : getTemplate(id);
     }
 
     @Nullable
@@ -373,10 +360,6 @@ public class PetManager extends AbstractManager<PetsPlugin> {
 
     public boolean hasActivePet(@NotNull Player player) {
         return this.getPlayerPet(player) != null;
-    }
-
-    public boolean isEgg(@NotNull ItemStack item) {
-        return this.getTemplate(item) != null;
     }
 
 
@@ -456,9 +439,9 @@ public class PetManager extends AbstractManager<PetsPlugin> {
 
         location.getChunk(); // Force load chunk before pet spawn.
 
-        Template config = petData.getConfig();
-        ActivePet holder = plugin.getPetNMS().spawnPet(config, location, entity -> new PetInstance(this.plugin, player, entity, petData));
-        holder.handleSpawn();
+        Template template = petData.getTemplate();
+        ActivePet pet = plugin.getPetNMS().spawnPet(template, location, entity -> new PetInstance(this.plugin, player, entity, petData));
+        pet.handleSpawn();
 
         return true;
     }
@@ -572,7 +555,10 @@ public class PetManager extends AbstractManager<PetsPlugin> {
             return false;
         }
 
-        PetReleaseEvent event = new PetReleaseEvent(player, petData.getTier(), petData.getConfig());
+        Template template = petData.getTemplate();
+        Tier tier = petData.getTier();
+
+        PetReleaseEvent event = new PetReleaseEvent(player, tier, template);
         this.plugin.getPluginManager().callEvent(event);
         if (event.isCancelled()) return false;
 
@@ -589,9 +575,7 @@ public class PetManager extends AbstractManager<PetsPlugin> {
             }
 
             if (PetUtils.isAllowedPetZone(location) && petData.isAlive()) {
-                Template config = petData.getConfig();
-
-                Entity entity = player.getWorld().spawnEntity(location, config.getEntityType());
+                Entity entity = player.getWorld().spawnEntity(location, template.getEntityType());
                 if (entity instanceof LivingEntity livingEntity) {
                     petData.getWardrobe().dressUp(livingEntity);
                 }
@@ -600,7 +584,7 @@ public class PetManager extends AbstractManager<PetsPlugin> {
             }
         }
 
-        this.removeFromCollection(plugin.getUserManager().getUserData(player), petData.getTier(), petData.getConfig());
+        this.removeFromCollection(plugin.getUserManager().getUserData(player), tier, template);
         Lang.PET_RELEASE_SUCCESS.getMessage().replace(petData.replacePlaceholders()).send(player);
         return true;
     }

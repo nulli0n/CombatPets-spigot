@@ -44,10 +44,17 @@ public class Config {
 
 
 
+    public static final ConfigValue<ItemStack> ITEM_MYSTERY_EGG = ConfigValue.create("Items.Mystery_Egg",
+        PetCreator.getDefaultMysteryEgg(),
+        "Mystery egg item."
+    );
+
+
+
     public static final ConfigValue<ItemStack> PET_EGG_ITEM = ConfigValue.create("Pets.Egg_Item",
-        PetCreator.getEggItem(),
-        "Sets pet egg item format.",
-        "[*] You should use '" + BukkitThing.toString(Material.PLAYER_HEAD) + "' as item Material to get the pet skin texture applied."
+        PetCreator.getDefaultEgg(),
+        "Egg item.",
+        "[*] You should use '" + BukkitThing.toString(Material.PLAYER_HEAD) + "' as item Material to apply pet's egg texture."
     );
 
     public static final ConfigValue<Set<String>> PET_DISABLED_WORLDS = ConfigValue.create("Pets.Disabled_Worlds",

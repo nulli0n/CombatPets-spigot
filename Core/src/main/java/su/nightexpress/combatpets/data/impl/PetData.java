@@ -20,7 +20,7 @@ import java.util.*;
 
 public class PetData implements Placeholder {
 
-    private final Template config;
+    private final Template template;
     private final Tier     tier;
 
     private String                        name;
@@ -69,7 +69,7 @@ public class PetData implements Placeholder {
     }
 
     public PetData(
-        @NotNull Template config,
+        @NotNull Template template,
         @NotNull Tier tier,
         @NotNull String name,
         boolean silent,
@@ -85,7 +85,7 @@ public class PetData implements Placeholder {
         @NotNull CombatMode combatMode,
         @NotNull PetWardrobe wardrobe
     ) {
-        this.config = config;
+        this.template = template;
         this.tier = tier;
         this.setName(name);
         this.setSilent(silent);
@@ -227,13 +227,19 @@ public class PetData implements Placeholder {
     }
 
     @NotNull
+    @Deprecated
     public Template getConfig() {
-        return this.config;
+        return this.getTemplate();
+    }
+
+    @NotNull
+    public Template getTemplate() {
+        return this.template;
     }
 
     @NotNull
     public Tier getTier() {
-        return tier;
+        return this.tier;
     }
 
 //    public void setTier(@NotNull Tier tier) {
