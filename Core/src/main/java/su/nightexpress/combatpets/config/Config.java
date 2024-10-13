@@ -21,6 +21,10 @@ public class Config {
     public static final String DIR_TIERS = "/pets/tiers/";
     public static final String DIR_PETS  = "/pets/configs/";
 
+    public static final ConfigValue<Boolean> GENERAL_PLACEHOLDER_API_GUI = ConfigValue.create("General.PlaceholderAPI_In_GUI",
+        false,
+        "When enabled, applies PlaceholderAPI placeholders to GUI title and items."
+    );
 
     public static final ConfigValue<Boolean> FEATURES_LEVELING_ENABLED = ConfigValue.create("Features.Leveling",
         true,
@@ -198,6 +202,10 @@ public class Config {
         "Use '" + DEFAULT + "' for any groups not listed here.",
         "Use '-1' for unlimited amount."
     );
+
+    public static boolean isGUIPlaceholdersEnabled() {
+        return GENERAL_PLACEHOLDER_API_GUI.get();
+    }
 
     public static boolean isLevelingEnabled() {
         return FEATURES_LEVELING_ENABLED.get();

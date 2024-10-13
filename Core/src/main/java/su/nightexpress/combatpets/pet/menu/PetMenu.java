@@ -13,6 +13,7 @@ import su.nightexpress.combatpets.api.pet.PetEntityBridge;
 import su.nightexpress.combatpets.config.Config;
 import su.nightexpress.combatpets.data.impl.PetUser;
 import su.nightexpress.combatpets.pet.AttributeRegistry;
+import su.nightexpress.combatpets.util.PetUtils;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.menu.MenuOptions;
 import su.nightexpress.nightcore.menu.MenuSize;
@@ -155,12 +156,14 @@ public class PetMenu extends ConfigMenu<PetsPlugin> {
                     .replace(petHolder.getTemplate().getPlaceholders())
                     .writeMeta();
             });
+
+            PetUtils.applyMenuPlaceholders(menuItem);
         });
     }
 
     @Override
     protected void onPrepare(@NotNull MenuViewer viewer, @NotNull MenuOptions options) {
-        
+        PetUtils.applyMenuPlaceholders(viewer, options);
     }
 
     @Override

@@ -14,6 +14,7 @@ import su.nightexpress.combatpets.config.Config;
 import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.data.impl.PetData;
 import su.nightexpress.combatpets.pet.AttributeRegistry;
+import su.nightexpress.combatpets.util.PetUtils;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.menu.MenuOptions;
@@ -61,6 +62,8 @@ public class CollectionMenu extends ConfigMenu<PetsPlugin> implements AutoFilled
         }));
 
         this.load();
+
+        this.getItems().forEach(PetUtils::applyMenuPlaceholders);
     }
 
     @NotNull
@@ -71,6 +74,7 @@ public class CollectionMenu extends ConfigMenu<PetsPlugin> implements AutoFilled
 
     @Override
     public void onPrepare(@NotNull MenuViewer viewer, @NotNull MenuOptions options) {
+        PetUtils.applyMenuPlaceholders(viewer, options);
         this.autoFill(viewer);
     }
 
@@ -86,7 +90,7 @@ public class CollectionMenu extends ConfigMenu<PetsPlugin> implements AutoFilled
 
         autoFill.setSlots(this.petSlots);
         autoFill.setItems(this.plugin.getUserManager().getUserData(player).getPets(tier).stream()
-            .sorted(Comparator.comparing(data -> data.getConfig().getId())).toList());
+            .sorted(Comparator.comparing(data -> data.getTemplate().getId())).toList());
         autoFill.setItemCreator(petData -> {
             ActivePet petHolder = PetEntityBridge.getByPlayer(player);
 
@@ -101,7 +105,7 @@ public class CollectionMenu extends ConfigMenu<PetsPlugin> implements AutoFilled
                 }
             }
             else {
-                if (petHolder == null || petHolder.getTemplate() != petData.getConfig() || petHolder.getTier() != petData.getTier()) {
+                if (petHolder == null || petHolder.getTemplate() != petData.getTemplate() || petHolder.getTier() != petData.getTier()) {
                     status.addAll(this.petStatusInactive);
                 }
                 else {
@@ -109,7 +113,7 @@ public class CollectionMenu extends ConfigMenu<PetsPlugin> implements AutoFilled
                 }
             }
 
-            ItemStack item = ItemUtil.getSkinHead(petData.getConfig().getEggTexture());
+            ItemStack item = ItemUtil.getSkinHead(petData.getTemplate().getEggTexture());
             ItemReplacer.create(item).hideFlags().trimmed()
                 .setDisplayName(this.petName)
                 .setLore(this.petLore)
@@ -118,7 +122,7 @@ public class CollectionMenu extends ConfigMenu<PetsPlugin> implements AutoFilled
                 .replace(GENERIC_COST, NumberUtil.format(petData.getTier().getReviveCost()))
                 .replace(petData.getPlaceholders())
                 .replace(petData.getTier().getPlaceholders())
-                .replace(petData.getConfig().getPlaceholders())
+                .replace(petData.getTemplate().getPlaceholders())
                 .writeMeta();
 
             return item;
@@ -134,7 +138,7 @@ public class CollectionMenu extends ConfigMenu<PetsPlugin> implements AutoFilled
 
                 if (holder != null) {
                     this.plugin.getPetManager().despawnPet(player);
-                    if (holder.getTemplate() == petData.getConfig()) {
+                    if (holder.getTemplate() == petData.getTemplate()) {
                         this.runNextTick(() -> this.flush(viewer));
                         return;
                     }
@@ -146,7 +150,7 @@ public class CollectionMenu extends ConfigMenu<PetsPlugin> implements AutoFilled
 
             if (event.getClick() == ClickType.DROP && Config.PET_RELEASE_ALLOWED.get()) {
                 if (holder != null) {
-                    if (holder.getTemplate() == petData.getConfig() && holder.getTier() == petData.getTier()) {
+                    if (holder.getTemplate() == petData.getTemplate() && holder.getTier() == petData.getTier()) {
                         //plugin.getMessage(Lang.PET_RELEASE_ERROR_ACTIVE).send(player);
                         return;
                     }

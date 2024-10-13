@@ -43,6 +43,8 @@ public abstract class ConfirmMenu extends ConfigMenu<PetsPlugin> implements Link
         }));
 
         this.load();
+
+        this.getItems().forEach(PetUtils::applyMenuPlaceholders);
     }
 
     @NotNull
@@ -72,10 +74,12 @@ public abstract class ConfirmMenu extends ConfigMenu<PetsPlugin> implements Link
 
     @Override
     public void onPrepare(@NotNull MenuViewer viewer, @NotNull MenuOptions options) {
+        PetUtils.applyMenuPlaceholders(viewer, options);
+
         PetData petData = this.getLink(viewer);
         if (petData == null) return;
 
-        ItemStack item = PetUtils.getRawEggItem(petData.getConfig());
+        ItemStack item = PetUtils.getRawEggItem(petData.getTemplate());
         ItemReplacer.create(item).hideFlags().trimmed()
             .setDisplayName(this.iconName)
             .setLore(this.iconLore)

@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import su.nightexpress.combatpets.PetsPlugin;
 import su.nightexpress.combatpets.config.Config;
 import su.nightexpress.combatpets.data.impl.PetData;
+import su.nightexpress.combatpets.util.PetUtils;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.menu.MenuOptions;
@@ -29,6 +30,8 @@ public class ReviveMenu extends ConfirmMenu {
     public ReviveMenu(@NotNull PetsPlugin plugin) {
         super(plugin, FileConfig.loadOrExtract(plugin, Config.DIR_MENU, FILE));
         this.load();
+
+        this.getItems().forEach(PetUtils::applyMenuPlaceholders);
     }
 
     @Override

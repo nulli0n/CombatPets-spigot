@@ -365,6 +365,7 @@ public class PetCreator {
 
         return switch (type) {
             case ALLAY -> "f315a6a899b15a9810bc2bfdffd491a038c48016c189d43f327092c8f011599f";
+            case AXOLOTL -> "21c3aa0d539208b47972bf8e72f0505cdcfb8d7796b2fcf85911ce94fd0193d0";
             case BEE -> "cce9edbbc5fdc0d8487ac72eab239d2cacfe408d74288d6384b044111ba4de0f";
             case BLAZE -> "b78ef2e4cf2c41a2d14bfde9caff10219f5b1bf5b35a49eb51c6467882cb5f0";
             case CAT -> "3a12188258601bcb7f76e3e2489555a26c0d76e6efec2fd966ca372b6dde00";

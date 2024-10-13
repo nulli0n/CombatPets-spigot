@@ -10,6 +10,7 @@ import su.nightexpress.combatpets.api.pet.Stat;
 import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.pet.AttributeRegistry;
 import su.nightexpress.nightcore.util.NumberUtil;
+import su.nightexpress.nightcore.util.text.NightMessage;
 
 public class PlaceholderHook {
 
@@ -73,6 +74,12 @@ public class PlaceholderHook {
             }
             if (params.equalsIgnoreCase("xp")) {
                 return NumberUtil.format(pet.getXP());
+            }
+            if (params.equalsIgnoreCase("level")) {
+                return String.valueOf(pet.getLevel());
+            }
+            if (params.equalsIgnoreCase("tier_name")) {
+                return NightMessage.asLegacy(pet.getTier().getName());
             }
             if (params.equalsIgnoreCase("required_xp")) {
                 return NumberUtil.format(pet.getRequiredXP());

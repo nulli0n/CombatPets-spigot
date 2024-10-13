@@ -22,6 +22,7 @@ public class EntityInjector {
 
     public static void register() {
         BRAIN_MOBS.put(EntityType.ALLAY, AllayPet.class);
+        BRAIN_MOBS.put(EntityType.AXOLOTL, AxolotlPet.class);
         BRAIN_MOBS.put(EntityType.ARMADILLO, ArmadilloPet.class);
         BRAIN_MOBS.put(EntityType.BREEZE, BreezePet.class);
         BRAIN_MOBS.put(EntityType.FROG, FrogPet.class);

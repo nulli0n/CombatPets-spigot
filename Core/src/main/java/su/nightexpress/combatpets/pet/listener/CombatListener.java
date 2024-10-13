@@ -30,7 +30,10 @@ public class CombatListener extends AbstractListener<PetsPlugin> {
         ActivePet activePet = this.petManager.getPetByMob(victim);
         if (activePet == null) return;
 
-        this.plugin.runTask(task -> activePet.updateHealthBar());
+        this.plugin.runTask(task -> {
+            activePet.updateHealthBar();
+            activePet.updateName();
+        });
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

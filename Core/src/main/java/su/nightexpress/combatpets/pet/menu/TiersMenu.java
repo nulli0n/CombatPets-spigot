@@ -8,6 +8,7 @@ import su.nightexpress.combatpets.api.pet.Tier;
 import su.nightexpress.combatpets.config.Config;
 import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.data.impl.PetUser;
+import su.nightexpress.combatpets.util.PetUtils;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.menu.MenuOptions;
@@ -42,10 +43,13 @@ public class TiersMenu extends ConfigMenu<PetsPlugin> implements AutoFilled<Tier
         super(plugin, FileConfig.loadOrExtract(plugin, Config.DIR_MENU, FILE_NAME));
 
         this.load();
+
+        this.getItems().forEach(PetUtils::applyMenuPlaceholders);
     }
 
     @Override
     public void onPrepare(@NotNull MenuViewer viewer, @NotNull MenuOptions options) {
+        PetUtils.applyMenuPlaceholders(viewer, options);
         this.autoFill(viewer);
     }
 

@@ -12,6 +12,7 @@ import su.nightexpress.combatpets.api.pet.PetEntityBridge;
 import su.nightexpress.combatpets.config.Config;
 import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.pet.AttributeRegistry;
+import su.nightexpress.combatpets.util.PetUtils;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.menu.MenuOptions;
@@ -71,6 +72,8 @@ public class AspectsMenu extends ConfigMenu<PetsPlugin> implements AutoFilled<As
         this.load();
 
         this.getItems().forEach(menuItem -> {
+            PetUtils.applyMenuPlaceholders(menuItem);
+
             if (menuItem.getHandler() == this.reallocateHandler) {
                 menuItem.getOptions().setVisibilityPolicy(viewer -> Config.PET_REALLOCATE_ASPECTS.get());
             }
@@ -79,6 +82,7 @@ public class AspectsMenu extends ConfigMenu<PetsPlugin> implements AutoFilled<As
 
     @Override
     public void onPrepare(@NotNull MenuViewer viewer, @NotNull MenuOptions options) {
+        PetUtils.applyMenuPlaceholders(viewer, options);
         this.autoFill(viewer);
     }
 

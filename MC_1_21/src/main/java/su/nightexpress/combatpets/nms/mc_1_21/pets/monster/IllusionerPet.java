@@ -12,6 +12,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.monster.Illusioner;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import su.nightexpress.combatpets.api.pet.PetEntity;
 import su.nightexpress.combatpets.nms.mc_1_21.MC_1_21;
 import su.nightexpress.combatpets.nms.mc_1_21.goals.combat.PetBowAttackGoal;
@@ -57,7 +58,7 @@ public class IllusionerPet extends Illusioner implements PetEntity {
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor,
                                         DifficultyInstance difficultyInstance,
                                         MobSpawnType spawnType,
-                                        @org.jetbrains.annotations.Nullable SpawnGroupData groupData) {
+                                        @Nullable SpawnGroupData groupData) {
         return groupData;
     }
 

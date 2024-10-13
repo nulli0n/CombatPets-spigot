@@ -2,6 +2,7 @@ package su.nightexpress.combatpets.util;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -19,10 +20,10 @@ import su.nightexpress.combatpets.api.pet.Template;
 import su.nightexpress.combatpets.api.pet.Tier;
 import su.nightexpress.combatpets.config.Config;
 import su.nightexpress.combatpets.data.impl.PetData;
-import su.nightexpress.nightcore.util.EntityUtil;
-import su.nightexpress.nightcore.util.ItemUtil;
-import su.nightexpress.nightcore.util.PDCUtil;
-import su.nightexpress.nightcore.util.Version;
+import su.nightexpress.nightcore.menu.MenuOptions;
+import su.nightexpress.nightcore.menu.MenuViewer;
+import su.nightexpress.nightcore.menu.item.MenuItem;
+import su.nightexpress.nightcore.util.*;
 import su.nightexpress.nightcore.util.random.Rnd;
 
 import java.nio.charset.StandardCharsets;
@@ -44,6 +45,18 @@ public class PetUtils {
             exception.printStackTrace();
         }
         return null;
+    }
+
+    public static void applyMenuPlaceholders(@NotNull MenuViewer viewer, @NotNull MenuOptions options) {
+        if (!Config.isGUIPlaceholdersEnabled()) return;
+
+        options.editTitle(str -> PlaceholderAPI.setPlaceholders(viewer.getPlayer(), str));
+    }
+
+    public static void applyMenuPlaceholders(@NotNull MenuItem menuItem) {
+        if (!Config.isGUIPlaceholdersEnabled()) return;
+
+        menuItem.getOptions().addDisplayModifier((viewer, itemStack) -> ItemReplacer.replacePlaceholderAPI(itemStack, viewer.getPlayer()));
     }
 
     public static long createTimestamp(long seconds) {
@@ -127,7 +140,8 @@ public class PetUtils {
     public static void populateDefaultEquipment(@NotNull PetData petData) {
         EntityType type = petData.getTemplate().getEntityType();
 
-        if (type == EntityType.SKELETON || type == EntityType.STRAY || (Version.isAtLeast(Version.MC_1_21) && type.name().equalsIgnoreCase("bogged"))) {
+        if (type == EntityType.SKELETON || type == EntityType.STRAY || type == EntityType.ILLUSIONER ||
+            (Version.isAtLeast(Version.MC_1_21) && type.name().equalsIgnoreCase("bogged"))) {
             petData.setEquipment(EquipmentSlot.HAND, new ItemStack(Material.BOW));
         }
         else if (type == EntityType.WITHER_SKELETON) {
