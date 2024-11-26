@@ -5,7 +5,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.combatpets.PetsPlugin;
-import su.nightexpress.combatpets.api.currency.Currency;
 import su.nightexpress.combatpets.api.pet.Template;
 import su.nightexpress.combatpets.api.pet.Tier;
 import su.nightexpress.combatpets.config.Config;
@@ -13,6 +12,7 @@ import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.util.PetUtils;
 import su.nightexpress.combatpets.shop.ShopManager;
 import su.nightexpress.combatpets.shop.data.EggPrice;
+import su.nightexpress.economybridge.api.Currency;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.menu.MenuOptions;
@@ -71,7 +71,7 @@ public class EggConfirmMenu extends ConfigMenu<PetsPlugin> implements Linked<Egg
             Currency currency = price.getCurrency();
             double cost = price.getPrice();
 
-            double balance = currency.getHandler().getBalance(player);
+            double balance = currency.getBalance(player);
             if (balance < cost) {
                 Lang.SHOP_PURCHASE_ERROR_NOT_ENOUGH_FUNDS.getMessage()
                     .replace(GENERIC_PRICE, currency.format(cost))
@@ -80,7 +80,7 @@ public class EggConfirmMenu extends ConfigMenu<PetsPlugin> implements Linked<Egg
                     .send(player);
             }
             else {
-                currency.getHandler().take(player, cost);
+                currency.take(player, cost);
                 Players.addItem(player, template.createEgg(tier));
 
                 Lang.SHOP_PURCHASE_SUCCESS.getMessage()

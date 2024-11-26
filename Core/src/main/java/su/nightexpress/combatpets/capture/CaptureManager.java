@@ -175,7 +175,7 @@ public class CaptureManager extends AbstractManager<PetsPlugin> {
         double maxPercent = CaptureConfig.CAPTURE_HEALTH_PERCENT.get();
         if (maxPercent <= 0D || maxPercent >= 100D) return true;
 
-        double maxHealth = EntityUtil.getAttribute(entity, Attribute.GENERIC_MAX_HEALTH);
+        double maxHealth = EntityUtil.getAttribute(entity, Attribute.MAX_HEALTH);
         double currentHealth = entity.getHealth();
         double healthPercent = currentHealth / maxHealth * 100D;
 

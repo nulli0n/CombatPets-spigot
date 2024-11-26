@@ -16,4 +16,9 @@ public interface PetEntity {
     default ActivePet getHolder() {
         return PetEntityBridge.getByPet(this);
     }
+
+    @NotNull
+    default UUID getOwnerId() {
+        return this.getHolder().getOwner().getUniqueId();
+    }
 }

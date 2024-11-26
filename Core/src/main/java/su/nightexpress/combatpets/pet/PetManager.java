@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.combatpets.PetsPlugin;
 import su.nightexpress.combatpets.Placeholders;
-import su.nightexpress.combatpets.api.currency.Currency;
 import su.nightexpress.combatpets.api.pet.*;
 import su.nightexpress.combatpets.api.pet.event.generic.PetReleaseEvent;
 import su.nightexpress.combatpets.config.Config;
@@ -39,10 +38,15 @@ import su.nightexpress.combatpets.pet.listener.PlayerGenericListener;
 import su.nightexpress.combatpets.pet.menu.*;
 import su.nightexpress.combatpets.util.PetCreator;
 import su.nightexpress.combatpets.util.PetUtils;
+import su.nightexpress.economybridge.EconomyBridge;
+import su.nightexpress.economybridge.api.Currency;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.dialog.Dialog;
 import su.nightexpress.nightcore.manager.AbstractManager;
-import su.nightexpress.nightcore.util.*;
+import su.nightexpress.nightcore.util.FileUtil;
+import su.nightexpress.nightcore.util.ItemUtil;
+import su.nightexpress.nightcore.util.Players;
+import su.nightexpress.nightcore.util.Plugins;
 import su.nightexpress.nightcore.util.random.Rnd;
 import su.nightexpress.nightcore.util.text.NightMessage;
 import su.nightexpress.nightcore.util.wrapper.UniSound;
@@ -178,30 +182,28 @@ public class PetManager extends AbstractManager<PetsPlugin> {
     }
 
     private void loadAttributes() {
-        this.loadAttribute(AttributeRegistry.ARMOR, Attribute.GENERIC_ARMOR);
-        this.loadAttribute(AttributeRegistry.ATTACK_DAMAGE, Attribute.GENERIC_ATTACK_DAMAGE);
-        this.loadAttribute(AttributeRegistry.ATTACK_KNOCKBACK, Attribute.GENERIC_ATTACK_KNOCKBACK);
-        this.loadAttribute(AttributeRegistry.ATTACK_SPEED, Attribute.GENERIC_ATTACK_SPEED);
-        this.loadAttribute(AttributeRegistry.FLYING_SPEED, Attribute.GENERIC_FLYING_SPEED);
+        this.loadAttribute(AttributeRegistry.ARMOR, Attribute.ARMOR);
+        this.loadAttribute(AttributeRegistry.ATTACK_DAMAGE, Attribute.ATTACK_DAMAGE);
+        this.loadAttribute(AttributeRegistry.ATTACK_KNOCKBACK, Attribute.ATTACK_KNOCKBACK);
+        this.loadAttribute(AttributeRegistry.ATTACK_SPEED, Attribute.ATTACK_SPEED);
+        this.loadAttribute(AttributeRegistry.FLYING_SPEED, Attribute.FLYING_SPEED);
         this.loadAttribute(AttributeRegistry.HEALTH_REGENEATION_FORCE);
         this.loadAttribute(AttributeRegistry.HEALTH_REGENEATION_SPEED);
-        this.loadAttribute(AttributeRegistry.HORSE_JUMP_STRENGTH, Attribute.HORSE_JUMP_STRENGTH);
-        this.loadAttribute(AttributeRegistry.KNOCKBACK_RESISTANCE, Attribute.GENERIC_KNOCKBACK_RESISTANCE);
-        this.loadAttribute(AttributeRegistry.MAX_HEALTH, Attribute.GENERIC_MAX_HEALTH);
+        this.loadAttribute(AttributeRegistry.HORSE_JUMP_STRENGTH, Attribute.JUMP_STRENGTH);
+        this.loadAttribute(AttributeRegistry.KNOCKBACK_RESISTANCE, Attribute.KNOCKBACK_RESISTANCE);
+        this.loadAttribute(AttributeRegistry.MAX_HEALTH, Attribute.MAX_HEALTH);
         this.loadAttribute(AttributeRegistry.MAX_SATURATION);
-        this.loadAttribute(AttributeRegistry.MOVEMENT_SPEED, Attribute.GENERIC_MOVEMENT_SPEED);
-        if (Version.isAtLeast(Version.MC_1_21)) {
+        this.loadAttribute(AttributeRegistry.MOVEMENT_SPEED, Attribute.MOVEMENT_SPEED);
             //this.loadAttribute(AttributeRegistry.ATTACK_REACH, Attribute.valueOf("GENERIC_ATTACK_REACH"));
-            this.loadAttribute(AttributeRegistry.BURNING_TIME, Attribute.valueOf("GENERIC_BURNING_TIME"));
-            this.loadAttribute(AttributeRegistry.EXPLOSION_KNOCKBACK_RESISTANCE, Attribute.valueOf("GENERIC_EXPLOSION_KNOCKBACK_RESISTANCE"));
-            this.loadAttribute(AttributeRegistry.FALL_DAMAGE_MULTIPLIER, Attribute.valueOf("GENERIC_FALL_DAMAGE_MULTIPLIER"));
-            this.loadAttribute(AttributeRegistry.GRAVITY, Attribute.valueOf("GENERIC_GRAVITY"));
-            this.loadAttribute(AttributeRegistry.MOVEMENT_EFFICIENCY, Attribute.valueOf("GENERIC_MOVEMENT_EFFICIENCY"));
-            this.loadAttribute(AttributeRegistry.SAFE_FALL_DISTANCE, Attribute.valueOf("GENERIC_SAFE_FALL_DISTANCE"));
-            this.loadAttribute(AttributeRegistry.SCALE, Attribute.valueOf("GENERIC_SCALE"));
-            this.loadAttribute(AttributeRegistry.STEP_HEIGHT, Attribute.valueOf("GENERIC_STEP_HEIGHT"));
-            this.loadAttribute(AttributeRegistry.WATER_MOVEMENT_EFFICIENCY, Attribute.valueOf("GENERIC_WATER_MOVEMENT_EFFICIENCY"));
-        }
+        this.loadAttribute(AttributeRegistry.BURNING_TIME, Attribute.BURNING_TIME);
+        this.loadAttribute(AttributeRegistry.EXPLOSION_KNOCKBACK_RESISTANCE, Attribute.EXPLOSION_KNOCKBACK_RESISTANCE);
+        this.loadAttribute(AttributeRegistry.FALL_DAMAGE_MULTIPLIER, Attribute.FALL_DAMAGE_MULTIPLIER);
+        this.loadAttribute(AttributeRegistry.GRAVITY, Attribute.GRAVITY);
+        this.loadAttribute(AttributeRegistry.MOVEMENT_EFFICIENCY, Attribute.MOVEMENT_EFFICIENCY);
+        this.loadAttribute(AttributeRegistry.SAFE_FALL_DISTANCE, Attribute.SAFE_FALL_DISTANCE);
+        this.loadAttribute(AttributeRegistry.SCALE, Attribute.SCALE);
+        this.loadAttribute(AttributeRegistry.STEP_HEIGHT, Attribute.STEP_HEIGHT);
+        this.loadAttribute(AttributeRegistry.WATER_MOVEMENT_EFFICIENCY, Attribute.WATER_MOVEMENT_EFFICIENCY);
     }
 
     private void loadAttribute(@NotNull String name) {
@@ -477,9 +479,13 @@ public class PetManager extends AbstractManager<PetsPlugin> {
         this.plugin.getUserManager().scheduleSave(user);
     }
 
-    public void addToCollection(@NotNull PetUser user, @NotNull Tier tier, @NotNull Template template) {
-        user.addPet(PetData.create(template, tier));
+    @NotNull
+    public PetData addToCollection(@NotNull PetUser user, @NotNull Tier tier, @NotNull Template template) {
+        PetData petData = PetData.create(template, tier);
+        user.addPet(petData);
         this.plugin.getUserManager().scheduleSave(user);
+
+        return petData;
     }
 
     public void removeFromCollection(@NotNull PetUser user, @NotNull Tier tier, @NotNull Template template) {
@@ -492,13 +498,14 @@ public class PetManager extends AbstractManager<PetsPlugin> {
         this.plugin.getUserManager().scheduleSave(user);
     }
 
-    public boolean tryClaimPet(@NotNull Player player, @NotNull Tier tier, @NotNull Template config) {
+    @Nullable
+    public PetData tryClaimPet(@NotNull Player player, @NotNull Tier tier, @NotNull Template config) {
         PetUser user = this.plugin.getUserManager().getUserData(player);
-        if (!user.isLoaded()) return false;
+        if (!user.isLoaded()) return null;
 
         if (user.hasPet(config, tier)) {
             Lang.PET_CLAIM_ERROR_ALREADY_HAVE.getMessage().send(player);
-            return false;
+            return null;
         }
 
         int petLimit = PetManager.getPetsLimit(player);
@@ -508,31 +515,35 @@ public class PetManager extends AbstractManager<PetsPlugin> {
                 .replace(tier.replacePlaceholders())
                 .replace(Placeholders.GENERIC_AMOUNT, petLimit)
                 .send(player);
-            return false;
+            return null;
         }
 
-        this.addToCollection(user, tier, config);
         Lang.PET_CLAIM_SUCCESS.getMessage().send(player);
-        return true;
+        return this.addToCollection(user, tier, config);
     }
 
     public boolean revivePet(@NotNull Player player, @NotNull PetData petData) {
+        if (!PetUtils.hasEconomyBridge()) {
+            petData.revive();
+            return true;
+        }
+
         Tier tier = petData.getTier();
 
-        Currency currency = this.plugin.getCurrencyManager().getCurrency(tier.getReviveCurrency());
+        Currency currency = EconomyBridge.getCurrency(tier.getReviveCurrency());
         if (currency == null) return false;
 
         double cost = tier.getReviveCost();
 
         if (cost > 0) {
-            if (currency.getHandler().getBalance(player) < cost) {
+            if (currency.getBalance(player) < cost) {
                 Lang.PET_REVIVE_ERROR_NOT_ENOUGH_FUNDS.getMessage()
                     .replace(Placeholders.PET_NAME, petData.getName())
                     .replace(Placeholders.GENERIC_AMOUNT, currency.format(cost))
                     .send(player);
                 return false;
             }
-            currency.getHandler().take(player, cost);
+            currency.take(player, cost);
         }
 
         petData.revive();

@@ -81,7 +81,7 @@ public class LevelingListener extends AbstractListener<PetsPlugin> {
         Map<UUID, Double> damagers = this.getDealtDamageMap(victim);
         if (damagers.isEmpty()) return;
 
-        double totalHealth = EntityUtil.getAttribute(victim, Attribute.GENERIC_MAX_HEALTH);
+        double totalHealth = EntityUtil.getAttribute(victim, Attribute.MAX_HEALTH);
 
         damagers.forEach((damagerId, damageDealt) -> {
             Entity entity = this.plugin.getServer().getEntity(damagerId);

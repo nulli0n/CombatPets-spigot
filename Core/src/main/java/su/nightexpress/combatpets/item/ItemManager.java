@@ -10,8 +10,10 @@ import su.nightexpress.combatpets.PetsPlugin;
 import su.nightexpress.combatpets.api.item.ItemType;
 import su.nightexpress.combatpets.api.pet.Template;
 import su.nightexpress.combatpets.api.pet.Tier;
+import su.nightexpress.combatpets.config.Config;
 import su.nightexpress.combatpets.config.Keys;
 import su.nightexpress.combatpets.config.Lang;
+import su.nightexpress.combatpets.data.impl.PetData;
 import su.nightexpress.combatpets.util.PetUtils;
 import su.nightexpress.nightcore.manager.AbstractManager;
 import su.nightexpress.nightcore.util.*;
@@ -117,9 +119,14 @@ public class ItemManager extends AbstractManager<PetsPlugin> {
         Tier tier = this.getEggTier(itemStack);
         if (tier == null) return;
 
-        if (this.plugin.getPetManager().tryClaimPet(player, tier, template)) {
-            itemStack.setAmount(itemStack.getAmount() - 1);
+        PetData petData = plugin.getPetManager().tryClaimPet(player, tier, template);
+        if (petData == null) return;
+
+        if (Config.isWardrobeEnabled()) {
+            petData.setWardrobe(plugin.getWardrobeManager().readAccessoryData(itemStack));
         }
+
+        itemStack.setAmount(itemStack.getAmount() - 1);
     }
 
     private void handleMysteryEggUse(@NotNull Player player, @NotNull ItemStack itemStack) {
@@ -131,7 +138,8 @@ public class ItemManager extends AbstractManager<PetsPlugin> {
         itemStack.setAmount(itemStack.getAmount() - 1);
 
         Players.addItem(player, this.createEgg(template, tier));
-        UniParticle.of(Particle.SPELL_WITCH).play(player.getLocation().add(0, 0.5, 0), 0.1, 0.5, 50);
+
+        UniParticle.of(Particle.WITCH).play(player.getLocation().add(0, 0.5, 0), 0.1, 0.5, 50);
 
         Lang.PET_MYSTERY_EGG_HATCH.getMessage()
             .replace(tier.replacePlaceholders())

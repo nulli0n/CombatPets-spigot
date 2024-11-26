@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import su.nightexpress.combatpets.PetsPlugin;
 import su.nightexpress.combatpets.api.item.ItemType;
 import su.nightexpress.nightcore.manager.AbstractListener;
+import su.nightexpress.nightcore.util.Players;
 
 public class ItemListener extends AbstractListener<PetsPlugin> {
 
@@ -33,9 +34,11 @@ public class ItemListener extends AbstractListener<PetsPlugin> {
         event.setUseInteractedBlock(Event.Result.DENY);
         event.setUseItemInHand(Event.Result.DENY);
 
-        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-
         Player player = event.getPlayer();
+
+        if (!Players.isBedrock(player)) {
+            if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        }
 
         this.manager.onItemUse(player, itemStack, type);
     }

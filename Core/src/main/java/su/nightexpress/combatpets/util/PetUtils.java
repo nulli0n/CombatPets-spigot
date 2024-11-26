@@ -15,11 +15,13 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import su.nightexpress.combatpets.PetAPI;
 import su.nightexpress.combatpets.api.pet.Stat;
 import su.nightexpress.combatpets.api.pet.Template;
 import su.nightexpress.combatpets.api.pet.Tier;
 import su.nightexpress.combatpets.config.Config;
 import su.nightexpress.combatpets.data.impl.PetData;
+import su.nightexpress.combatpets.hook.HookId;
 import su.nightexpress.nightcore.menu.MenuOptions;
 import su.nightexpress.nightcore.menu.MenuViewer;
 import su.nightexpress.nightcore.menu.item.MenuItem;
@@ -30,6 +32,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class PetUtils {
+
+    public static boolean hasEconomyBridge() {
+        return Plugins.isInstalled(HookId.ECONOMY_BRIDGE);
+    }
 
     @Nullable
     public static String extractBase64TextureURL(@NotNull String headTexture) {
@@ -171,6 +177,17 @@ public class PetUtils {
     private static void maybeEquipment(@NotNull PetData petData, @NotNull EquipmentSlot slot, @NotNull ItemStack item, double chance) {
         if (Rnd.RANDOM.nextFloat() < chance) {
             petData.setEquipment(slot, item);
+        }
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public static void hurtArmor(@NotNull LivingEntity entity, @NotNull DamageSource source, float amount) {
+        if (amount <= 0F) return;
+
+        int damage = (int) Math.max(1.0F, amount / 4.0F);
+
+        for (EquipmentSlot slot : EntityUtil.EQUIPMENT_SLOTS) {
+            PetAPI.plugin.getPetNMS().damageItem(slot, entity, source, damage);
         }
     }
 }

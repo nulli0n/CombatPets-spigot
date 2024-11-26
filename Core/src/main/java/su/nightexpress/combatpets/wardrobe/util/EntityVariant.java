@@ -1,12 +1,15 @@
 package su.nightexpress.combatpets.wardrobe.util;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import su.nightexpress.combatpets.PetAPI;
 
 public class EntityVariant<T> {
 
     private final String            name;
+    private final NamespacedKey     key;
     private final VariantHandler<T> handler;
 
     private String    displayName;
@@ -14,6 +17,7 @@ public class EntityVariant<T> {
 
     public EntityVariant(@NotNull String name, @NotNull VariantHandler<T> handler) {
         this.name = name.toLowerCase();
+        this.key = new NamespacedKey(PetAPI.plugin, "accessorydata." + this.name);
         this.handler = handler;
 
         this.setDisplayName(this.getName());
@@ -23,6 +27,11 @@ public class EntityVariant<T> {
     @NotNull
     public String getName() {
         return name;
+    }
+
+    @NotNull
+    public NamespacedKey getKey() {
+        return this.key;
     }
 
     @NotNull

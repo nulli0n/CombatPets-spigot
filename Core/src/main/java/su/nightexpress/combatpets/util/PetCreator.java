@@ -18,6 +18,7 @@ import su.nightexpress.combatpets.nms.PetNMS;
 import su.nightexpress.combatpets.pet.AttributeRegistry;
 import su.nightexpress.combatpets.pet.impl.*;
 import su.nightexpress.nightcore.util.*;
+import su.nightexpress.nightcore.util.bukkit.NightSound;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
 import java.io.File;
@@ -139,7 +140,7 @@ public class PetCreator {
             petTemplate.setCaptureEscapeChance(0.5D);
             petTemplate.setSpawnParticle(UniParticle.of(Particle.CLOUD));
             petTemplate.setDespawnParticle(UniParticle.of(Particle.ASH));
-            petTemplate.setEatSound(Sound.ENTITY_GENERIC_EAT);
+            petTemplate.setEatSound(NightSound.of(Sound.ENTITY_GENERIC_EAT));
             petTemplate.setExhaustModifier(ExhaustReason.IDLE, 0.01);
             petTemplate.setExhaustModifier(ExhaustReason.WALK, 0.02);
             petTemplate.setExhaustModifier(ExhaustReason.COMBAT, 0.04);
@@ -345,7 +346,7 @@ public class PetCreator {
                 "",
                 LIGHT_GRAY.enclose(LIGHT_YELLOW.enclose("[▶]") + " " + "Right-Click a pet to " + LIGHT_YELLOW.enclose("apply") + ".")
             ));
-            meta.addEnchant(Enchantment.DURABILITY, 1, true);
+            meta.addEnchant(Enchantment.UNBREAKING, 1, true);
             meta.addItemFlags(ItemFlag.values());
         });
 
@@ -354,20 +355,23 @@ public class PetCreator {
 
     @NotNull
     private static String getSkinURL(@NotNull EntityType type) {
-        if (Version.isAtLeast(Version.MC_1_21)) {
-            String raw = BukkitThing.toString(type);
-
-            if (raw.equalsIgnoreCase("armadillo")) return "9852b33ba294f560090752d113fe728cbc7dd042029a38d5382d65a2146068b7";
-            if (raw.equalsIgnoreCase("bogged")) return "a3b9003ba2d05562c75119b8a62185c67130e9282f7acbac4bc2824c21eb95d9";
-            if (raw.equalsIgnoreCase("breeze")) return  "a275728af7e6a29c88125b675a39d88ae9919bb61fdc200337fed6ab0c49d65c";
-            if (raw.equalsIgnoreCase("sniffer")) return "fe5a8341c478a134302981e6a7758ea4ecfd8d62a0df4067897e75502f9b25de";
-        }
+//        if (Version.isAtLeast(Version.MC_1_21)) {
+//            String raw = BukkitThing.toString(type);
+//
+//            //if (raw.equalsIgnoreCase("armadillo")) return "9852b33ba294f560090752d113fe728cbc7dd042029a38d5382d65a2146068b7";
+//            //if (raw.equalsIgnoreCase("bogged")) return "a3b9003ba2d05562c75119b8a62185c67130e9282f7acbac4bc2824c21eb95d9";
+//            //if (raw.equalsIgnoreCase("breeze")) return  "a275728af7e6a29c88125b675a39d88ae9919bb61fdc200337fed6ab0c49d65c";
+//            //if (raw.equalsIgnoreCase("sniffer")) return "fe5a8341c478a134302981e6a7758ea4ecfd8d62a0df4067897e75502f9b25de";
+//        }
 
         return switch (type) {
             case ALLAY -> "f315a6a899b15a9810bc2bfdffd491a038c48016c189d43f327092c8f011599f";
+            case ARMADILLO -> "9852b33ba294f560090752d113fe728cbc7dd042029a38d5382d65a2146068b7";
             case AXOLOTL -> "21c3aa0d539208b47972bf8e72f0505cdcfb8d7796b2fcf85911ce94fd0193d0";
             case BEE -> "cce9edbbc5fdc0d8487ac72eab239d2cacfe408d74288d6384b044111ba4de0f";
             case BLAZE -> "b78ef2e4cf2c41a2d14bfde9caff10219f5b1bf5b35a49eb51c6467882cb5f0";
+            case BOGGED -> "a3b9003ba2d05562c75119b8a62185c67130e9282f7acbac4bc2824c21eb95d9";
+            case BREEZE -> "a275728af7e6a29c88125b675a39d88ae9919bb61fdc200337fed6ab0c49d65c";
             case CAT -> "3a12188258601bcb7f76e3e2489555a26c0d76e6efec2fd966ca372b6dde00";
             case CAVE_SPIDER -> "41645dfd77d09923107b3496e94eeb5c30329f97efc96ed76e226e98224";
             case CHICKEN -> "1638469a599ceef7207537603248a9ab11ff591fd378bea4735b346a7fae893";
@@ -390,7 +394,7 @@ public class PetCreator {
             case LLAMA -> "cf24e56fd9ffd7133da6d1f3e2f455952b1da462686f753c597ee82299a";
             case MAGMA_CUBE -> "38957d5023c937c4c41aa2412d43410bda23cf79a9f6ab36b76fef2d7c429";
             case MULE -> "a0486a742e7dda0bae61ce2f55fa13527f1c3b334c57c034bb4cf132fb5f5f";
-            case MUSHROOM_COW -> "a163bc416b8e6058f92b231e9a524b7fe118eb6e7eeab4ad16d1b52a3ec04fcd";
+            case MOOSHROOM -> "a163bc416b8e6058f92b231e9a524b7fe118eb6e7eeab4ad16d1b52a3ec04fcd";
             case OCELOT -> "5657cd5c2989ff97570fec4ddcdc6926a68a3393250c1be1f0b114a1db1";
             case PANDA -> "ba6e3ad823f96d4a80a14556d8c9c7632163bbd2a876c0118b458925d87a5513";
             case PHANTOM -> "411d25bcdabafad5fd6e010c5b1cf7a00c9cca40c5a46747f706dc9cb3a";
@@ -406,7 +410,8 @@ public class PetCreator {
             case SKELETON -> "301268e9c492da1f0d88271cb492a4b302395f515a7bbf77f4a20b95fc02eb2";
             case SKELETON_HORSE -> "72618a3c268ca388a38b893016aba26f6271519cde1a6bbd599cdd6472843b7f";
             case SLIME -> "895aeec6b842ada8669f846d65bc49762597824ab944f22f45bf3bbb941abe6c";
-            case SNOWMAN -> "98e334e4bee04264759a766bc1955cfaf3f56201428fafec8d4bf1bb36ae6";
+            case SNIFFER -> "fe5a8341c478a134302981e6a7758ea4ecfd8d62a0df4067897e75502f9b25de";
+            case SNOW_GOLEM -> "98e334e4bee04264759a766bc1955cfaf3f56201428fafec8d4bf1bb36ae6";
             case SPIDER -> "cd541541daaff50896cd258bdbdd4cf80c3ba816735726078bfe393927e57f1";
             case STRAY -> "78ddf76e555dd5c4aa8a0a5fc584520cd63d489c253de969f7f22f85a9a2d56";
             case TRADER_LLAMA -> "15ad6b69cc6b4769d3516a0ce98b99b2a5d406fea4912dec570ea4a4f2bcc0ff";
@@ -431,8 +436,7 @@ public class PetCreator {
 
     @NotNull
     private static Set<String> getFoodCategories(@NotNull EntityType entityType) {
-        String raw = BukkitThing.toString(entityType);
-        if (raw.equalsIgnoreCase("bogged")) return Lists.newSet(FOOD_BONE_MEAL);
+        //String raw = BukkitThing.toString(entityType);
 
         return switch (entityType) {
             case BEE -> Lists.newSet(FOOD_FLOWERS);
@@ -440,7 +444,7 @@ public class PetCreator {
             case CHICKEN -> Lists.newSet(FOOD_WHEAT_SEEDS);
             case COW, LLAMA, TRADER_LLAMA, SHEEP, GOAT -> Lists.newSet(FOOD_WHEAT);
             case DONKEY, HORSE, MULE -> Lists.newSet(FOOD_APPLES);
-            case MUSHROOM_COW -> Lists.newSet(FOOD_MUSHROOMS);
+            case MOOSHROOM -> Lists.newSet(FOOD_MUSHROOMS);
             case PANDA -> Lists.newSet(FOOD_RAW_MEAT, FOOD_BAMBOO);
             case PIG, PIGLIN, PIGLIN_BRUTE, HOGLIN -> Lists.newSet(FOOD_CARROTS, FOOD_APPLES, FOOD_BREAD, FOOD_BEETROOT);
             case RABBIT -> Lists.newSet(FOOD_CARROTS);
@@ -450,7 +454,7 @@ public class PetCreator {
             case CREEPER, GHAST, MAGMA_CUBE -> Lists.newSet(FOOD_GUNPOWDER);
             case ZOGLIN, ZOMBIFIED_PIGLIN, ZOMBIE, ZOMBIE_VILLAGER, ZOMBIE_HORSE, HUSK, DROWNED, GIANT -> Lists.newSet(FOOD_ROTTEN_FLESH);
             case ENDERMAN, ENDERMITE, PHANTOM -> Lists.newSet(FOOD_CHORUS_FRUITS);
-            case SKELETON, SKELETON_HORSE, STRAY, SILVERFISH -> Lists.newSet(FOOD_BONE_MEAL);
+            case BOGGED, SKELETON, SKELETON_HORSE, STRAY, SILVERFISH -> Lists.newSet(FOOD_BONE_MEAL);
             case WITHER, WITHER_SKELETON -> Lists.newSet(FOOD_WITHER_ROSES);
             default -> Collections.emptySet();
         };
@@ -465,7 +469,7 @@ public class PetCreator {
         Entity entity = world.createEntity(world.getSpawnLocation(), clazz);
         if (!(entity instanceof LivingEntity livingEntity)) return;
 
-        double maxHealth = Math.max(10D, EntityUtil.getAttribute(livingEntity, Attribute.GENERIC_MAX_HEALTH));
+        double maxHealth = Math.max(10D, EntityUtil.getAttribute(livingEntity, Attribute.MAX_HEALTH));
 
         for (Stat petAttribute : AttributeRegistry.values()) {
             String name = petAttribute.getId();

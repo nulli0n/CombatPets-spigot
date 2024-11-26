@@ -3,6 +3,10 @@ name: CombatPets
 version: '${project.version}'
 author: NightExpress
 description: Customizable pets with many cool features!
-depend: [ nightcore ]
-softdepend: [ MythicMobs, PlaceholderAPI, Vault ]
-api-version: 1.19
+depend:
+  - nightcore
+softdepend:
+  - MythicMobs
+  - PlaceholderAPI
+  - EconomyBridge
+api-version: 1.20

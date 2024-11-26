@@ -5,8 +5,14 @@ import su.nightexpress.combatpets.api.pet.FoodCategory;
 import su.nightexpress.combatpets.api.pet.Stat;
 import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.data.impl.PetData;
-import su.nightexpress.combatpets.pet.impl.*;
 import su.nightexpress.combatpets.pet.AttributeRegistry;
+import su.nightexpress.combatpets.pet.impl.PetAspect;
+import su.nightexpress.combatpets.pet.impl.PetInstance;
+import su.nightexpress.combatpets.pet.impl.PetTemplate;
+import su.nightexpress.combatpets.pet.impl.PetTier;
+import su.nightexpress.combatpets.util.PetUtils;
+import su.nightexpress.economybridge.EconomyBridge;
+import su.nightexpress.economybridge.api.Currency;
 import su.nightexpress.nightcore.util.NumberUtil;
 import su.nightexpress.nightcore.util.TimeUtil;
 import su.nightexpress.nightcore.util.placeholder.PlaceholderMap;
@@ -124,12 +130,12 @@ public class Placeholders extends su.nightexpress.nightcore.util.Placeholders {
 //        }
 
         return new PlaceholderMap()
-            .add(instance.getData().getPlaceholders())
             .add(PET_HEALTH, () -> NumberUtil.format(instance.getEntity().getHealth()))
             .add(PET_MAX_HEALTH, () -> NumberUtil.format(instance.getMaxHealth()))
             .add(PET_OWNER_NAME, () -> instance.getOwner().getName())
             .add(PET_EQUIPMENT_UNLOCKED, () -> Lang.getYesOrNo(instance.isEquipmentUnlocked()))
-            .add(PET_INVENTORY_FILLED, () -> String.valueOf(Stream.of(instance.getInventory().getContents()).filter(i -> i != null && !i.getType().isAir()).count()));
+            .add(PET_INVENTORY_FILLED, () -> String.valueOf(Stream.of(instance.getInventory().getContents()).filter(i -> i != null && !i.getType().isAir()).count()))
+            .add(instance.getData().getPlaceholders());
     }
 
     @NotNull
@@ -141,7 +147,12 @@ public class Placeholders extends su.nightexpress.nightcore.util.Placeholders {
             .add(TIER_INVENTORY_SIZE, () -> String.valueOf(tier.getInventorySize()))
             .add(TIER_EQUIPMENT_HAS, () -> Lang.getYesOrNo(tier.hasEquipment()))
             .add(TIER_DEATH_REVIVE_COOLDOWN, () -> TimeUtil.formatTime(tier.getAutoRespawnTime()))
-            .add(TIER_DEATH_REVIVE_COST, () -> NumberUtil.format(tier.getReviveCost()))
+            .add(TIER_DEATH_REVIVE_COST, () -> {
+                if (!PetUtils.hasEconomyBridge()) return NumberUtil.format(tier.getReviveCost());
+
+                Currency currency = EconomyBridge.getCurrency(tier.getReviveCurrency());
+                return currency == null ? "0" : currency.format(tier.getReviveCost());
+            })
             ;
     }
 

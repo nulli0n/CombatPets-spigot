@@ -4,15 +4,16 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.combatpets.PetsPlugin;
-import su.nightexpress.combatpets.api.currency.Currency;
 import su.nightexpress.combatpets.api.pet.Template;
 import su.nightexpress.combatpets.api.pet.Tier;
-import su.nightexpress.combatpets.currency.handler.VaultEconomyHandler;
 import su.nightexpress.combatpets.shop.command.ShopCommands;
 import su.nightexpress.combatpets.shop.data.EggPrice;
 import su.nightexpress.combatpets.shop.menu.EggConfirmMenu;
 import su.nightexpress.combatpets.shop.menu.ShopEggsMenu;
 import su.nightexpress.combatpets.shop.menu.ShopTiersMenu;
+import su.nightexpress.economybridge.EconomyBridge;
+import su.nightexpress.economybridge.api.Currency;
+import su.nightexpress.economybridge.currency.CurrencyId;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.manager.AbstractManager;
@@ -80,7 +81,7 @@ public class ShopManager extends AbstractManager<PetsPlugin> {
                 double oldPrice = petFile.getDouble("Egg_Cost", -1) * oldModifier;
 
                 config.addMissing(path + ".Price", oldPrice);
-                config.addMissing(path + ".Currency", VaultEconomyHandler.ID);
+                config.addMissing(path + ".Currency", CurrencyId.VAULT);
                 petFile.remove("Egg_Cost");
             }
             // ----------- UPDATE OLD DATA - END -----------
@@ -91,8 +92,8 @@ public class ShopManager extends AbstractManager<PetsPlugin> {
             double price = ConfigValue.create(path + ".Price", 1000D).read(config);
             if (price <= 0D) return;
 
-            String currencyId = ConfigValue.create(path + ".Currency", VaultEconomyHandler.ID).read(config);
-            Currency currency = this.plugin.getCurrencyManager().getCurrency(currencyId);
+            String currencyId = CurrencyId.reroute(ConfigValue.create(path + ".Currency", CurrencyId.VAULT).read(config));
+            Currency currency = EconomyBridge.getCurrency(currencyId);
             if (currency == null) {
                 this.plugin.warn("Invalid currency '" + currencyId + "' for default tier price for '" + tier.getId() + "' tier.");
                 return;
@@ -120,8 +121,8 @@ public class ShopManager extends AbstractManager<PetsPlugin> {
                 double price = ConfigValue.create(path + ".Price", 0D).read(config);
                 if (price <= 0D) return;
 
-                String currencyId = ConfigValue.create(path + ".Currency", VaultEconomyHandler.ID).read(config);
-                Currency currency = this.plugin.getCurrencyManager().getCurrency(currencyId);
+                String currencyId = CurrencyId.reroute(ConfigValue.create(path + ".Currency", CurrencyId.VAULT).read(config));
+                Currency currency = EconomyBridge.getCurrency(currencyId);
                 if (currency == null) {
                     this.plugin.warn("Invalid currency '" + currencyId + "' for '" + tier.getId() + " -> " + petConfig.getId() + "' pet egg price.");
                     return;

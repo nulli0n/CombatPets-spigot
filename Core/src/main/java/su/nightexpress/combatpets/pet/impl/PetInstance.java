@@ -2,6 +2,7 @@ package su.nightexpress.combatpets.pet.impl;
 
 import org.bukkit.Particle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.entity.Breedable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
@@ -26,8 +27,7 @@ import su.nightexpress.combatpets.pet.AttributeRegistry;
 import su.nightexpress.combatpets.util.PetUtils;
 import su.nightexpress.nightcore.menu.api.Menu;
 import su.nightexpress.nightcore.menu.impl.AbstractMenu;
-import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.NumberUtil;
+import su.nightexpress.nightcore.util.*;
 import su.nightexpress.nightcore.util.placeholder.PlaceholderMap;
 import su.nightexpress.nightcore.util.text.NightMessage;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
@@ -42,7 +42,8 @@ public final class PetInstance implements ActivePet {
     private final PlaceholderMap   placeholderMap;
 
     private boolean equipmentUnlocked;
-    private long    lastRegeneratedTime;
+    private long    nextRegenTime;
+    private long    regenCooldownDate;
     private BossBar healthBar;
 
     //private DynamicEntity dynamicEntity;
@@ -233,10 +234,19 @@ public final class PetInstance implements ActivePet {
         this.entity.setSilent(this.data.isSilent());
         this.entity.setPersistent(true);
         this.entity.setRemoveWhenFarAway(false);
+        this.entity.setCanPickupItems(false);
+        if (this.entity instanceof Breedable breedable) {
+            breedable.setAgeLock(true);
+        }
 
         this.updateHealthBar();
         this.updateName();
         this.getTemplate().getSpawnParticle().play(entity.getEyeLocation(), 0.5, 0.1, 25);
+    }
+
+    @Override
+    public void onIncomingDamage() {
+        this.regenCooldownDate = TimeUtil.createFutureTimestamp(Config.PET_DAMAGE_REGEN_COOLDOWN.get());
     }
 
     @Override
@@ -345,7 +355,7 @@ public final class PetInstance implements ActivePet {
 
     @Override
     public Template getTemplate() {
-        return this.data.getConfig();
+        return this.data.getTemplate();
     }
 
     @NotNull
@@ -402,12 +412,8 @@ public final class PetInstance implements ActivePet {
     @Override
     public boolean doRegenerate(@NotNull EntityRegainHealthEvent.RegainReason reason) {
         if (reason == EntityRegainHealthEvent.RegainReason.REGEN) {
-            double regenSpeed = this.getRegenerationSpeed();
-
-            long needPass = (long) (regenSpeed * 1000L);
-            long now = System.currentTimeMillis();
-
-            if (now - this.lastRegeneratedTime < needPass) return false;
+            if (!TimeUtil.isPassed(this.regenCooldownDate)) return false;
+            if (!TimeUtil.isPassed(this.nextRegenTime)) return false;
         }
 
         double healthMax = this.getMaxHealth();
@@ -429,7 +435,7 @@ public final class PetInstance implements ActivePet {
         this.doRegenerate(event.getAmount());
 
         if (reason == EntityRegainHealthEvent.RegainReason.REGEN) {
-            this.lastRegeneratedTime = System.currentTimeMillis();
+            this.nextRegenTime = TimeUtil.createFutureTimestamp(this.getRegenerationSpeed());
         }
         return true;
     }
@@ -444,6 +450,7 @@ public final class PetInstance implements ActivePet {
         this.data.setHealth(this.entity.getHealth());
 
         this.updateHealthBar();
+        this.updateName();
     }
 
     @Override
@@ -465,7 +472,10 @@ public final class PetInstance implements ActivePet {
         if (saturation >= maxSaturation) return false;
 
         this.doFeed(foodItem.getSaturation());
-        UniParticle.of(Particle.ITEM_CRACK, foodItem.getItem()).play(this.entity.getEyeLocation(), 0.25, 0.1, 15);
+
+        if (Version.isAtLeast(Version.MC_1_21)) {
+            UniParticle.of(Particle.ITEM, foodItem.getItem()).play(this.entity.getEyeLocation(), 0.25, 0.1, 15);
+        }
         return true;
     }
 
@@ -537,7 +547,6 @@ public final class PetInstance implements ActivePet {
     @Override
     public boolean canGainXP() {
         if (!Config.isLevelingEnabled()) return false;
-        //if (LevelingConfig.DISABLED_WORLDS.get().contains(this.entity.getWorld().getName())) return false;
         if (!this.isMaxLevel()) return true;
 
         return this.getXP() < this.getRequiredXP();
@@ -546,7 +555,6 @@ public final class PetInstance implements ActivePet {
     @Override
     public boolean canLossXP() {
         if (!Config.isLevelingEnabled()) return false;
-        //if (LevelingConfig.DISABLED_WORLDS.get().contains(this.entity.getWorld().getName())) return false;
         if (this.getLevel() == 1) {
             if (!LevelingConfig.ALLOW_DOWNGRADE.get()) {
                 return this.getXP() <= 0;
@@ -568,6 +576,7 @@ public final class PetInstance implements ActivePet {
         }
         else {
             this.updateHealthBar();
+            this.updateName();
         }
     }
 
@@ -588,6 +597,7 @@ public final class PetInstance implements ActivePet {
         }
         else {
             this.updateHealthBar();
+            this.updateName();
         }
     }
 

@@ -22,6 +22,7 @@ import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.manager.AbstractManager;
 import su.nightexpress.nightcore.util.ItemReplacer;
+import su.nightexpress.nightcore.util.ItemUtil;
 import su.nightexpress.nightcore.util.PDCUtil;
 import su.nightexpress.nightcore.util.StringUtil;
 
@@ -69,12 +70,14 @@ public class WardrobeManager extends AbstractManager<PetsPlugin> {
     private void loadVariants(@NotNull FileConfig config) {
         this.register("age", new AgeVariantHandler(), config);
         this.register("size", new SizeVariantHandler(), config);
+        this.register("creeper_state", new CreeperPowerVariantHandler(), config);
         this.register("fox_type", new FoxTypeVariantHandler(), config);
         this.register("llama_color", new LlamaColorVariantHandler(), config);
         this.register("sheep_color", new SheepColorVariantHandler(), config);
         this.register("horse_style", new HorseStyleVariantHandler(), config);
         this.register("horse_color", new HorseColorVariantHandler(), config);
-        // TODO More varaints, Creeper charge, sheep sheared
+        this.register("shear_style", new SheepShearVariantHandler(), config);
+        // TODO More varaints
         // Rabbit type, Cat type, Mooshroom type, Villager profession (+ zombie)
     }
 
@@ -121,6 +124,34 @@ public class WardrobeManager extends AbstractManager<PetsPlugin> {
         WardrobeConfig.WARDROBE_ACCESSORY_APPLY_SOUND.get().play(entity.getEyeLocation());
 
         return true;
+    }
+
+    // Used to store entity accessories in pet egg obtained from capturing.
+    public void storeAccessoryData(@NotNull LivingEntity entity, @NotNull ItemStack itemStack) {
+        ItemUtil.editMeta(itemStack, meta -> {
+            PetWardrobe.of(entity).getAccessories().forEach((key, data) -> {
+
+                EntityVariant<?> variant = VariantRegistry.getVariant(key);
+                if (variant == null) return;
+
+                PDCUtil.set(meta, variant.getKey(), data);
+            });
+        });
+    }
+
+    // Used to restore entity accessories to PetData when player claims pet egg.
+    @NotNull
+    public PetWardrobe readAccessoryData(@NotNull ItemStack itemStack) {
+        PetWardrobe wardrobe = new PetWardrobe();
+
+        VariantRegistry.getVariants().forEach(variant -> {
+            String data = PDCUtil.getString(itemStack, variant.getKey()).orElse(null);
+            if (data == null) return;
+
+            wardrobe.addAccessory(variant.getName(), data);
+        });
+
+        return wardrobe;
     }
 
     @NotNull

@@ -1,28 +1,27 @@
 package su.nightexpress.combatpets;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import su.nightexpress.combatpets.capture.CaptureManager;
-import su.nightexpress.combatpets.command.impl.BaseCommands;
 import su.nightexpress.combatpets.command.impl.AspectPointsCommands;
+import su.nightexpress.combatpets.command.impl.BaseCommands;
 import su.nightexpress.combatpets.config.Config;
 import su.nightexpress.combatpets.config.Keys;
 import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.config.Perms;
-import su.nightexpress.combatpets.currency.CurrencyManager;
-import su.nightexpress.combatpets.item.ItemManager;
-import su.nightexpress.combatpets.level.LevelingManager;
-import su.nightexpress.combatpets.wardrobe.WardrobeManager;
 import su.nightexpress.combatpets.data.DataHandler;
 import su.nightexpress.combatpets.data.UserManager;
 import su.nightexpress.combatpets.data.impl.PetUser;
+import su.nightexpress.combatpets.hook.HookId;
 import su.nightexpress.combatpets.hook.impl.PlaceholderHook;
+import su.nightexpress.combatpets.item.ItemManager;
+import su.nightexpress.combatpets.level.LevelingManager;
 import su.nightexpress.combatpets.nms.PetNMS;
 import su.nightexpress.combatpets.nms.mc_1_21.MC_1_21;
-import su.nightexpress.combatpets.nms.v1_19_R1.V1_19_R1;
-import su.nightexpress.combatpets.nms.v1_20.V1_20;
+import su.nightexpress.combatpets.nms.mc_1_21_3.MC_1_21_3;
 import su.nightexpress.combatpets.pet.PetManager;
 import su.nightexpress.combatpets.shop.ShopManager;
+import su.nightexpress.combatpets.util.PetUtils;
+import su.nightexpress.combatpets.wardrobe.WardrobeManager;
 import su.nightexpress.nightcore.NightDataPlugin;
 import su.nightexpress.nightcore.command.experimental.ImprovedCommands;
 import su.nightexpress.nightcore.config.PluginDetails;
@@ -34,7 +33,6 @@ public class PetsPlugin extends NightDataPlugin<PetUser> implements ImprovedComm
     private DataHandler dataHandler;
     private UserManager userManager;
 
-    private CurrencyManager currencyManager;
     private ItemManager itemManager;
     private PetManager      petManager;
     private LevelingManager levelingManager;
@@ -73,9 +71,6 @@ public class PetsPlugin extends NightDataPlugin<PetUser> implements ImprovedComm
         this.userManager = new UserManager(this);
         this.userManager.setup();
 
-        this.currencyManager = new CurrencyManager(this);
-        this.currencyManager.setup();
-
         this.itemManager = new ItemManager(this);
         this.itemManager.setup();
 
@@ -105,9 +100,8 @@ public class PetsPlugin extends NightDataPlugin<PetUser> implements ImprovedComm
     }
 
     private boolean loadShop() {
-        if (!this.currencyManager.hasCurrency()) {
-            this.warn("No currencies are available. Shop will be disabled.");
-            this.warn(Placeholders.WIKI_CURRENCY_URL);
+        if (!PetUtils.hasEconomyBridge()) {
+            this.error("You must install " + HookId.ECONOMY_BRIDGE + " to use shop features!");
             return false;
         }
 
@@ -133,7 +127,6 @@ public class PetsPlugin extends NightDataPlugin<PetUser> implements ImprovedComm
         if (this.captureManager != null) this.captureManager.shutdown();
         if (this.petManager != null) this.petManager.shutdown();
         if (this.wardrobeManager != null) this.wardrobeManager.shutdown();
-        if (this.currencyManager != null) this.currencyManager.shutdown();
         if (this.itemManager != null) this.itemManager.shutdown();
 
         PetAPI.shutdown();
@@ -146,9 +139,8 @@ public class PetsPlugin extends NightDataPlugin<PetUser> implements ImprovedComm
 
     private boolean setupNMS() {
         switch (Version.getCurrent()) {
-            case V1_19_R3 -> this.petNMS = new V1_19_R1();
-            case V1_20_R3 -> this.petNMS = new V1_20();
             case MC_1_21 -> this.petNMS = new MC_1_21();
+            case MC_1_21_3 -> this.petNMS = new MC_1_21_3();
         }
         return this.petNMS != null;
     }
@@ -171,11 +163,6 @@ public class PetsPlugin extends NightDataPlugin<PetUser> implements ImprovedComm
     }
 
     @NotNull
-    public CurrencyManager getCurrencyManager() {
-        return currencyManager;
-    }
-
-    @NotNull
     public ItemManager getItemManager() {
         return itemManager;
     }
@@ -185,23 +172,19 @@ public class PetsPlugin extends NightDataPlugin<PetUser> implements ImprovedComm
         return this.petManager;
     }
 
-    @Nullable
     public LevelingManager getLevelingManager() {
-        return levelingManager;
+        return this.levelingManager;
     }
 
-    @Nullable
     public CaptureManager getCaptureManager() {
-        return captureManager;
+        return this.captureManager;
     }
 
-    @Nullable
     public WardrobeManager getWardrobeManager() {
         return this.wardrobeManager;
     }
 
-    @Nullable
     public ShopManager getShopManager() {
-        return shopManager;
+        return this.shopManager;
     }
 }

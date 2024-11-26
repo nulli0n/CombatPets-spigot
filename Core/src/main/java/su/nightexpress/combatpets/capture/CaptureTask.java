@@ -4,15 +4,17 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.combatpets.PetsPlugin;
 import su.nightexpress.combatpets.Placeholders;
 import su.nightexpress.combatpets.api.pet.Template;
 import su.nightexpress.combatpets.api.pet.Tier;
-import su.nightexpress.combatpets.api.pet.event.capture.PetEscapeCaptureEvent;
 import su.nightexpress.combatpets.api.pet.event.capture.PetCaptureFailureEvent;
 import su.nightexpress.combatpets.api.pet.event.capture.PetCaptureSuccessEvent;
+import su.nightexpress.combatpets.api.pet.event.capture.PetEscapeCaptureEvent;
 import su.nightexpress.combatpets.capture.config.CaptureConfig;
+import su.nightexpress.combatpets.config.Config;
 import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.nightcore.util.random.Rnd;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
@@ -103,7 +105,7 @@ public final class CaptureTask {
         }
         else this.countFailure();
 
-        UniParticle.of(Particle.SMOKE_NORMAL).play(this.entity.getLocation(), 0.5, 0.1, 10);
+        UniParticle.of(Particle.SMOKE).play(this.entity.getLocation(), 0.5, 0.1, 10);
 
         Lang.CAPTURE_PROGRESS.getMessage()
             .replace(Placeholders.GENERIC_SUCCESS, String.valueOf(this.success))
@@ -130,7 +132,12 @@ public final class CaptureTask {
     }
 
     private void onSuccess() {
-        this.entity.getWorld().dropItemNaturally(this.entity.getLocation(), this.template.createEgg(this.tier));
+        ItemStack itemStack = this.template.createEgg(this.tier);
+        if (Config.isWardrobeEnabled()) {
+            this.plugin.getWardrobeManager().storeAccessoryData(this.entity, itemStack);
+        }
+
+        this.entity.getWorld().dropItemNaturally(this.entity.getLocation(), itemStack);
         this.entity.remove();
 
         UniParticle.of(Particle.CLOUD).play(this.entity.getLocation(), 0.5, 0.1, 30);
@@ -168,7 +175,8 @@ public final class CaptureTask {
             this.entity.damage(0.1D, this.player);
 
             CaptureManager.setEscapedFromCatch(this.entity, true);
-            UniParticle.of(Particle.VILLAGER_ANGRY).play(this.entity.getEyeLocation(), 0.1, 3);
+
+            UniParticle.of(Particle.ANGRY_VILLAGER).play(this.entity.getEyeLocation(), 0.1, 3);
 
             PetEscapeCaptureEvent event = new PetEscapeCaptureEvent(player, entity, template, tier);
             plugin.getPluginManager().callEvent(event);

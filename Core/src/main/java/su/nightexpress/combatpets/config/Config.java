@@ -109,6 +109,10 @@ public class Config {
         70,
         "Sets for how many percents a pet should be satiated to be able for natural health regen.");
 
+    public static final ConfigValue<Double> PET_DAMAGE_REGEN_COOLDOWN = ConfigValue.create("Pets.Damage_Regen_Cooldown",
+        5D,
+        "Sets natural regeneration cooldown (in seconds) when a pet was damaged.");
+
     public static final ConfigValue<Boolean> PET_PERMANENT_DEATH = ConfigValue.create("Pets.Permanent_Deaths",
         false,
         "Sets whether or not pet will be removed from player's collection when pet dies.");

@@ -7,6 +7,8 @@ import org.bukkit.entity.Horse;
 import org.bukkit.entity.Llama;
 import su.nightexpress.combatpets.api.pet.type.CombatMode;
 import su.nightexpress.combatpets.wardrobe.handler.AgeVariantHandler;
+import su.nightexpress.combatpets.wardrobe.handler.CreeperPowerVariantHandler;
+import su.nightexpress.combatpets.wardrobe.handler.SheepShearVariantHandler;
 import su.nightexpress.nightcore.core.CoreLang;
 import su.nightexpress.nightcore.language.entry.LangEnum;
 import su.nightexpress.nightcore.language.entry.LangString;
@@ -19,12 +21,14 @@ import static su.nightexpress.nightcore.language.tag.MessageTags.*;
 
 public class Lang extends CoreLang {
 
-    public static final LangEnum<AgeVariantHandler.Type> AGE_TYPE    = LangEnum.of("PetVariant.AgeType", AgeVariantHandler.Type.class);
-    public static final LangEnum<DyeColor>               DYE_COLOR   = LangEnum.of("PetVariant.DyeColor", DyeColor.class);
-    public static final LangEnum<Fox.Type>               FOX_TYPE    = LangEnum.of("PetVariant.FoxType", Fox.Type.class);
-    public static final LangEnum<Horse.Color>            HORSE_COLOR = LangEnum.of("PetVariant.HorseColor", Horse.Color.class);
-    public static final LangEnum<Horse.Style>            HORSE_STYLE = LangEnum.of("PetVariant.FoxType", Horse.Style.class);
-    public static final LangEnum<Llama.Color>            LLAMA_COLOR = LangEnum.of("PetVariant.LlamaColor", Llama.Color.class);
+    public static final LangEnum<AgeVariantHandler.Type>          AGE_TYPE    = LangEnum.of("PetVariant.AgeType", AgeVariantHandler.Type.class);
+    public static final LangEnum<CreeperPowerVariantHandler.Type> POWER_TYPE  = LangEnum.of("PetVariant.CreeperPower", CreeperPowerVariantHandler.Type.class);
+    public static final LangEnum<DyeColor>                        DYE_COLOR   = LangEnum.of("PetVariant.DyeColor", DyeColor.class);
+    public static final LangEnum<Fox.Type>                        FOX_TYPE    = LangEnum.of("PetVariant.FoxType", Fox.Type.class);
+    public static final LangEnum<Horse.Color>                     HORSE_COLOR = LangEnum.of("PetVariant.HorseColor", Horse.Color.class);
+    public static final LangEnum<Horse.Style>                     HORSE_STYLE = LangEnum.of("PetVariant.FoxType", Horse.Style.class);
+    public static final LangEnum<Llama.Color>                     LLAMA_COLOR = LangEnum.of("PetVariant.LlamaColor", Llama.Color.class);
+    public static final LangEnum<SheepShearVariantHandler.Type>   SHEEP_SHEAR = LangEnum.of("PetVariant.SheepShear", SheepShearVariantHandler.Type.class);
 
     public static final LangEnum<CombatMode> COMBAT_MODE = LangEnum.of("CombatMode", CombatMode.class);
 

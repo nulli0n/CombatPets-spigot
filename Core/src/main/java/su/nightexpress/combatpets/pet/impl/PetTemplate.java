@@ -18,8 +18,11 @@ import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.language.LangAssets;
 import su.nightexpress.nightcore.manager.AbstractFileData;
+import su.nightexpress.nightcore.util.bukkit.NightSound;
 import su.nightexpress.nightcore.util.placeholder.PlaceholderMap;
+import su.nightexpress.nightcore.util.text.NightMessage;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
+import su.nightexpress.nightcore.util.wrapper.UniSound;
 
 import java.io.File;
 import java.util.HashMap;
@@ -40,7 +43,7 @@ public class PetTemplate extends AbstractFileData<PetsPlugin> implements Templat
     private double      captureEscapeChance;
     private double      captureChance;
     private Set<String> foodCategories;
-    private Sound       eatSound;
+    private NightSound       eatSound;
     private UniParticle spawnParticle;
     private UniParticle despawnParticle;
 
@@ -119,7 +122,7 @@ public class PetTemplate extends AbstractFileData<PetsPlugin> implements Templat
         ).read(config));
 
         this.setEatSound(ConfigValue.create("Saturation.Eat_Sound",
-            Sound.class, Sound.ENTITY_GENERIC_EAT,
+            NightSound.of(Sound.ENTITY_GENERIC_EAT),
             "Sets sound to play when pet ates food item."
         ).read(config));
 
@@ -159,7 +162,7 @@ public class PetTemplate extends AbstractFileData<PetsPlugin> implements Templat
                 AttributeRegistry.MOVEMENT_SPEED, 0.2D,
                 AttributeRegistry.MAX_SATURATION, 15D,
                 AttributeRegistry.HEALTH_REGENEATION_FORCE, 0.5D,
-                AttributeRegistry.HEALTH_REGENEATION_SPEED, 1D
+                AttributeRegistry.HEALTH_REGENEATION_SPEED, 3.5D
             ),
             "Default (initial) attribute values for this pet.",
             Placeholders.WIKI_ATTRIBUTES_URL
@@ -176,7 +179,7 @@ public class PetTemplate extends AbstractFileData<PetsPlugin> implements Templat
                 AttributeRegistry.MOVEMENT_SPEED, 0.01D,
                 AttributeRegistry.MAX_SATURATION, 0.2D,
                 AttributeRegistry.HEALTH_REGENEATION_FORCE, 0.05D,
-                AttributeRegistry.HEALTH_REGENEATION_SPEED, 0.02D
+                AttributeRegistry.HEALTH_REGENEATION_SPEED, -0.01D
             ),
             "Attribute values added per each aspect value.",
             Placeholders.WIKI_ATTRIBUTES_URL,
@@ -199,7 +202,7 @@ public class PetTemplate extends AbstractFileData<PetsPlugin> implements Templat
         config.set("Catchable", this.isCapturable());
         this.getSpawnParticle().write(config, "Spawn_Particle");
         this.getDespawnParticle().write(config, "Despawn_Particle");
-        config.set("Saturation.Eat_Sound", this.getEatSound().getKey().getKey());
+        config.set("Saturation.Eat_Sound", this.getEatSound());
         config.remove("Saturation.Exhaust");
         this.exhaustModifier.forEach((reason, mod) -> {
             config.set("Saturation.Exhaust." + reason.name(), mod);
@@ -335,12 +338,12 @@ public class PetTemplate extends AbstractFileData<PetsPlugin> implements Templat
 
     @NotNull
     @Override
-    public Sound getEatSound() {
+    public NightSound getEatSound() {
         return eatSound;
     }
 
     @Override
-    public void setEatSound(@NotNull Sound eatSound) {
+    public void setEatSound(@NotNull NightSound eatSound) {
         this.eatSound = eatSound;
     }
 

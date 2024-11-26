@@ -1,12 +1,12 @@
 package su.nightexpress.combatpets.shop.data;
 
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.combatpets.api.currency.Currency;
+import su.nightexpress.economybridge.api.Currency;
 
 public class EggPrice {
 
     private final Currency currency;
-    private final double price;
+    private final double   price;
 
     public EggPrice(@NotNull Currency currency, double price) {
         this.currency = currency;

@@ -140,6 +140,7 @@ public class MC_1_21 implements PetNMS {
         mob.setLeashedTo(holder == null ? null : ((CraftEntity)holder).getHandle(), true);
     }
 
+    @Deprecated
     public static void hurtArmor(@NotNull net.minecraft.world.entity.LivingEntity entity, DamageSource source, float amount) {
         if (amount <= 0F) return;
 

@@ -1,9 +1,11 @@
 package su.nightexpress.combatpets.nms;
 
 import org.bukkit.Location;
+import org.bukkit.damage.DamageSource;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.combatpets.api.pet.Template;
@@ -18,6 +20,10 @@ public interface PetNMS {
 
     default boolean canSpawn(@NotNull EntityType entityType) {
         return this.getSupportedEntities().contains(entityType);
+    }
+
+    default void damageItem(@NotNull EquipmentSlot slot, @NotNull LivingEntity entity, @NotNull DamageSource source, int damage) {
+
     }
 
     @NotNull

@@ -1,11 +1,13 @@
 package su.nightexpress.combatpets.pet.listener;
 
+import org.bukkit.damage.DamageSource;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.tag.DamageTypeTags;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.combatpets.PetsPlugin;
 import su.nightexpress.combatpets.api.pet.ActivePet;
@@ -13,6 +15,7 @@ import su.nightexpress.combatpets.config.Config;
 import su.nightexpress.combatpets.pet.PetManager;
 import su.nightexpress.combatpets.util.PetUtils;
 import su.nightexpress.nightcore.manager.AbstractListener;
+import su.nightexpress.nightcore.util.Version;
 
 public class CombatListener extends AbstractListener<PetsPlugin> {
 
@@ -23,6 +26,7 @@ public class CombatListener extends AbstractListener<PetsPlugin> {
         this.petManager = petManager;
     }
 
+    @SuppressWarnings({"UnstableApiUsage", "deprecation"})
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPetDamageInUpdate(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof LivingEntity victim)) return;
@@ -30,9 +34,19 @@ public class CombatListener extends AbstractListener<PetsPlugin> {
         ActivePet activePet = this.petManager.getPetByMob(victim);
         if (activePet == null) return;
 
+        if (Version.isAtLeast(Version.MC_1_21)) {
+            DamageSource source = event.getDamageSource();
+            if (!DamageTypeTags.BYPASSES_ARMOR.isTagged(source.getDamageType())) {
+                float amount = (float) (event.getDamage() + event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) + event.getDamage(EntityDamageEvent.DamageModifier.HARD_HAT));
+                PetUtils.hurtArmor(victim, source, amount);
+            }
+        }
+
+        activePet.onIncomingDamage();
+
         this.plugin.runTask(task -> {
-            activePet.updateHealthBar();
             activePet.updateName();
+            activePet.updateHealthBar();
         });
     }
 

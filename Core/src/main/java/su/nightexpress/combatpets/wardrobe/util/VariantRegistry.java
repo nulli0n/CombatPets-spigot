@@ -23,8 +23,8 @@ public class VariantRegistry {
     }
 
     @NotNull
-    public static Collection<EntityVariant<?>> getVariants() {
-        return VARIANT_MAP.values();
+    public static Set<EntityVariant<?>> getVariants() {
+        return new HashSet<>(VARIANT_MAP.values());
     }
 
     @NotNull

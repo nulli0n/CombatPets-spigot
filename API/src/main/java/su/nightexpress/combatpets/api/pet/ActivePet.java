@@ -31,6 +31,8 @@ public interface ActivePet extends Placeholder, InventoryHolder {
 
     void onLevelDowngrade();
 
+    void onIncomingDamage();
+
     void saveData();
 
     void update();

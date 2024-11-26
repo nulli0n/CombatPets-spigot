@@ -1,11 +1,11 @@
 package su.nightexpress.combatpets.api.pet;
 
-import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.combatpets.api.pet.type.ExhaustReason;
 import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.util.bukkit.NightSound;
 import su.nightexpress.nightcore.util.placeholder.Placeholder;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
@@ -69,9 +69,9 @@ public interface Template extends Placeholder {
 
 
 
-    @NotNull Sound getEatSound();
+    @NotNull NightSound getEatSound();
 
-    void setEatSound(@NotNull Sound eatSound);
+    void setEatSound(@NotNull NightSound eatSound);
 
     @NotNull UniParticle getSpawnParticle();
 

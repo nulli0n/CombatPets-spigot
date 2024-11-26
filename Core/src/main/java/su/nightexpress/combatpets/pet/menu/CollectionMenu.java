@@ -87,6 +87,7 @@ public class CollectionMenu extends ConfigMenu<PetsPlugin> implements AutoFilled
     public void onAutoFill(@NotNull MenuViewer viewer, @NotNull AutoFill<PetData> autoFill) {
         Player player = viewer.getPlayer();
         Tier tier = this.getLink(player);
+        if (tier == null) return;
 
         autoFill.setSlots(this.petSlots);
         autoFill.setItems(this.plugin.getUserManager().getUserData(player).getPets(tier).stream()
@@ -103,6 +104,10 @@ public class CollectionMenu extends ConfigMenu<PetsPlugin> implements AutoFilled
                 else {
                     status.addAll(this.petStatusDeadManual);
                 }
+                status.replaceAll(str -> str
+                    .replace(GENERIC_TIME, TimeUtil.formatDuration(petData.getReviveDate()))
+                    .replace(GENERIC_COST, NumberUtil.format(petData.getTier().getReviveCost()))
+                );
             }
             else {
                 if (petHolder == null || petHolder.getTemplate() != petData.getTemplate() || petHolder.getTier() != petData.getTier()) {
@@ -118,8 +123,6 @@ public class CollectionMenu extends ConfigMenu<PetsPlugin> implements AutoFilled
                 .setDisplayName(this.petName)
                 .setLore(this.petLore)
                 .replace(STATUS, status)
-                .replace(GENERIC_TIME, TimeUtil.formatDuration(petData.getReviveDate()))
-                .replace(GENERIC_COST, NumberUtil.format(petData.getTier().getReviveCost()))
                 .replace(petData.getPlaceholders())
                 .replace(petData.getTier().getPlaceholders())
                 .replace(petData.getTemplate().getPlaceholders())
