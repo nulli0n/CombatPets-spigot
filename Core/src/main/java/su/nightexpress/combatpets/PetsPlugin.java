@@ -17,7 +17,7 @@ import su.nightexpress.combatpets.item.ItemManager;
 import su.nightexpress.combatpets.level.LevelingManager;
 import su.nightexpress.combatpets.nms.PetNMS;
 import su.nightexpress.combatpets.nms.mc_1_21.MC_1_21;
-import su.nightexpress.combatpets.nms.mc_1_21_3.MC_1_21_3;
+import su.nightexpress.combatpets.nms.mc_1_21_3.MC_1_21_4;
 import su.nightexpress.combatpets.pet.PetManager;
 import su.nightexpress.combatpets.shop.ShopManager;
 import su.nightexpress.combatpets.util.PetUtils;
@@ -140,7 +140,7 @@ public class PetsPlugin extends NightDataPlugin<PetUser> implements ImprovedComm
     private boolean setupNMS() {
         switch (Version.getCurrent()) {
             case MC_1_21 -> this.petNMS = new MC_1_21();
-            case MC_1_21_3 -> this.petNMS = new MC_1_21_3();
+            case MC_1_21_4 -> this.petNMS = new MC_1_21_4();
         }
         return this.petNMS != null;
     }
