@@ -4,6 +4,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -25,9 +26,19 @@ public class CaptureListener extends AbstractListener<PetsPlugin> {
         this.manager.stopCapture(event.getPlayer().getUniqueId());
     }
 
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onCaptureDeath(PlayerDeathEvent event) {
+        this.manager.stopCapture(event.getEntity().getUniqueId());
+    }
+
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onCaptureClick(PlayerInteractEntityEvent event) {
         if (!(event.getRightClicked() instanceof LivingEntity entity)) return;
+
+        if (this.manager.isBeingCaptured(entity)) {
+            event.setCancelled(true);
+            return;
+        }
 
         Player player = event.getPlayer();
         ItemStack itemStack = player.getInventory().getItem(event.getHand());

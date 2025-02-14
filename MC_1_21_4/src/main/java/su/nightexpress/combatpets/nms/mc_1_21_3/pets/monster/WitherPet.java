@@ -35,7 +35,7 @@ public class WitherPet extends WitherBoss implements PetEntity {
 
     @Override
     protected void customServerAiStep(ServerLevel worldserver) {
-        Reflex.setFieldValue(this, "cf", new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE}); // nextHeadUpdate
+        Reflex.setFieldValue(this, "ce", new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE}); // nextHeadUpdate
         super.customServerAiStep(worldserver);
     }
 

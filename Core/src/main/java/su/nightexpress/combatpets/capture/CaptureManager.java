@@ -86,6 +86,10 @@ public class CaptureManager extends AbstractManager<PetsPlugin> {
         return this.getCaptureProcess(player.getUniqueId()) != null;
     }
 
+    public boolean isBeingCaptured(@NotNull LivingEntity entity) {
+        return this.captureMap.values().stream().anyMatch(captureTask -> captureTask.getEntity() == entity);
+    }
+
     @Nullable
     public CaptureTask getCaptureProcess(@NotNull UUID playerId) {
         return this.captureMap.get(playerId);

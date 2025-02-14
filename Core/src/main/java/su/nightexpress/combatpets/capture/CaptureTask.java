@@ -198,4 +198,9 @@ public final class CaptureTask {
             this.running = false;
         }
     }
+
+    @NotNull
+    public LivingEntity getEntity() {
+        return this.entity;
+    }
 }

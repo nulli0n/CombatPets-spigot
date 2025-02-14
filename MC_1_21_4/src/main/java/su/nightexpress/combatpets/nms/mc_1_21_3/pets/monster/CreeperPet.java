@@ -61,7 +61,7 @@ public class CreeperPet extends Creeper implements PetEntity {
             }
 
             if (this.explodeCooldown-- <= 0) {
-                Reflex.setFieldValue(this, "e", this.swell);
+                Reflex.setFieldValue(this, "d", this.swell);
 
                 if (this.isIgnited()) {
                     this.setSwellDir(1);

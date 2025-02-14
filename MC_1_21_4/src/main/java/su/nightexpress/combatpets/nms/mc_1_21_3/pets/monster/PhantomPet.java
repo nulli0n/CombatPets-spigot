@@ -26,8 +26,8 @@ import java.util.EnumSet;
 public class PhantomPet extends Phantom implements PetEntity {
 
     private static final String MOVE_TARGET_POINT = "d";
-    private static final String ATTACK_FASE = "bZ";
-    private static final String ANCHOR_POINT = "bY";
+    private static final String ATTACK_FASE = "bY";
+    private static final String ANCHOR_POINT = "bX";
 
     private LivingEntity lastTarget;
 
