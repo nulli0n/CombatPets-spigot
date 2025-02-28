@@ -29,6 +29,7 @@ import java.util.function.Function;
 import static su.nightexpress.nightcore.util.text.tag.Tags.*;
 import static su.nightexpress.combatpets.Placeholders.*;
 
+@SuppressWarnings("UnstableApiUsage")
 public class PetCreator {
 
     private static final String ASPECT_STRENGTH  = "strength";
@@ -56,6 +57,7 @@ public class PetCreator {
     private static final String FOOD_CHORUS_FRUITS = "chorus_fruits";
     private static final String FOOD_BONE_MEAL     = "bone_meal";
     private static final String FOOD_WITHER_ROSES  = "wither_roses";
+    private static final String FOOD_CREAKING = "sticks";
 
     public static void createTiers(@NotNull PetsPlugin plugin) {
         createTier(plugin, "common", tier -> {
@@ -268,6 +270,10 @@ public class PetCreator {
             createFoodItem(category, Material.WITHER_ROSE, 3)
         )));
 
+        list.add(createFoodCategory(FOOD_CREAKING, category -> Lists.newList(
+            createFoodItem(category, Material.STICK, 2)
+        )));
+
         return list;
     }
 
@@ -376,6 +382,7 @@ public class PetCreator {
             case CAVE_SPIDER -> "41645dfd77d09923107b3496e94eeb5c30329f97efc96ed76e226e98224";
             case CHICKEN -> "1638469a599ceef7207537603248a9ab11ff591fd378bea4735b346a7fae893";
             case COW -> "5d6c6eda942f7f5f71c3161c7306f4aed307d82895f9d2b07ab4525718edc5";
+            case CREAKING -> "f93c9469797dd29ed877adefcb3d2e6da528d9203567ca2a4075e751db05c3e0";
             case CREEPER -> "f4254838c33ea227ffca223dddaabfe0b0215f70da649e944477f44370ca6952";
             case DONKEY -> "63a976c047f412ebc5cb197131ebef30c004c0faf49d8dd4105fca1207edaff3";
             case DROWNED -> "c84df79c49104b198cdad6d99fd0d0bcf1531c92d4ab6269e40b7d3cbbb8e98c";
@@ -443,6 +450,7 @@ public class PetCreator {
             case CAT, OCELOT, FOX, WOLF, POLAR_BEAR, SPIDER, CAVE_SPIDER, RAVAGER, WARDEN -> Lists.newSet(FOOD_RAW_MEAT, FOOD_RAW_FISH);
             case CHICKEN -> Lists.newSet(FOOD_WHEAT_SEEDS);
             case COW, LLAMA, TRADER_LLAMA, SHEEP, GOAT -> Lists.newSet(FOOD_WHEAT);
+            case CREAKING -> Lists.newSet(FOOD_CREAKING);
             case DONKEY, HORSE, MULE -> Lists.newSet(FOOD_APPLES);
             case MOOSHROOM -> Lists.newSet(FOOD_MUSHROOMS);
             case PANDA -> Lists.newSet(FOOD_RAW_MEAT, FOOD_BAMBOO);

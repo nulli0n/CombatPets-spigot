@@ -33,11 +33,11 @@ public class PetFightBehaviors {
     public static BehaviorControl<Mob> autoTargetAndAttack() {
         return BehaviorBuilder.create((builder) -> {
             return builder.group(builder.absent(MemoryModuleType.ATTACK_TARGET), builder.registered(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE)).apply(builder, (memAttackTarget, memCantReach) -> {
-                return (world, mob, longValue) -> {
+                return (world, petMob, longValue) -> {
 
-                    Optional<LivingEntity> angerTarget = PetAI.getAngerTarget(mob);
+                    Optional<LivingEntity> angerTarget = PetAI.getAngerTarget(petMob);
                     if (angerTarget.isPresent()) return false;
-                    if (!(mob instanceof PetEntity petEntity)) return false;
+                    if (!(petMob instanceof PetEntity petEntity)) return false;
 
                     ActivePet petHolder = petEntity.getHolder();
                     Player owner = ((CraftPlayer) petHolder.getOwner()).getHandle();
@@ -45,28 +45,28 @@ public class PetFightBehaviors {
                     if (combatMode == CombatMode.PASSIVE) return false;
 
                     if (combatMode == CombatMode.PROTECTIVE || combatMode == CombatMode.PROTECTIVE_AND_SUPPORTIVE) {
-                        if (owner.tickCount - owner.getLastHurtByMobTimestamp() <= 50) {
+                        if (owner.tickCount - owner.getLastHurtByMobTimestamp() <= 50 && owner.getLastHurtByMob() != owner) {
                             angerTarget = Optional.ofNullable(owner.getLastHurtByMob());
                         }
                     }
                     if (angerTarget.isEmpty() && (combatMode == CombatMode.SUPPORTIVE || combatMode == CombatMode.PROTECTIVE_AND_SUPPORTIVE)) {
-                        if (owner.tickCount - owner.getLastHurtMobTimestamp() <= 50) {
+                        if (owner.tickCount - owner.getLastHurtMobTimestamp() <= 50 && owner.getLastHurtMob() != owner) {
                             angerTarget = Optional.ofNullable(owner.getLastHurtMob());
                         }
                     }
                     if (angerTarget.isEmpty()) {
-                        if (mob.tickCount - mob.getLastHurtByMobTimestamp() <= 50) {
-                            angerTarget = Optional.ofNullable(mob.getLastHurtByMob());
+                        if (petMob.tickCount - petMob.getLastHurtByMobTimestamp() <= 50) {
+                            angerTarget = Optional.ofNullable(petMob.getLastHurtByMob());
                         }
                     }
                     if (angerTarget.isEmpty()) return false;
 
                     LivingEntity target = angerTarget.get();
-                    if (!mob.canAttack(target)) {
+                    if (!petMob.canAttack(target) || target == owner) {
                         return false;
                     }
 
-                    EntityTargetEvent event = CraftEventFactory.callEntityTargetLivingEvent(mob, target, EntityTargetEvent.TargetReason.OWNER_ATTACKED_TARGET);
+                    EntityTargetEvent event = CraftEventFactory.callEntityTargetLivingEvent(petMob, target, EntityTargetEvent.TargetReason.OWNER_ATTACKED_TARGET);
                     if (event.isCancelled()) {
                         return false;
                     }
@@ -77,7 +77,7 @@ public class PetFightBehaviors {
                     }
 
                     target = ((CraftLivingEntity) event.getTarget()).getHandle();
-                    return PetAI.setAngerTarget(mob, target, false);
+                    return PetAI.setAngerTarget(petMob, target, false);
                 };
             });
         });

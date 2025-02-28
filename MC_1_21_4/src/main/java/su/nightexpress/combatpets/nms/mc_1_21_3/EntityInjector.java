@@ -33,6 +33,7 @@ public class EntityInjector {
         BRAIN_MOBS.put(EntityType.SNIFFER, SnifferPet.class);
         BRAIN_MOBS.put(EntityType.ZOGLIN, ZoglinPet.class);
         BRAIN_MOBS.put(EntityType.WARDEN, WardenPet.class);
+        BRAIN_MOBS.put(EntityType.CREAKING, CreakingPet.class);
 
         GOAL_MOBS.put(EntityType.BEE, BeePet.class);
         GOAL_MOBS.put(EntityType.BLAZE, BlazePet.class);
