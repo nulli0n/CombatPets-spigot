@@ -64,7 +64,7 @@ public class WardenPet extends Warden implements PetEntity {
     @Override
     public boolean hurtServer(ServerLevel worldserver, DamageSource damagesource, float damage) {
         boolean flag = PetBrain.hurt(this, worldserver, damagesource, damage);
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide && flag) {
             Entity entity = damagesource.getEntity();
             if (entity != null && !this.getHolder().getOwner().getUniqueId().equals(entity.getUUID())) {
                 this.increaseAngerAt(entity, AngerLevel.ANGRY.getMinimumAnger() + 20, false);
