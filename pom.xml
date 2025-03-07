@@ -7,7 +7,7 @@
     <groupId>su.nightexpress.combatpets</groupId>
     <artifactId>CombatPets</artifactId>
     <packaging>pom</packaging>
-    <version>2.3.4</version>
+    <version>2.4.0</version>
     <modules>
         <module>Core</module>
         <module>API</module>

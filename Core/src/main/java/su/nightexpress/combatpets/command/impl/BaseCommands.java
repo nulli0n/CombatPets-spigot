@@ -7,6 +7,7 @@ import su.nightexpress.combatpets.PetsPlugin;
 import su.nightexpress.combatpets.Placeholders;
 import su.nightexpress.combatpets.api.pet.*;
 import su.nightexpress.combatpets.command.CommandArguments;
+import su.nightexpress.combatpets.config.Config;
 import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.config.Perms;
 import su.nightexpress.combatpets.data.impl.PetData;
@@ -100,13 +101,18 @@ public class BaseCommands {
             .executes((context, arguments) -> giveFood(plugin, context, arguments))
         );
 
-        rootNode.addChildren(DirectNode.builder(plugin, "collection")
+        DirectNode collectionNode = DirectNode.builder(plugin, "collection")
             .description(Lang.COMMAND_COLLECTION_DESC)
             .permission(Perms.COMMAND_COLLECTION)
             .playerOnly()
             .withArgument(CommandArguments.tierArgument(plugin))
-            .executes((context, arguments) -> openCollection(plugin, context, arguments))
-        );
+            .executes((context, arguments) -> openCollection(plugin, context, arguments)).build();
+
+        if (Config.GENERAL_COLLECTION_DEFAULT_COMMAND.get()) {
+            rootNode.setFallback(collectionNode);
+        }
+
+        rootNode.addChildren(collectionNode);
 
         rootNode.addChildren(DirectNode.builder(plugin, "menu")
             .description(Lang.COMMAND_MENU_DESC)

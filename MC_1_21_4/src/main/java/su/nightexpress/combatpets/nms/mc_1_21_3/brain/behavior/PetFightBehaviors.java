@@ -52,6 +52,12 @@ public class PetFightBehaviors {
                     if (angerTarget.isEmpty() && (combatMode == CombatMode.SUPPORTIVE || combatMode == CombatMode.PROTECTIVE_AND_SUPPORTIVE)) {
                         if (owner.tickCount - owner.getLastHurtMobTimestamp() <= 50 && owner.getLastHurtMob() != owner) {
                             angerTarget = Optional.ofNullable(owner.getLastHurtMob());
+
+                            // Projectiles set lastHurtMob even if damage event was cancelled
+                            // so need to double check if target was actually damaged.
+                            if (angerTarget.isPresent() && angerTarget.get().getLastHurtByMob() != owner) {
+                                angerTarget = Optional.empty();
+                            }
                         }
                     }
                     if (angerTarget.isEmpty()) {

@@ -21,10 +21,15 @@ public class Config {
     public static final String DIR_TIERS = "/pets/tiers/";
     public static final String DIR_PETS  = "/pets/configs/";
 
+    @Deprecated
     public static final ConfigValue<Boolean> GENERAL_PLACEHOLDER_API_GUI = ConfigValue.create("General.PlaceholderAPI_In_GUI",
         false,
         "When enabled, applies PlaceholderAPI placeholders to GUI title and items."
     );
+
+    public static final ConfigValue<Boolean> GENERAL_COLLECTION_DEFAULT_COMMAND = ConfigValue.create("General.Collection_As_Default_Command",
+        false,
+        "Sets whether Pets Collection GUI should open if no command argument specified.");
 
     public static final ConfigValue<Boolean> FEATURES_LEVELING_ENABLED = ConfigValue.create("Features.Leveling",
         true,
