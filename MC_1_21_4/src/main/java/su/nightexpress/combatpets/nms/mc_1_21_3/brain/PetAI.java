@@ -9,6 +9,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.sensing.Sensor;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.schedule.Activity;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,7 +17,16 @@ import java.util.Optional;
 
 public class PetAI {
 
+    private static final int MAX_TICKS_TO_AUTO_ATTACK = 50;
     private static final UniformInt RETREAT_DURATION = TimeUtil.rangeOfSeconds(5, 20);
+
+    public static boolean ownerDamaged(@NotNull Player owner) {
+        return owner.tickCount - owner.getLastHurtByMobTimestamp() <= MAX_TICKS_TO_AUTO_ATTACK && owner.getLastHurtByMob() != owner;
+    }
+
+    public static boolean ownerAttacked(@NotNull Player owner) {
+        return owner.tickCount - owner.getLastHurtMobTimestamp() <= MAX_TICKS_TO_AUTO_ATTACK && owner.getLastHurtMob() != owner;
+    }
 
     public static <T extends LivingEntity> void updateActivity(@NotNull Mob entity, @NotNull Brain<T> brain) {
         if (PetAI.getAngerTarget(entity).isPresent()) {

@@ -9,8 +9,9 @@ import org.bukkit.craftbukkit.v1_21_R3.entity.CraftPlayer;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.combatpets.api.pet.ActivePet;
-import su.nightexpress.combatpets.api.pet.type.CombatMode;
 import su.nightexpress.combatpets.api.pet.PetEntity;
+import su.nightexpress.combatpets.api.pet.type.CombatMode;
+import su.nightexpress.combatpets.nms.mc_1_21_3.brain.PetAI;
 
 import java.util.EnumSet;
 
@@ -53,20 +54,26 @@ public class PetHurtByTargetGoal extends TargetGoal {
         }
 
         if (combatMode == CombatMode.PROTECTIVE || combatMode == CombatMode.PROTECTIVE_AND_SUPPORTIVE) {
-            this.ownerLastAttacker = owner.getLastHurtByMob();
-            int ownerLastHurtByDate = owner.getLastHurtByMobTimestamp();
-            if (owner.tickCount - ownerLastHurtByDate <= 50) {
-                if (ownerLastHurtByDate != this.timestampOwnerLastHurtBy && this.ownerLastAttacker != null) {
+            if (PetAI.ownerDamaged(owner)) {
+                this.ownerLastAttacker = owner.getLastHurtByMob();
+                if (owner.getLastHurtByMobTimestamp() != this.timestampOwnerLastHurtBy && this.ownerLastAttacker != null) {
                     return this.canAttack(this.ownerLastAttacker, TargetingConditions.DEFAULT);
                 }
             }
         }
 
         if (combatMode == CombatMode.SUPPORTIVE || combatMode == CombatMode.PROTECTIVE_AND_SUPPORTIVE) {
-            this.ownerLastVictim = owner.getLastHurtMob();
-            int ownerLastHurtDate = owner.getLastHurtMobTimestamp();
-            if (owner.tickCount - ownerLastHurtDate <= 50) {
-                if (ownerLastHurtDate != this.timestampOwnerLastHurt && this.ownerLastVictim != null) {
+            if (PetAI.ownerAttacked(owner)) {
+                this.ownerLastVictim = owner.getLastHurtMob();
+
+                // Projectiles set lastHurtMob even if damage event was cancelled
+                // so need to double check if target was actually damaged.
+                if (this.ownerLastVictim != null && this.ownerLastVictim.getLastHurtByMob() != owner) {
+                    this.ownerLastVictim = null;
+                    return false;
+                }
+
+                if (owner.getLastHurtMobTimestamp() != this.timestampOwnerLastHurt && this.ownerLastVictim != null) {
                     return this.canAttack(this.ownerLastVictim, TargetingConditions.DEFAULT);
                 }
             }

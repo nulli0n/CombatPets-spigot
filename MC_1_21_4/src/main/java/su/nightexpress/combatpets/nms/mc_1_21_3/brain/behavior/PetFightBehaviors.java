@@ -44,13 +44,15 @@ public class PetFightBehaviors {
                     CombatMode combatMode = petHolder.getCombatMode();
                     if (combatMode == CombatMode.PASSIVE) return false;
 
+                    // TODO As dedicated method to getAutoTarget
+                    // ------------------------------
                     if (combatMode == CombatMode.PROTECTIVE || combatMode == CombatMode.PROTECTIVE_AND_SUPPORTIVE) {
-                        if (owner.tickCount - owner.getLastHurtByMobTimestamp() <= 50 && owner.getLastHurtByMob() != owner) {
+                        if (PetAI.ownerDamaged(owner)) {
                             angerTarget = Optional.ofNullable(owner.getLastHurtByMob());
                         }
                     }
                     if (angerTarget.isEmpty() && (combatMode == CombatMode.SUPPORTIVE || combatMode == CombatMode.PROTECTIVE_AND_SUPPORTIVE)) {
-                        if (owner.tickCount - owner.getLastHurtMobTimestamp() <= 50 && owner.getLastHurtMob() != owner) {
+                        if (PetAI.ownerAttacked(owner)) {
                             angerTarget = Optional.ofNullable(owner.getLastHurtMob());
 
                             // Projectiles set lastHurtMob even if damage event was cancelled
@@ -65,6 +67,8 @@ public class PetFightBehaviors {
                             angerTarget = Optional.ofNullable(petMob.getLastHurtByMob());
                         }
                     }
+                    // ------------------------------
+
                     if (angerTarget.isEmpty()) return false;
 
                     LivingEntity target = angerTarget.get();
