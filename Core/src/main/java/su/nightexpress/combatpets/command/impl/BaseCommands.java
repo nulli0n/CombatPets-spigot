@@ -27,7 +27,7 @@ public class BaseCommands {
     public static void load(@NotNull PetsPlugin plugin) {
         ChainedNode rootNode = plugin.getRootNode();
 
-        ReloadCommand.inject(plugin, rootNode, Perms.COMMAND_RELOAD);
+        rootNode.addChildren(ReloadCommand.builder(plugin, Perms.COMMAND_RELOAD));
 
         rootNode.addChildren(DirectNode.builder(plugin, "add")
             .description(Lang.COMMAND_ADD_DESC)
@@ -180,11 +180,10 @@ public class BaseCommands {
 
             plugin.getUserManager().scheduleSave(user);
 
-            message.getMessage()
+            context.send(message, replacer -> replacer
                 .replace(Placeholders.PLAYER_NAME, user.getName())
                 .replace(template.replacePlaceholders())
-                .replace(tier.replacePlaceholders())
-                .send(context.getSender());
+                .replace(tier.replacePlaceholders()));
         });
 
         return true;
@@ -210,10 +209,9 @@ public class BaseCommands {
 
             plugin.getUserManager().scheduleSave(user);
 
-            message.getMessage()
+            context.send(message, replacer -> replacer
                 .replace(Placeholders.PLAYER_NAME, user.getName())
-                .replace(tier.replacePlaceholders())
-                .send(context.getSender());
+                .replace(tier.replacePlaceholders()));
         });
 
         return true;
@@ -231,11 +229,10 @@ public class BaseCommands {
 
         Players.addItem(player, template.createEgg(tier));
 
-        Lang.COMMAND_EGG_DONE.getMessage()
+        context.send(Lang.COMMAND_EGG_DONE, replacer -> replacer
             .replace(Placeholders.PLAYER_NAME, player.getName())
             .replace(tier.replacePlaceholders())
-            .replace(template.replacePlaceholders())
-            .send(context.getSender());
+            .replace(template.replacePlaceholders()));
         return true;
     }
 
@@ -250,10 +247,9 @@ public class BaseCommands {
         ItemStack itemStack = plugin.getItemManager().createMysteryEgg(template);
         Players.addItem(player, itemStack);
 
-        Lang.COMMAND_MYSTERY_EGG_DONE.getMessage()
+        context.send(Lang.COMMAND_MYSTERY_EGG_DONE, replacer -> replacer
             .replace(Placeholders.PLAYER_NAME, player.getName())
-            .replace(template.replacePlaceholders())
-            .send(context.getSender());
+            .replace(template.replacePlaceholders()));
         return true;
     }
 
@@ -269,7 +265,7 @@ public class BaseCommands {
         String itemName = arguments.getStringArgument(CommandArguments.NAME);
         FoodItem foodItem = category.getItem(itemName);
         if (foodItem == null) {
-            Lang.ERROR_COMMAND_INVALID_FOOD_ITEM_ARGUMENT.getMessage().replace(Placeholders.GENERIC_VALUE, itemName).send(context.getSender());
+            context.send(Lang.ERROR_COMMAND_INVALID_FOOD_ITEM_ARGUMENT, replacer -> replacer.replace(Placeholders.GENERIC_VALUE, itemName));
             return false;
         }
 
@@ -280,11 +276,10 @@ public class BaseCommands {
 
         Players.addItem(player, itemStack);
 
-        Lang.COMMAND_FOOD_DONE.getMessage()
+        context.send(Lang.COMMAND_FOOD_DONE, replacer -> replacer
             .replace(Placeholders.GENERIC_AMOUNT, NumberUtil.format(amount))
             .replace(Placeholders.GENERIC_ITEM, ItemUtil.getItemName(itemStack))
-            .replace(Placeholders.PLAYER_NAME, player.getName())
-            .send(context.getSender());
+            .replace(Placeholders.PLAYER_NAME, player.getName()));
         return true;
     }
 
@@ -340,10 +335,9 @@ public class BaseCommands {
 
             plugin.getUserManager().scheduleSave(user);
 
-            Lang.COMMAND_RENAME_DONE.getMessage()
+            context.send(Lang.COMMAND_RENAME_DONE, replacer -> replacer
                 .replace(Placeholders.PLAYER_NAME, user.getName())
-                .replace(Placeholders.PET_NAME, name)
-                .send(context.getSender());
+                .replace(Placeholders.PET_NAME, name));
         });
 
         return true;
@@ -369,10 +363,9 @@ public class BaseCommands {
             }
 
             if (petData.isAlive()) {
-                Lang.COMMAND_REVIVE_ERROR_ALIVE.getMessage()
+                context.send(Lang.COMMAND_REVIVE_ERROR_ALIVE, replacer -> replacer
                     .replace(Placeholders.PLAYER_NAME, user.getName())
-                    .replace(Placeholders.PET_NAME, petData.getName())
-                    .send(context.getSender());
+                    .replace(Placeholders.PET_NAME, petData.getName()));
                 return;
             }
 
@@ -380,12 +373,11 @@ public class BaseCommands {
 
             plugin.getUserManager().scheduleSave(user);
 
-            Lang.COMMAND_REVIVE_DONE.getMessage()
+            context.send(Lang.COMMAND_REVIVE_DONE, replacer -> replacer
                 .replace(Placeholders.PLAYER_NAME, user.getName())
                 .replace(Placeholders.PET_NAME, petData.getName())
                 .replace(tier.replacePlaceholders())
-                .replace(template.replacePlaceholders())
-                .send(context.getSender());
+                .replace(template.replacePlaceholders()));
         });
         return true;
     }
@@ -413,12 +405,11 @@ public class BaseCommands {
 
             plugin.getUserManager().scheduleSave(user);
 
-            Lang.COMMAND_CLEAR_INVENTORY_DONE.getMessage()
+            context.send(Lang.COMMAND_CLEAR_INVENTORY_DONE, replacer -> replacer
                 .replace(Placeholders.PLAYER_NAME, user.getName())
                 .replace(Placeholders.PET_NAME, petData.getName())
                 .replace(tier.replacePlaceholders())
-                .replace(template.replacePlaceholders())
-                .send(context.getSender());
+                .replace(template.replacePlaceholders()));
         });
         return true;
     }

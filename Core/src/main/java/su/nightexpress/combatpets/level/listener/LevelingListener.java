@@ -13,7 +13,6 @@ import su.nightexpress.combatpets.PetsPlugin;
 import su.nightexpress.combatpets.api.pet.ActivePet;
 import su.nightexpress.combatpets.level.LevelingConfig;
 import su.nightexpress.combatpets.level.LevelingManager;
-import su.nightexpress.combatpets.util.PetUtils;
 import su.nightexpress.nightcore.manager.AbstractListener;
 import su.nightexpress.nightcore.util.EntityUtil;
 
@@ -55,14 +54,12 @@ public class LevelingListener extends AbstractListener<PetsPlugin> {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onExpGainHit(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof LivingEntity victim)) return;
+        if (!(event.getDamageSource().getCausingEntity() instanceof LivingEntity damager)) return;
         if (!this.manager.shouldDropXP(victim)) return;
         if (this.manager.isDisabledWorld(victim.getWorld())) return;
 
         double damage = event.getFinalDamage();
         if (damage <= 0D) return;
-
-        LivingEntity damager = PetUtils.getEventDamager(event);
-        if (damager == null) return;
 
         ActivePet activePet = this.plugin.getPetManager().getPetByMob(damager);
         if (activePet == null) return;

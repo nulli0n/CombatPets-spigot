@@ -143,11 +143,6 @@ public class BreezePet extends Breeze implements PetEntity {
     }
 
     @Override
-    public boolean hurtServer(ServerLevel worldserver, DamageSource damagesource, float damage) {
-        return PetBrain.hurt(this, worldserver, damagesource, damage);
-    }
-
-    @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         return this.level().isClientSide ? InteractionResult.CONSUME : InteractionResult.SUCCESS_SERVER;
     }

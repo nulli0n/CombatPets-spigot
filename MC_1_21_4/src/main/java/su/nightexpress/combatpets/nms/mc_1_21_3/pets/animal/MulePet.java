@@ -11,7 +11,6 @@ import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.animal.horse.Mule;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.combatpets.api.pet.PetEntity;
@@ -25,7 +24,6 @@ public class MulePet extends Mule implements PetEntity {
 
     public MulePet(@NotNull ServerLevel world) {
         super(EntityType.MULE, world);
-        this.equipSaddle(Items.SADDLE.getDefaultInstance(), null);
     }
 
     @Override

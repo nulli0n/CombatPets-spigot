@@ -1,12 +1,12 @@
 package su.nightexpress.combatpets.capture.config;
 
-import org.bukkit.inventory.ItemStack;
 import su.nightexpress.combatpets.util.PetCreator;
 import su.nightexpress.nightcore.config.ConfigValue;
+import su.nightexpress.nightcore.util.bukkit.NightItem;
 
 public class CaptureConfig {
 
-    public static final ConfigValue<ItemStack> CAPTURE_ITEM = ConfigValue.create("Settings.Item",
+    public static final ConfigValue<NightItem> CAPTURE_ITEM = ConfigValue.create("Settings.Item",
         PetCreator.getCaptureItem(),
         "Sets capture item format."
     );

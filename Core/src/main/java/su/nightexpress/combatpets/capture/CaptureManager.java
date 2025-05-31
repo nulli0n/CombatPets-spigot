@@ -51,7 +51,7 @@ public class CaptureManager extends AbstractManager<PetsPlugin> {
 
         this.addListener(new CaptureListener(this.plugin, this));
 
-        this.addTask(this.plugin.createTask(this::tickTasks).setTicksInterval(1L));
+        this.addTask(this::tickCaptures, 1L);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class CaptureManager extends AbstractManager<PetsPlugin> {
         CaptureCommands.load(this.plugin, this);
     }
 
-    public void tickTasks() {
+    public void tickCaptures() {
         this.captureMap.values().forEach(CaptureTask::tick);
         this.captureMap.values().removeIf(Predicate.not(CaptureTask::isRunning));
     }
@@ -99,10 +99,10 @@ public class CaptureManager extends AbstractManager<PetsPlugin> {
         if (!PetUtils.isAllowedPetZone(entity.getLocation())) return false;
 
         String name = entity.getCustomName();
-        if (name == null) name = LangAssets.get(entity.getType());
+        String localized = name == null ? LangAssets.get(entity.getType()) : name;
 
         if (!this.canBeCaptured(entity)) {
-            Lang.CAPTURE_ERROR_NOT_CAPTURABLE.getMessage().replace(Placeholders.GENERIC_NAME, name).send(player);
+            Lang.CAPTURE_ERROR_NOT_CAPTURABLE.getMessage().send(player, replacer -> replacer.replace(Placeholders.GENERIC_NAME, localized));
             return false;
         }
 
@@ -110,12 +110,12 @@ public class CaptureManager extends AbstractManager<PetsPlugin> {
         if (template == null || !template.isCapturable()) return false;
 
         if (!player.hasPermission(Perms.CAPTURE) && !player.hasPermission(template.getCapturePermission())) {
-            Lang.CAPTURE_ERROR_PERMISSION.getMessage().replace(Placeholders.GENERIC_NAME, name).send(player);
+            Lang.CAPTURE_ERROR_PERMISSION.getMessage().send(player, replacer -> replacer.replace(Placeholders.GENERIC_NAME, localized));
             return false;
         }
 
         if (!this.isReadyToCapture(entity)) {
-            Lang.CAPTURE_ERROR_NOT_READY.getMessage().replace(Placeholders.GENERIC_NAME, name).send(player);
+            Lang.CAPTURE_ERROR_NOT_READY.getMessage().send(player, replacer -> replacer.replace(Placeholders.GENERIC_NAME, localized));
             return false;
         }
 
@@ -166,7 +166,7 @@ public class CaptureManager extends AbstractManager<PetsPlugin> {
 
     @NotNull
     public ItemStack createCaptureItem() {
-        ItemStack itemStack = new ItemStack(CaptureConfig.CAPTURE_ITEM.get());
+        ItemStack itemStack = CaptureConfig.CAPTURE_ITEM.get().getItemStack();
         PDCUtil.set(itemStack, Keys.captureItem, true);
         return itemStack;
     }

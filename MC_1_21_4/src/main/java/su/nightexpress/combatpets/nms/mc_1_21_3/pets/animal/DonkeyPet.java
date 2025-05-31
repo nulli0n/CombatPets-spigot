@@ -11,7 +11,6 @@ import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.animal.horse.Donkey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.combatpets.api.pet.PetEntity;
@@ -25,7 +24,6 @@ public class DonkeyPet extends Donkey implements PetEntity {
 
     public DonkeyPet(@NotNull ServerLevel world) {
         super(EntityType.DONKEY, world);
-        this.equipSaddle(Items.SADDLE.getDefaultInstance(), null);
     }
 
     @Override

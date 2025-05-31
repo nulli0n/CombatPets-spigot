@@ -8,10 +8,6 @@ public interface PetEntity {
 
     void setGoals();
 
-    @Deprecated default UUID getUniqueId(){
-        return null;
-    }
-
     @NotNull
     default ActivePet getHolder() {
         return PetEntityBridge.getByPet(this);

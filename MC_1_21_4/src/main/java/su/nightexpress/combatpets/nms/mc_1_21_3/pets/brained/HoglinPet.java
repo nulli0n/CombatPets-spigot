@@ -70,8 +70,9 @@ public class HoglinPet extends Hoglin implements PetEntity {
     }
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource damageSource, float damage) {
-        return PetBrain.hurt(this, level, damageSource, damage);
+    public boolean hurtServer(ServerLevel level, DamageSource damageSource, float amount) {
+        return PetBrain.hurt(this, damageSource, fixed -> super.hurtServer(level, fixed, amount));
+        //return PetBrain.hurt(this, level, fixed, damage);
     }
 
     @Override

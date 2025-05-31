@@ -62,22 +62,28 @@ public class WardenPet extends Warden implements PetEntity {
     }
 
     @Override
-    public boolean hurtServer(ServerLevel worldserver, DamageSource damagesource, float damage) {
-        boolean flag = PetBrain.hurt(this, worldserver, damagesource, damage);
-        if (!this.level().isClientSide && flag) {
-            Entity entity = damagesource.getEntity();
-            if (entity != null && !this.getHolder().getOwner().getUniqueId().equals(entity.getUUID())) {
-                this.increaseAngerAt(entity, AngerLevel.ANGRY.getMinimumAnger() + 20, false);
-                if (this.brain.getMemory(MemoryModuleType.ATTACK_TARGET).isEmpty() && entity instanceof LivingEntity target) {
-                    if (damagesource.isDirect() || this.closerThan(target, 5.0)) {
-                        this.setAttackTarget(target);
-                    }
-                }
-            }
-        }
-
-        return flag;
+    public boolean hurtServer(ServerLevel level, DamageSource damageSource, float amount) {
+        return PetBrain.hurt(this, damageSource, fixed -> super.hurtServer(level, fixed, amount));
+        //return PetBrain.hurt(this, level, fixed, damage);
     }
+
+//    @Override
+//    public boolean hurtServer(ServerLevel worldserver, DamageSource damagesource, float damage) {
+//        boolean flag = PetBrain.hurt(this, worldserver, damagesource, damage);
+//        if (!this.level().isClientSide && flag) {
+//            Entity entity = damagesource.getEntity();
+//            if (entity != null && !this.getHolder().getOwner().getUniqueId().equals(entity.getUUID())) {
+//                this.increaseAngerAt(entity, AngerLevel.ANGRY.getMinimumAnger() + 20, false);
+//                if (this.brain.getMemory(MemoryModuleType.ATTACK_TARGET).isEmpty() && entity instanceof LivingEntity target) {
+//                    if (damagesource.isDirect() || this.closerThan(target, 5.0)) {
+//                        this.setAttackTarget(target);
+//                    }
+//                }
+//            }
+//        }
+//
+//        return flag;
+//    }
 
     @Override
     protected void customServerAiStep(ServerLevel level) {

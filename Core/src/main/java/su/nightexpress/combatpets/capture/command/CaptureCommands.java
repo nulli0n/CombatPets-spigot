@@ -54,11 +54,10 @@ public class CaptureCommands {
         ItemStack captureItem = manager.createCaptureItem();
         Players.addItem(player, captureItem, amount);
 
-        Lang.COMMAND_CATCH_ITEM_DONE.getMessage()
+        context.send(Lang.COMMAND_CATCH_ITEM_DONE, replacer -> replacer
             .replace(Placeholders.GENERIC_AMOUNT, NumberUtil.format(amount))
             .replace(Placeholders.GENERIC_ITEM, ItemUtil.getItemName(captureItem))
-            .replace(Placeholders.PLAYER_NAME, player.getName())
-            .send(context.getSender());
+            .replace(Placeholders.PLAYER_NAME, player.getName()));
 
         return true;
     }

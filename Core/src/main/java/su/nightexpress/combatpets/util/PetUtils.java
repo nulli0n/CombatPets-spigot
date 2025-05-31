@@ -10,7 +10,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.entity.*;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +32,8 @@ import java.util.Base64;
 
 public class PetUtils {
 
+    private static final EquipmentSlot[] ARMOR_SLOTS = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.BODY};
+
     public static boolean hasEconomyBridge() {
         return Plugins.isInstalled(HookId.ECONOMY_BRIDGE);
     }
@@ -53,12 +54,14 @@ public class PetUtils {
         return null;
     }
 
+    @Deprecated
     public static void applyMenuPlaceholders(@NotNull MenuViewer viewer, @NotNull MenuOptions options) {
         if (!Config.isGUIPlaceholdersEnabled()) return;
 
         options.editTitle(str -> PlaceholderAPI.setPlaceholders(viewer.getPlayer(), str));
     }
 
+    @Deprecated
     public static void applyMenuPlaceholders(@NotNull MenuItem menuItem) {
         if (!Config.isGUIPlaceholdersEnabled()) return;
 
@@ -81,16 +84,6 @@ public class PetUtils {
     @NotNull
     public static ItemStack getRawMysteryEgg(@NotNull Template template) {
         return new ItemStack(Config.ITEM_MYSTERY_EGG.get());
-    }
-
-    @SuppressWarnings("UnstableApiUsage")
-    @Nullable
-    public static LivingEntity getEventDamager(@NotNull EntityDamageByEntityEvent event) {
-        if (Version.isAtLeast(Version.MC_1_20_6)) {
-            DamageSource source = event.getDamageSource();
-            return source.getCausingEntity() instanceof LivingEntity damager ? damager : null;
-        }
-        return getParent(event.getDamager());
     }
 
     @Nullable
@@ -180,14 +173,11 @@ public class PetUtils {
         }
     }
 
-    @SuppressWarnings("UnstableApiUsage")
-    public static void hurtArmor(@NotNull LivingEntity entity, @NotNull DamageSource source, float amount) {
-        if (amount <= 0F) return;
-
-        int damage = (int) Math.max(1.0F, amount / 4.0F);
-
-        for (EquipmentSlot slot : EntityUtil.EQUIPMENT_SLOTS) {
-            PetAPI.plugin.getPetNMS().damageItem(slot, entity, source, damage);
-        }
-    }
+//    public static void hurtArmor(@NotNull LivingEntity entity, @NotNull DamageSource source, float amount) {
+//        if (amount <= 0F) return;
+//
+//        int damage = (int) Math.max(1F, amount / 4F);
+//
+//        PetAPI.plugin.getPetNMS().damageItem(ARMOR_SLOTS, entity, source, damage);
+//    }
 }

@@ -107,10 +107,9 @@ public final class CaptureTask {
 
         UniParticle.of(Particle.SMOKE).play(this.entity.getLocation(), 0.5, 0.1, 10);
 
-        Lang.CAPTURE_PROGRESS.getMessage()
+        Lang.CAPTURE_PROGRESS.getMessage().send(this.player, replacer -> replacer
             .replace(Placeholders.GENERIC_SUCCESS, String.valueOf(this.success))
-            .replace(Placeholders.GENERIC_FAILURE, String.valueOf(this.failure))
-            .send(this.player);
+            .replace(Placeholders.GENERIC_FAILURE, String.valueOf(this.failure)));
     }
 
     private boolean resultPredefined() {
@@ -146,10 +145,9 @@ public final class CaptureTask {
         PetCaptureSuccessEvent event = new PetCaptureSuccessEvent(player, entity, template, tier);
         plugin.getPluginManager().callEvent(event);
 
-        Lang.CAPTURE_SUCCESS.getMessage()
+        Lang.CAPTURE_SUCCESS.getMessage().send(this.player, replacer -> replacer
             .replace(Placeholders.TEMPLATE_DEFAULT_NAME, this.template.getDefaultName())
-            .replace(Placeholders.TIER_NAME, this.tier.getName())
-            .send(this.player);
+            .replace(Placeholders.TIER_NAME, this.tier.getName()));
     }
 
     private void onFailure() {
@@ -162,10 +160,9 @@ public final class CaptureTask {
         PetCaptureFailureEvent event = new PetCaptureFailureEvent(player, entity, template, tier);
         plugin.getPluginManager().callEvent(event);
 
-        Lang.CAPTURE_FAIL_UNLUCK.getMessage()
+        Lang.CAPTURE_FAIL_UNLUCK.getMessage().send(this.player, replacer -> replacer
             .replace(Placeholders.TEMPLATE_DEFAULT_NAME, this.template.getDefaultName())
-            .replace(Placeholders.TIER_NAME, this.tier.getName())
-            .send(this.player);
+            .replace(Placeholders.TIER_NAME, this.tier.getName()));
     }
 
     private boolean tryEscape() {
@@ -181,10 +178,9 @@ public final class CaptureTask {
             PetEscapeCaptureEvent event = new PetEscapeCaptureEvent(player, entity, template, tier);
             plugin.getPluginManager().callEvent(event);
 
-            Lang.CAPTURE_FAIL_ESCAPED.getMessage()
+            Lang.CAPTURE_FAIL_ESCAPED.getMessage().send(this.player, replacer -> replacer
                 .replace(Placeholders.TEMPLATE_DEFAULT_NAME, this.template.getDefaultName())
-                .replace(Placeholders.TIER_NAME, this.tier.getName())
-                .send(this.player);
+                .replace(Placeholders.TIER_NAME, this.tier.getName()));
             return true;
         }
 

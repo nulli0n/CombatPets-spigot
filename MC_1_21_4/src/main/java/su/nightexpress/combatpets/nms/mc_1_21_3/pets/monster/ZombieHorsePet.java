@@ -11,7 +11,6 @@ import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.animal.horse.ZombieHorse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.combatpets.api.pet.PetEntity;
@@ -25,7 +24,6 @@ public class ZombieHorsePet extends ZombieHorse implements PetEntity {
 
     public ZombieHorsePet(@NotNull ServerLevel level) {
         super(EntityType.ZOMBIE_HORSE, level);
-        this.inventory.setItem(0, new ItemStack(Items.SADDLE));
     }
 
     @Override

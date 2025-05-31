@@ -7,8 +7,8 @@ import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -47,9 +47,9 @@ import su.nightexpress.nightcore.util.FileUtil;
 import su.nightexpress.nightcore.util.ItemUtil;
 import su.nightexpress.nightcore.util.Players;
 import su.nightexpress.nightcore.util.Plugins;
+import su.nightexpress.nightcore.util.bukkit.NightSound;
 import su.nightexpress.nightcore.util.random.Rnd;
 import su.nightexpress.nightcore.util.text.NightMessage;
-import su.nightexpress.nightcore.util.wrapper.UniSound;
 
 import java.io.File;
 import java.util.*;
@@ -643,13 +643,13 @@ public class PetManager extends AbstractManager<PetsPlugin> {
                     petHolder.saveData();
                     PetUser user = this.plugin.getUserManager().getUserData(player);
                     this.plugin.getUserManager().scheduleSave(user);
-                    UniSound.of(Sound.ITEM_ARMOR_EQUIP_LEATHER).play(entity.getLocation());
+                    NightSound.of(Sound.ITEM_ARMOR_EQUIP_LEATHER).play(entity.getLocation());
                 }
                 return true;
             }
         }
 
-        boolean isRideable = entity instanceof Horse;
+        boolean isRideable = entity instanceof AbstractHorse;
         boolean needSneak = Config.PET_SNEAK_TO_OPEN_MENU.get();
         if (isRideable) needSneak = !needSneak;
 
@@ -658,7 +658,7 @@ public class PetManager extends AbstractManager<PetsPlugin> {
         if (isMenu) {
             petHolder.openMenu();
         }
-        else if (entity instanceof Horse horse) {
+        else if (entity instanceof AbstractHorse horse) {
             horse.addPassenger(player);
         }
         return true;
@@ -726,5 +726,27 @@ public class PetManager extends AbstractManager<PetsPlugin> {
         holder.setName(name);
         Lang.PET_RENAME_SUCCESS.getMessage().replace(Placeholders.PET_NAME, holder.getName()).send(player);
         return true;
+    }
+
+    public boolean canDamage(@NotNull LivingEntity damager, @NotNull LivingEntity victim) {
+        ActivePet damagerPet = this.getPetByMob(damager);
+        if (damagerPet != null) {
+            return this.canBeDamaged(damagerPet, victim);
+        }
+
+        ActivePet victimPet = this.getPetByMob(victim);
+        if (victimPet != null) {
+            return this.canBeDamaged(victimPet, damager);
+        }
+
+        return true;
+    }
+
+    public boolean canBeDamaged(@NotNull ActivePet pet, @NotNull LivingEntity entity) {
+        if (entity == pet.getOwner()) return false;
+        if (entity == pet.getEntity()) return true;
+        if (Config.PET_PVP_ALLOWED.get()) return true;
+
+        return (!(entity instanceof Player) && !this.isPetEntity(entity));
     }
 }

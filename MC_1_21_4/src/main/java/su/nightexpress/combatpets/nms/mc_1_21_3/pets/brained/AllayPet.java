@@ -7,7 +7,6 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.SpawnGroupData;
@@ -43,11 +42,6 @@ public class AllayPet extends Allay implements PetEntity {
     @Override
     protected Brain<?> makeBrain(Dynamic<?> dynamic) {
         return PetBrain.refreshBrain(this, this.brainProvider().makeBrain(dynamic));
-    }
-
-    @Override
-    public boolean hurtServer(ServerLevel level, DamageSource damagesource, float damage) {
-        return PetBrain.hurt(this, level, damagesource, damage);
     }
 
     @Override

@@ -77,8 +77,9 @@ public class WardrobeManager extends AbstractManager<PetsPlugin> {
         this.register("horse_style", new HorseStyleVariantHandler(), config);
         this.register("horse_color", new HorseColorVariantHandler(), config);
         this.register("shear_style", new SheepShearVariantHandler(), config);
+        this.register("rabbit_type", new RabbitVariantHandler(), config);
         // TODO More varaints
-        // Rabbit type, Cat type, Mooshroom type, Villager profession (+ zombie)
+        // Cat type, Mooshroom type, Villager profession (+ zombie)
     }
 
     public <T> void register(@NotNull String name, @NotNull VariantHandler<T> handler, @NotNull FileConfig config) {

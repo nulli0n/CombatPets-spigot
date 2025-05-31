@@ -144,11 +144,10 @@ public class AspectPointsCommands {
 
             plugin.getUserManager().scheduleSave(user);
 
-            message.getMessage()
+            context.send(message, replacer -> replacer
                 .replace(Placeholders.PLAYER_NAME, user.getName())
                 .replace(Placeholders.PET_NAME, data.getName())
-                .replace(Placeholders.GENERIC_AMOUNT, NumberUtil.format(amount))
-                .send(context.getSender());
+                .replace(Placeholders.GENERIC_AMOUNT, NumberUtil.format(amount)));
         });
 
 
@@ -186,11 +185,10 @@ public class AspectPointsCommands {
 
         plugin.getUserManager().scheduleSave(user);
 
-        message.getMessage()
+        context.send(message, replacer -> replacer
             .replace(Placeholders.forPlayer(player))
             .replace(Placeholders.PET_NAME, activePet.getName())
-            .replace(Placeholders.GENERIC_AMOUNT, NumberUtil.format(amount))
-            .send(context.getSender());
+            .replace(Placeholders.GENERIC_AMOUNT, NumberUtil.format(amount)));
 
         return true;
     }

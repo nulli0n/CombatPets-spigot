@@ -12,7 +12,6 @@ import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.combatpets.api.pet.PetEntity;
@@ -26,7 +25,6 @@ public class HorsePet extends Horse implements PetEntity {
 
     public HorsePet(@NotNull ServerLevel world) {
         super(EntityType.HORSE, world);
-        this.equipSaddle(Items.SADDLE.getDefaultInstance(), null);
     }
 
     @Override

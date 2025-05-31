@@ -12,7 +12,9 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.equipment.Equippable;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -89,6 +91,14 @@ public class MC_1_21_4 implements PetNMS {
         return holder;
     }
 
+    @Override
+    public void setSaddle(@NotNull LivingEntity entity) {
+        net.minecraft.world.entity.LivingEntity nmsEntity = ((CraftLivingEntity)entity).getHandle();
+        if (nmsEntity instanceof AbstractHorse horse) {
+            horse.equipSaddle(Items.SADDLE.getDefaultInstance(), null);
+        }
+    }
+
 //    private void setAttribute(@NotNull net.minecraft.world.entity.LivingEntity handle, @NotNull Holder<Attribute> holder, double value) {
 //        this.registerAttribute(handle, holder);
 //
@@ -141,24 +151,24 @@ public class MC_1_21_4 implements PetNMS {
         mob.setLeashedTo(holder == null ? null : ((CraftEntity)holder).getHandle(), true);
     }
 
-    @SuppressWarnings("UnstableApiUsage")
-    @Override
-    public void damageItem(@NotNull org.bukkit.inventory.EquipmentSlot bukkitSlot,
-                           @NotNull LivingEntity bukkitEntity,
-                           @NotNull org.bukkit.damage.DamageSource bukkitSource,
-                           int damage) {
-
-        EquipmentSlot slot = CraftEquipmentSlot.getNMS(bukkitSlot);
-        DamageSource source = ((CraftDamageSource)bukkitSource).getHandle();
-        net.minecraft.world.entity.LivingEntity entity = ((CraftLivingEntity)bukkitEntity).getHandle();
-
-        ItemStack stack = entity.getItemBySlot(slot);
-
-        Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
-        if (equippable != null && equippable.damageOnHurt() && stack.isDamageableItem() && stack.canBeHurtBy(source)) {
-            stack.hurtAndBreak(damage, entity, slot);
-        }
-    }
+//    @SuppressWarnings("UnstableApiUsage")
+//    @Override
+//    public void damageItem(@NotNull org.bukkit.inventory.EquipmentSlot bukkitSlot,
+//                           @NotNull LivingEntity bukkitEntity,
+//                           @NotNull org.bukkit.damage.DamageSource bukkitSource,
+//                           int damage) {
+//
+//        EquipmentSlot slot = CraftEquipmentSlot.getNMS(bukkitSlot);
+//        DamageSource source = ((CraftDamageSource)bukkitSource).getHandle();
+//        net.minecraft.world.entity.LivingEntity entity = ((CraftLivingEntity)bukkitEntity).getHandle();
+//
+//        ItemStack stack = entity.getItemBySlot(slot);
+//
+//        Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
+//        if (equippable != null && equippable.damageOnHurt() && stack.isDamageableItem() && stack.canBeHurtBy(source)) {
+//            stack.hurtAndBreak(damage, entity, slot);
+//        }
+//    }
 
 //    public static void hurtArmor(@NotNull net.minecraft.world.entity.LivingEntity entity, DamageSource source, float amount) {
 //        if (amount <= 0F) return;

@@ -181,7 +181,7 @@ public class Config {
         "Sets whether or not to use boss bar indicating pet health.");
 
     public static final ConfigValue<String> PET_HEALTHBAR_TITLE = ConfigValue.create("Pets.Healthbar.Title",
-        LIGHT_YELLOW.enclose(PET_NAME) + "   " + GRAY.enclose("Lv. ") + WHITE.enclose(PET_LEVEL) + "   " + LIGHT_RED.enclose(PET_HEALTH) + GRAY.enclose("/") + LIGHT_RED.enclose(PET_MAX_HEALTH + " ❤"),
+        LIGHT_YELLOW.wrap(PET_NAME) + "   " + GRAY.wrap("Lv. ") + WHITE.wrap(PET_LEVEL) + "   " + LIGHT_RED.wrap(PET_HEALTH) + GRAY.wrap("/") + LIGHT_RED.wrap(PET_MAX_HEALTH + " ❤"),
         "Sets healthbar title.",
         "You can use 'Pet' placeholders: " + WIKI_PLACEHOLDERS_URL
     );
@@ -212,6 +212,7 @@ public class Config {
         "Use '-1' for unlimited amount."
     );
 
+    @Deprecated
     public static boolean isGUIPlaceholdersEnabled() {
         return GENERAL_PLACEHOLDER_API_GUI.get();
     }

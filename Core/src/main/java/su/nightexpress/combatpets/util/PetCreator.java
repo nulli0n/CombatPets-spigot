@@ -18,6 +18,7 @@ import su.nightexpress.combatpets.nms.PetNMS;
 import su.nightexpress.combatpets.pet.AttributeRegistry;
 import su.nightexpress.combatpets.pet.impl.*;
 import su.nightexpress.nightcore.util.*;
+import su.nightexpress.nightcore.util.bukkit.NightItem;
 import su.nightexpress.nightcore.util.bukkit.NightSound;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
 
@@ -61,7 +62,7 @@ public class PetCreator {
 
     public static void createTiers(@NotNull PetsPlugin plugin) {
         createTier(plugin, "common", tier -> {
-            tier.setName(WHITE.enclose("Common"));
+            tier.setName(WHITE.wrap("Common"));
             tier.setIcon(ItemUtil.getSkinHead("6cedec04d2380cd77027f9d44455c98b7edc5f664ca0dd30a6106903915391db"));
             tier.setWeight(75);
             tier.setInventorySize(9);
@@ -71,7 +72,7 @@ public class PetCreator {
         });
 
         createTier(plugin, "rare", tier -> {
-            tier.setName(LIGHT_GREEN.enclose("Rare"));
+            tier.setName(LIGHT_GREEN.wrap("Rare"));
             tier.setIcon(ItemUtil.getSkinHead("f3a58bec65668b682abab361300a9c4133bb6c06db8847210a62b884ee6fbc7d"));
             tier.setWeight(15);
             tier.setInventorySize(18);
@@ -81,7 +82,7 @@ public class PetCreator {
         });
 
         createTier(plugin, "unique", tier -> {
-            tier.setName(LIGHT_BLUE.enclose("Unique"));
+            tier.setName(LIGHT_BLUE.wrap("Unique"));
             tier.setIcon(ItemUtil.getSkinHead("bd37285793131ed755f1b0098f29dd413d67656b6208728935492b49b1d0d4ba"));
             tier.setWeight(7.5);
             tier.setInventorySize(27);
@@ -91,7 +92,7 @@ public class PetCreator {
         });
 
         createTier(plugin, "mythic", tier -> {
-            tier.setName(LIGHT_PURPLE.enclose("Mythic"));
+            tier.setName(LIGHT_PURPLE.wrap("Mythic"));
             tier.setIcon(ItemUtil.getSkinHead("74649c6c22cb2480a1400fb7e845bddf36ffcd3011dd51a8e9aabebeae918bb6"));
             tier.setWeight(2.5);
             tier.setInventorySize(36);
@@ -105,7 +106,7 @@ public class PetCreator {
         File file = new File(plugin.getDataFolder() + Config.DIR_TIERS, id + ".yml");
         PetTier tier = new PetTier(plugin, file);
 
-        tier.setNameFormat(GRAY.enclose(PET_NAME) + " " + LIGHT_YELLOW.enclose("Lv. " + LIGHT_ORANGE.enclose(PET_LEVEL)));
+        tier.setNameFormat(GRAY.wrap(PET_NAME) + " " + LIGHT_YELLOW.wrap("Lv. " + LIGHT_ORANGE.wrap(PET_LEVEL)));
         tier.setHasInventory(true);
         tier.setHasEquipment(true);
         tier.setInventoryDropChance(0D);
@@ -293,19 +294,14 @@ public class PetCreator {
     }
 
     @NotNull
-    public static ItemStack getCaptureItem() {
-        ItemStack itemStack = new ItemStack(Material.LEAD);
-
-        ItemUtil.editMeta(itemStack, meta -> {
-            meta.setDisplayName(LIGHT_ORANGE.enclose(BOLD.enclose("Capture Lead")));
-            meta.setLore(Lists.newList(
-                GRAY.enclose("Special lead used to capture mobs."),
+    public static NightItem getCaptureItem() {
+        return NightItem.fromType(Material.LEAD)
+            .setDisplayName(LIGHT_ORANGE.wrap(BOLD.wrap("Capture Lead")))
+            .setLore(Lists.newList(
+                GRAY.wrap("Special lead used to capture mobs."),
                 "",
-                LIGHT_GRAY.enclose(LIGHT_ORANGE.enclose("[▶]") + " " + "Right-Click a mob to " + LIGHT_ORANGE.enclose("capture") + ".")
+                LIGHT_GRAY.wrap(LIGHT_ORANGE.wrap("[▶]") + " " + "Right-Click a mob to " + LIGHT_ORANGE.wrap("capture") + ".")
             ));
-        });
-
-        return itemStack;
     }
 
     @NotNull
@@ -313,11 +309,11 @@ public class PetCreator {
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
 
         ItemUtil.editMeta(itemStack, meta -> {
-            meta.setDisplayName(LIGHT_YELLOW.enclose(BOLD.enclose("Pet Egg")) + " " + GRAY.enclose("(" + WHITE.enclose(TEMPLATE_DEFAULT_NAME) + ")"));
+            meta.setDisplayName(LIGHT_YELLOW.wrap(BOLD.wrap("Pet Egg")) + " " + GRAY.wrap("(" + WHITE.wrap(TEMPLATE_DEFAULT_NAME) + ")"));
             meta.setLore(Lists.newList(
-                DARK_GRAY.enclose("Tier: " + GRAY.enclose(TIER_NAME)),
+                DARK_GRAY.wrap("Tier: " + GRAY.wrap(TIER_NAME)),
                 "",
-                LIGHT_GRAY.enclose(LIGHT_YELLOW.enclose("[▶]") + " Right-Click to " + LIGHT_YELLOW.enclose("claim") + ".")
+                LIGHT_GRAY.wrap(LIGHT_YELLOW.wrap("[▶]") + " Right-Click to " + LIGHT_YELLOW.wrap("claim") + ".")
             ));
         });
 
@@ -329,11 +325,11 @@ public class PetCreator {
         ItemStack itemStack = ItemUtil.getSkinHead("e6ba9987f738e6d75d3b02c30d1480a360593ddb464bd1c81abb9d71d9e656c0");
 
         ItemUtil.editMeta(itemStack, meta -> {
-            meta.setDisplayName(LIGHT_PURPLE.enclose(BOLD.enclose("Mystery Pet Egg")) + " " + GRAY.enclose("(" + WHITE.enclose(TEMPLATE_DEFAULT_NAME) + ")"));
+            meta.setDisplayName(LIGHT_PURPLE.wrap(BOLD.wrap("Mystery Pet Egg")) + " " + GRAY.wrap("(" + WHITE.wrap(TEMPLATE_DEFAULT_NAME) + ")"));
             meta.setLore(Lists.newList(
-                DARK_GRAY.enclose("Hatches into egg with random tier."),
+                DARK_GRAY.wrap("Hatches into egg with random tier."),
                 "",
-                LIGHT_GRAY.enclose(LIGHT_PURPLE.enclose("[▶]") + " Right-Click to " + LIGHT_PURPLE.enclose("hatch") + ".")
+                LIGHT_GRAY.wrap(LIGHT_PURPLE.wrap("[▶]") + " Right-Click to " + LIGHT_PURPLE.wrap("hatch") + ".")
             ));
         });
 
@@ -345,12 +341,12 @@ public class PetCreator {
         ItemStack itemStack = new ItemStack(Material.FLOWER_BANNER_PATTERN);
 
         ItemUtil.editMeta(itemStack, meta -> {
-            meta.setDisplayName(LIGHT_YELLOW.enclose(BOLD.enclose("Pet Accessory")) + " " + GRAY.enclose("(" + WHITE.enclose(GENERIC_TYPE) + ")"));
+            meta.setDisplayName(LIGHT_YELLOW.wrap(BOLD.wrap("Pet Accessory")) + " " + GRAY.wrap("(" + WHITE.wrap(GENERIC_TYPE) + ")"));
             meta.setLore(Lists.newList(
-                GRAY.enclose("Applies " + LIGHT_YELLOW.enclose(GENERIC_NAME + " " + GENERIC_TYPE)),
-                GRAY.enclose("accessory on your pet."),
+                GRAY.wrap("Applies " + LIGHT_YELLOW.wrap(GENERIC_NAME + " " + GENERIC_TYPE)),
+                GRAY.wrap("accessory on your pet."),
                 "",
-                LIGHT_GRAY.enclose(LIGHT_YELLOW.enclose("[▶]") + " " + "Right-Click a pet to " + LIGHT_YELLOW.enclose("apply") + ".")
+                LIGHT_GRAY.wrap(LIGHT_YELLOW.wrap("[▶]") + " " + "Right-Click a pet to " + LIGHT_YELLOW.wrap("apply") + ".")
             ));
             meta.addEnchant(Enchantment.UNBREAKING, 1, true);
             meta.addItemFlags(ItemFlag.values());

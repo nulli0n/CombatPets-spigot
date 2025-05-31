@@ -2,9 +2,7 @@ package su.nightexpress.combatpets.pet.impl;
 
 import org.bukkit.Particle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.entity.Breedable;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
@@ -16,18 +14,21 @@ import su.nightexpress.combatpets.Placeholders;
 import su.nightexpress.combatpets.api.pet.*;
 import su.nightexpress.combatpets.api.pet.event.PetLevelDownEvent;
 import su.nightexpress.combatpets.api.pet.event.PetLevelUpEvent;
-import su.nightexpress.combatpets.api.pet.type.ExhaustReason;
 import su.nightexpress.combatpets.api.pet.type.CombatMode;
+import su.nightexpress.combatpets.api.pet.type.ExhaustReason;
 import su.nightexpress.combatpets.config.Config;
 import su.nightexpress.combatpets.config.Lang;
-import su.nightexpress.combatpets.level.LevelingConfig;
-import su.nightexpress.combatpets.wardrobe.PetWardrobe;
 import su.nightexpress.combatpets.data.impl.PetData;
+import su.nightexpress.combatpets.level.LevelingConfig;
 import su.nightexpress.combatpets.pet.AttributeRegistry;
 import su.nightexpress.combatpets.util.PetUtils;
+import su.nightexpress.combatpets.wardrobe.PetWardrobe;
 import su.nightexpress.nightcore.menu.api.Menu;
 import su.nightexpress.nightcore.menu.impl.AbstractMenu;
-import su.nightexpress.nightcore.util.*;
+import su.nightexpress.nightcore.util.Lists;
+import su.nightexpress.nightcore.util.NumberUtil;
+import su.nightexpress.nightcore.util.TimeUtil;
+import su.nightexpress.nightcore.util.Version;
 import su.nightexpress.nightcore.util.placeholder.PlaceholderMap;
 import su.nightexpress.nightcore.util.text.NightMessage;
 import su.nightexpress.nightcore.util.wrapper.UniParticle;
@@ -237,6 +238,13 @@ public final class PetInstance implements ActivePet {
         this.entity.setCanPickupItems(false);
         if (this.entity instanceof Breedable breedable) {
             breedable.setAgeLock(true);
+        }
+        if (this.entity instanceof Tameable tameable) {
+            tameable.setTamed(true);
+            tameable.setOwner(this.owner);
+        }
+        if (this.entity instanceof AbstractHorse) {
+            this.plugin.getPetNMS().setSaddle(this.entity);
         }
 
         this.updateHealthBar();
