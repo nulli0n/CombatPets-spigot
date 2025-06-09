@@ -45,7 +45,7 @@ public class PetsPlugin extends NightDataPlugin<PetUser> implements ImprovedComm
     @Override
     @NotNull
     protected PluginDetails getDefaultDetails() {
-        return PluginDetails.create("Pets", new String[]{"pets", "pet", "compatpets"})
+        return PluginDetails.create("Pets", new String[]{"pets", "pet", "combatpets"})
             .setConfigClass(Config.class)
             .setLangClass(Lang.class)
             .setPermissionsClass(Perms.class);

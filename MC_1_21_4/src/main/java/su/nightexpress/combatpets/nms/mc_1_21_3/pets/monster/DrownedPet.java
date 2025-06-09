@@ -20,26 +20,6 @@ import su.nightexpress.combatpets.nms.mc_1_21_3.goals.follow.PetFollowOwnerGoal;
 
 public class DrownedPet extends Drowned implements PetEntity {
 
-    private final PetRangedAttackGoal rangedAttackGoal = new PetRangedAttackGoal(this, 1D, 10F) {
-
-        @Override
-        public boolean canUse() {
-            return super.canUse() && this.pet.getMainHandItem().is(Items.TRIDENT);
-        }
-
-        public void start() {
-            super.start();
-            this.pet.setAggressive(true);
-            this.pet.startUsingItem(InteractionHand.MAIN_HAND);
-        }
-
-        @Override
-        public void stop() {
-            super.stop();
-            this.pet.stopUsingItem();
-        }
-    };
-
     public DrownedPet(@NotNull ServerLevel world) {
         super(EntityType.DROWNED, world);
     }
@@ -48,8 +28,26 @@ public class DrownedPet extends Drowned implements PetEntity {
     public void setGoals() {
         this.targetSelector.addGoal(1, new PetHurtByTargetGoal(this));
         this.goalSelector.addGoal(2, new PetFollowOwnerGoal(this));
-        this.goalSelector.addGoal(3, this.rangedAttackGoal);
         this.goalSelector.addGoal(3, new PetZombieAttackGoal(this, 1D));
+        this.goalSelector.addGoal(3, new PetRangedAttackGoal(this, 1D, 10F) {
+
+            @Override
+            public boolean canUse() {
+                return super.canUse() && this.pet.getMainHandItem().is(Items.TRIDENT);
+            }
+
+            public void start() {
+                super.start();
+                this.pet.setAggressive(true);
+                this.pet.startUsingItem(InteractionHand.MAIN_HAND);
+            }
+
+            @Override
+            public void stop() {
+                super.stop();
+                this.pet.stopUsingItem();
+            }
+        });
     }
 
     @Override

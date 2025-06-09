@@ -100,7 +100,7 @@ public class MC_1_21_5 implements PetNMS {
         if (instance != null) return;
 
         AttributeMap attributes = handle.getAttributes();
-        AttributeSupplier supplier = (AttributeSupplier) Reflex.getFieldValue(attributes, "e");
+        AttributeSupplier supplier = (AttributeSupplier) Reflex.getFieldValue(attributes, "d");
         if (supplier == null) return;
 
         Map<Holder<Attribute>, AttributeInstance> instances = (Map<Holder<Attribute>, AttributeInstance>) Reflex.getFieldValue(supplier, "a");
