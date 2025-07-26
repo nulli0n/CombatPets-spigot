@@ -55,6 +55,6 @@ public class PetAPI {
 
     @NotNull
     public static PetUser getPlayerData(@NotNull Player player) {
-        return plugin.getUserManager().getUserData(player);
+        return plugin.getUserManager().getOrFetch(player);
     }
 }

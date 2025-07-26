@@ -178,7 +178,7 @@ public class BaseCommands {
                 else message = Lang.PET_USER_ERROR_NOT_COLLECTED;
             }
 
-            plugin.getUserManager().scheduleSave(user);
+            plugin.getUserManager().save(user);
 
             context.send(message, replacer -> replacer
                 .replace(Placeholders.PLAYER_NAME, user.getName())
@@ -207,7 +207,7 @@ public class BaseCommands {
                 else plugin.getPetManager().removeFromCollection(user, tier, template);
             });
 
-            plugin.getUserManager().scheduleSave(user);
+            plugin.getUserManager().save(user);
 
             context.send(message, replacer -> replacer
                 .replace(Placeholders.PLAYER_NAME, user.getName())
@@ -333,7 +333,7 @@ public class BaseCommands {
                 petData.setName(name);
             }
 
-            plugin.getUserManager().scheduleSave(user);
+            plugin.getUserManager().save(user);
 
             context.send(Lang.COMMAND_RENAME_DONE, replacer -> replacer
                 .replace(Placeholders.PLAYER_NAME, user.getName())
@@ -371,7 +371,7 @@ public class BaseCommands {
 
             petData.revive();
 
-            plugin.getUserManager().scheduleSave(user);
+            plugin.getUserManager().save(user);
 
             context.send(Lang.COMMAND_REVIVE_DONE, replacer -> replacer
                 .replace(Placeholders.PLAYER_NAME, user.getName())
@@ -403,7 +403,7 @@ public class BaseCommands {
 
             petData.getInventory().clear();
 
-            plugin.getUserManager().scheduleSave(user);
+            plugin.getUserManager().save(user);
 
             context.send(Lang.COMMAND_CLEAR_INVENTORY_DONE, replacer -> replacer
                 .replace(Placeholders.PLAYER_NAME, user.getName())

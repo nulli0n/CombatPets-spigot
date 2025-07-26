@@ -91,8 +91,8 @@ public class PetMenu extends ConfigMenu<PetsPlugin> {
                 }
 
                 petHolder.saveData();
-                PetUser user = plugin.getUserManager().getUserData(viewer.getPlayer());
-                this.plugin.getUserManager().scheduleSave(user);
+                PetUser user = plugin.getUserManager().getOrFetch(viewer.getPlayer());
+                this.plugin.getUserManager().save(user);
             }
         }));
 

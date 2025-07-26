@@ -2,40 +2,39 @@ package su.nightexpress.combatpets.data.impl;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nightexpress.combatpets.PetsPlugin;
 import su.nightexpress.combatpets.api.pet.Template;
 import su.nightexpress.combatpets.api.pet.Tier;
 import su.nightexpress.combatpets.util.PetUtils;
-import su.nightexpress.nightcore.database.AbstractUser;
+import su.nightexpress.nightcore.db.AbstractUser;
 
 import java.util.*;
 
-public class PetUser extends AbstractUser<PetsPlugin> {
+public class PetUser extends AbstractUser {
 
     private final Map<String, PetData> petMap;
 
     private boolean loaded;
 
     @NotNull
-    public static PetUser create(@NotNull PetsPlugin plugin, @NotNull UUID uuid, @NotNull String name) {
+    public static PetUser create(@NotNull UUID uuid, @NotNull String name) {
         long dateCreated = System.currentTimeMillis();
         long lastOnline = System.currentTimeMillis();
         Map<String, PetData> petMap = new HashMap<>();
 
-        PetUser user = new PetUser(plugin, uuid, name, dateCreated, lastOnline, petMap);
+        PetUser user = new PetUser(uuid, name, dateCreated, lastOnline, petMap);
         user.load(new HashMap<>());
         return user;
     }
 
-    public PetUser(@NotNull PetsPlugin plugin,
-                   @NotNull UUID uuid,
+    public PetUser(@NotNull UUID uuid,
                    @NotNull String name,
                    long dateCreated,
                    long lastOnline,
                    @NotNull Map<String, PetData> petMap
     ) {
-        super(plugin, uuid, name, dateCreated, lastOnline);
-        this.petMap = new HashMap<>();
+        super(uuid, name, dateCreated, lastOnline);
+        this.petMap = new HashMap<>(petMap);
+        this.loaded = true;
     }
 
     public boolean isLoaded() {

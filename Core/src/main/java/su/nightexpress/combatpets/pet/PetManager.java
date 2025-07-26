@@ -101,7 +101,7 @@ public class PetManager extends AbstractManager<PetsPlugin> {
     protected void onShutdown() {
         PetManager.getActivePets().forEach(holder -> {
             this.removePet(holder);
-            this.plugin.getData().saveUser(plugin.getUserManager().getUserData(holder.getOwner()));
+            this.plugin.getDataHandler().saveUser(plugin.getUserManager().getOrFetch(holder.getOwner()));
         });
 
         if (this.collectionMenu != null) this.collectionMenu.clear();
@@ -366,13 +366,13 @@ public class PetManager extends AbstractManager<PetsPlugin> {
 
 
     public void openTierCollection(@NotNull Player player) {
-        if (!plugin.getUserManager().getUserData(player).isLoaded()) return;
+        if (!plugin.getUserManager().getOrFetch(player).isLoaded()) return;
 
         this.tiersMenu.open(player);
     }
 
     public void openPetsCollection(@NotNull Player player, @NotNull Tier tier) {
-        if (!plugin.getUserManager().getUserData(player).isLoaded()) return;
+        if (!plugin.getUserManager().getOrFetch(player).isLoaded()) return;
 
         this.collectionMenu.open(player, tier);
     }
@@ -409,7 +409,7 @@ public class PetManager extends AbstractManager<PetsPlugin> {
     }
 
     public boolean spawnPet(@NotNull Player player, @NotNull Tier tier, @NotNull Template config) {
-        PetUser user = plugin.getUserManager().getUserData(player);
+        PetUser user = plugin.getUserManager().getOrFetch(player);
         PetData petData = user.getPet(config, tier);
         if (petData == null) return false;
 
@@ -450,11 +450,11 @@ public class PetManager extends AbstractManager<PetsPlugin> {
 
     public void handleDeath(@NotNull ActivePet holder) {
         Player player = holder.getOwner();
-        PetUser user = this.plugin.getUserManager().getUserData(player);
+        PetUser user = this.plugin.getUserManager().getOrFetch(player);
 
         holder.handleDeath();
 
-        this.plugin.getUserManager().scheduleSave(user);
+        this.plugin.getUserManager().save(user);
     }
 
     public void despawnPet(@NotNull Player player) {
@@ -475,15 +475,15 @@ public class PetManager extends AbstractManager<PetsPlugin> {
 
     public void removePetAndSave(@NotNull ActivePet holder) {
         this.removePet(holder);
-        PetUser user = this.plugin.getUserManager().getUserData(holder.getOwner());
-        this.plugin.getUserManager().scheduleSave(user);
+        PetUser user = this.plugin.getUserManager().getOrFetch(holder.getOwner());
+        this.plugin.getUserManager().save(user);
     }
 
     @NotNull
     public PetData addToCollection(@NotNull PetUser user, @NotNull Tier tier, @NotNull Template template) {
         PetData petData = PetData.create(template, tier);
         user.addPet(petData);
-        this.plugin.getUserManager().scheduleSave(user);
+        this.plugin.getUserManager().save(user);
 
         return petData;
     }
@@ -495,12 +495,12 @@ public class PetManager extends AbstractManager<PetsPlugin> {
             this.removePet(activePet);
         }
         user.removePet(template, tier);
-        this.plugin.getUserManager().scheduleSave(user);
+        this.plugin.getUserManager().save(user);
     }
 
     @Nullable
     public PetData tryClaimPet(@NotNull Player player, @NotNull Tier tier, @NotNull Template config) {
-        PetUser user = this.plugin.getUserManager().getUserData(player);
+        PetUser user = this.plugin.getUserManager().getOrFetch(player);
         if (!user.isLoaded()) return null;
 
         if (user.hasPet(config, tier)) {
@@ -595,7 +595,7 @@ public class PetManager extends AbstractManager<PetsPlugin> {
             }
         }
 
-        this.removeFromCollection(plugin.getUserManager().getUserData(player), tier, template);
+        this.removeFromCollection(plugin.getUserManager().getOrFetch(player), tier, template);
         Lang.PET_RELEASE_SUCCESS.getMessage().replace(petData.replacePlaceholders()).send(player);
         return true;
     }
@@ -641,8 +641,8 @@ public class PetManager extends AbstractManager<PetsPlugin> {
                     handItem.setAmount(0);
 
                     petHolder.saveData();
-                    PetUser user = this.plugin.getUserManager().getUserData(player);
-                    this.plugin.getUserManager().scheduleSave(user);
+                    PetUser user = this.plugin.getUserManager().getOrFetch(player);
+                    this.plugin.getUserManager().save(user);
                     NightSound.of(Sound.ITEM_ARMOR_EQUIP_LEATHER).play(entity.getLocation());
                 }
                 return true;

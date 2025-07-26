@@ -90,7 +90,7 @@ public class CollectionMenu extends ConfigMenu<PetsPlugin> implements AutoFilled
         if (tier == null) return;
 
         autoFill.setSlots(this.petSlots);
-        autoFill.setItems(this.plugin.getUserManager().getUserData(player).getPets(tier).stream()
+        autoFill.setItems(this.plugin.getUserManager().getOrFetch(player).getPets(tier).stream()
             .sorted(Comparator.comparing(data -> data.getTemplate().getId())).toList());
         autoFill.setItemCreator(petData -> {
             ActivePet petHolder = PetEntityBridge.getByPlayer(player);

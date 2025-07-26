@@ -142,7 +142,7 @@ public class AspectPointsCommands {
                 }
             }
 
-            plugin.getUserManager().scheduleSave(user);
+            plugin.getUserManager().save(user);
 
             context.send(message, replacer -> replacer
                 .replace(Placeholders.PLAYER_NAME, user.getName())
@@ -166,7 +166,7 @@ public class AspectPointsCommands {
         int amount = arguments.getIntArgument(CommandArguments.AMOUNT);
         if (amount == 0) return false;
 
-        PetUser user = plugin.getUserManager().getUserData(player);
+        PetUser user = plugin.getUserManager().getOrFetch(player);
         ActivePet activePet = plugin.getPetManager().getPlayerPet(player);
         if (activePet == null) {
             Lang.PET_USER_ERROR_NOT_SUMMONED.getMessage().send(context.getSender());
@@ -183,7 +183,7 @@ public class AspectPointsCommands {
             activePet.removeAspectPoints(amount);
         }
 
-        plugin.getUserManager().scheduleSave(user);
+        plugin.getUserManager().save(user);
 
         context.send(message, replacer -> replacer
             .replace(Placeholders.forPlayer(player))

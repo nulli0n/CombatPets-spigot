@@ -10,7 +10,6 @@ import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.config.Perms;
 import su.nightexpress.combatpets.data.DataHandler;
 import su.nightexpress.combatpets.data.UserManager;
-import su.nightexpress.combatpets.data.impl.PetUser;
 import su.nightexpress.combatpets.hook.HookId;
 import su.nightexpress.combatpets.hook.impl.PlaceholderHook;
 import su.nightexpress.combatpets.item.ItemManager;
@@ -18,17 +17,18 @@ import su.nightexpress.combatpets.level.LevelingManager;
 import su.nightexpress.combatpets.nms.PetNMS;
 import su.nightexpress.combatpets.nms.mc_1_21_3.MC_1_21_4;
 import su.nightexpress.combatpets.nms.mc_1_21_5.MC_1_21_5;
+import su.nightexpress.combatpets.nms.mc_1_21_8.MC_1_21_8;
 import su.nightexpress.combatpets.pet.PetManager;
 import su.nightexpress.combatpets.shop.ShopManager;
 import su.nightexpress.combatpets.util.PetUtils;
 import su.nightexpress.combatpets.wardrobe.WardrobeManager;
-import su.nightexpress.nightcore.NightDataPlugin;
+import su.nightexpress.nightcore.NightPlugin;
 import su.nightexpress.nightcore.command.experimental.ImprovedCommands;
 import su.nightexpress.nightcore.config.PluginDetails;
 import su.nightexpress.nightcore.util.Plugins;
 import su.nightexpress.nightcore.util.Version;
 
-public class PetsPlugin extends NightDataPlugin<PetUser> implements ImprovedCommands {
+public class PetsPlugin extends NightPlugin implements ImprovedCommands {
 
     private DataHandler dataHandler;
     private UserManager userManager;
@@ -68,7 +68,7 @@ public class PetsPlugin extends NightDataPlugin<PetUser> implements ImprovedComm
         this.dataHandler = new DataHandler(this);
         this.dataHandler.setup();
 
-        this.userManager = new UserManager(this);
+        this.userManager = new UserManager(this, this.dataHandler);
         this.userManager.setup();
 
         this.itemManager = new ItemManager(this);
@@ -128,6 +128,8 @@ public class PetsPlugin extends NightDataPlugin<PetUser> implements ImprovedComm
         if (this.petManager != null) this.petManager.shutdown();
         if (this.wardrobeManager != null) this.wardrobeManager.shutdown();
         if (this.itemManager != null) this.itemManager.shutdown();
+        if (this.userManager != null) this.userManager.shutdown();
+        if (this.dataHandler != null) this.dataHandler.shutdown();
 
         PetAPI.shutdown();
     }
@@ -141,18 +143,17 @@ public class PetsPlugin extends NightDataPlugin<PetUser> implements ImprovedComm
         switch (Version.getCurrent()) {
             case MC_1_21_4 -> this.petNMS = new MC_1_21_4();
             case MC_1_21_5 -> this.petNMS = new MC_1_21_5();
+            case MC_1_21_8 -> this.petNMS = new MC_1_21_8();
         }
         return this.petNMS != null;
     }
 
-    @Override
     @NotNull
-    public DataHandler getData() {
+    public DataHandler getDataHandler() {
         return this.dataHandler;
     }
 
     @NotNull
-    @Override
     public UserManager getUserManager() {
         return userManager;
     }

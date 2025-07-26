@@ -158,7 +158,7 @@ public class LevelingCommands {
                 }
             }
 
-            plugin.getUserManager().scheduleSave(user);
+            plugin.getUserManager().save(user);
 
             message.getMessage()
                 .replace(Placeholders.PLAYER_NAME, user.getName())
@@ -183,7 +183,7 @@ public class LevelingCommands {
         int amount = arguments.getIntArgument(CommandArguments.AMOUNT);
         if (amount == 0) return false;
 
-        PetUser user = plugin.getUserManager().getUserData(player);
+        PetUser user = plugin.getUserManager().getOrFetch(player);
         ActivePet activePet = plugin.getPetManager().getPlayerPet(player);
         if (activePet == null) {
             Lang.PET_USER_ERROR_NOT_SUMMONED.getMessage().send(context.getSender());
@@ -200,7 +200,7 @@ public class LevelingCommands {
             activePet.removeXP(amount);
         }
 
-        plugin.getUserManager().scheduleSave(user);
+        plugin.getUserManager().save(user);
 
         message.getMessage()
             .replace(Placeholders.forPlayer(player))
@@ -235,7 +235,7 @@ public class LevelingCommands {
             }
             else data.resetXP();
 
-            plugin.getUserManager().scheduleSave(user);
+            plugin.getUserManager().save(user);
 
             Lang.COMMAND_RESET_PROGRESS_DONE.getMessage()
                 .replace(Placeholders.PLAYER_NAME, user.getName())

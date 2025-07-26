@@ -83,7 +83,7 @@ public class PetGenericListener extends AbstractListener<PetsPlugin> {
 
         if (deathEvent.isPermanentDeath()) {
             Player owner = activePet.getOwner();
-            PetUser user = plugin.getUserManager().getUserData(owner);
+            PetUser user = plugin.getUserManager().getOrFetch(owner);
             this.petManager.removeFromCollection(user, activePet.getTier(), activePet.getTemplate());
         }
     }

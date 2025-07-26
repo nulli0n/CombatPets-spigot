@@ -63,7 +63,7 @@ public class TiersMenu extends ConfigMenu<PetsPlugin> implements AutoFilled<Tier
         autoFill.setSlots(this.tierSlots);
         autoFill.setItems(this.plugin.getPetManager().getTiers().stream().sorted(Comparator.comparingDouble(Tier::getWeight).reversed()).toList());
         autoFill.setItemCreator(tier -> {
-            PetUser user = plugin.getUserManager().getUserData(viewer.getPlayer());
+            PetUser user = plugin.getUserManager().getOrFetch(viewer.getPlayer());
 
             ItemStack item = tier.getIcon();
             ItemReplacer.create(item).hideFlags().trimmed()
