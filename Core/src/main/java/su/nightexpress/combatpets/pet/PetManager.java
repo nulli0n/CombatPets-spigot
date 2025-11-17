@@ -38,10 +38,11 @@ import su.nightexpress.combatpets.pet.listener.PlayerGenericListener;
 import su.nightexpress.combatpets.pet.menu.*;
 import su.nightexpress.combatpets.util.PetCreator;
 import su.nightexpress.combatpets.util.PetUtils;
-import su.nightexpress.economybridge.EconomyBridge;
-import su.nightexpress.economybridge.api.Currency;
+import su.nightexpress.nightcore.bridge.currency.Currency;
 import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.core.config.CoreLang;
 import su.nightexpress.nightcore.dialog.Dialog;
+import su.nightexpress.nightcore.integration.currency.EconomyBridge;
 import su.nightexpress.nightcore.manager.AbstractManager;
 import su.nightexpress.nightcore.util.FileUtil;
 import su.nightexpress.nightcore.util.ItemUtil;
@@ -396,7 +397,7 @@ public class PetManager extends AbstractManager<PetsPlugin> {
     public boolean openPetMenu(@NotNull Player player) {
         ActivePet petHolder = getPlayerPet(player);
         if (petHolder == null) {
-            Lang.PET_ERROR_NO_ACTIVE_PET.getMessage().send(player);
+            Lang.PET_ERROR_NO_ACTIVE_PET.message().send(player);
             return false;
         }
 
@@ -418,15 +419,15 @@ public class PetManager extends AbstractManager<PetsPlugin> {
 
     public boolean spawnPet(@NotNull Player player, @NotNull PetData petData) {
         if (this.hasActivePet(player)) {
-            Lang.PET_SPAWN_ERROR_ALREADY.getMessage().send(player);
+            Lang.PET_SPAWN_ERROR_ALREADY.message().send(player);
             return false;
         }
         if (petData.isDead()) {
-            Lang.PET_SPAWN_ERROR_DEAD.getMessage().send(player);
+            Lang.PET_SPAWN_ERROR_DEAD.message().send(player);
             return false;
         }
         if (!PetUtils.isAllowedPetZone(player.getLocation())) {
-            Lang.PET_ERROR_BAD_WORLD.getMessage().send(player);
+            Lang.PET_ERROR_BAD_WORLD.message().send(player);
             return false;
         }
 
@@ -435,7 +436,7 @@ public class PetManager extends AbstractManager<PetsPlugin> {
         location.add(0, 1, 0).add(direction.multiply(1.5));
         Block block = location.getBlock();
         if (!block.isEmpty() && block.getType().isSolid()) {
-            Lang.PET_SPAWN_ERROR_BAD_PLACE.getMessage().send(player);
+            Lang.PET_SPAWN_ERROR_BAD_PLACE.message().send(player);
             return false;
         }
 
@@ -466,7 +467,7 @@ public class PetManager extends AbstractManager<PetsPlugin> {
 
     public void despawnPet(@NotNull ActivePet holder) {
         this.removePetAndSave(holder);
-        Lang.PET_DESPAWN_DEFAULT.getMessage().send(holder.getOwner());
+        Lang.PET_DESPAWN_DEFAULT.message().send(holder.getOwner());
     }
 
     public void removePet(@NotNull ActivePet holder) {
@@ -504,30 +505,25 @@ public class PetManager extends AbstractManager<PetsPlugin> {
         if (!user.isLoaded()) return null;
 
         if (user.hasPet(config, tier)) {
-            Lang.PET_CLAIM_ERROR_ALREADY_HAVE.getMessage().send(player);
+            Lang.PET_CLAIM_ERROR_ALREADY_HAVE.message().send(player);
             return null;
         }
 
         int petLimit = PetManager.getPetsLimit(player);
         int petCollected = user.getPets(tier).size();
         if (petLimit > 0 && petCollected >= petLimit) {
-            Lang.PET_CLAIM_ERROR_REACHED_LIMIT.getMessage()
+            Lang.PET_CLAIM_ERROR_REACHED_LIMIT.message().send(player, replacer -> replacer
                 .replace(tier.replacePlaceholders())
                 .replace(Placeholders.GENERIC_AMOUNT, petLimit)
-                .send(player);
+            );
             return null;
         }
 
-        Lang.PET_CLAIM_SUCCESS.getMessage().send(player);
+        Lang.PET_CLAIM_SUCCESS.message().send(player);
         return this.addToCollection(user, tier, config);
     }
 
     public boolean revivePet(@NotNull Player player, @NotNull PetData petData) {
-        if (!PetUtils.hasEconomyBridge()) {
-            petData.revive();
-            return true;
-        }
-
         Tier tier = petData.getTier();
 
         Currency currency = EconomyBridge.getCurrency(tier.getReviveCurrency());
@@ -537,10 +533,10 @@ public class PetManager extends AbstractManager<PetsPlugin> {
 
         if (cost > 0) {
             if (currency.getBalance(player) < cost) {
-                Lang.PET_REVIVE_ERROR_NOT_ENOUGH_FUNDS.getMessage()
+                Lang.PET_REVIVE_ERROR_NOT_ENOUGH_FUNDS.message().send(player, replacer -> replacer
                     .replace(Placeholders.PET_NAME, petData.getName())
                     .replace(Placeholders.GENERIC_AMOUNT, currency.format(cost))
-                    .send(player);
+                );
                 return false;
             }
             currency.take(player, cost);
@@ -548,21 +544,21 @@ public class PetManager extends AbstractManager<PetsPlugin> {
 
         petData.revive();
 
-        Lang.PET_REVIVE_SUCCESS.getMessage()
+        Lang.PET_REVIVE_SUCCESS.message().send(player, replacer -> replacer
             .replace(Placeholders.PET_NAME, petData.getName())
             .replace(Placeholders.GENERIC_AMOUNT, currency.format(cost))
-            .send(player);
+        );
         return true;
     }
 
     public boolean releasePet(@NotNull Player player, @NotNull PetData petData) {
         if (!Config.PET_RELEASE_ALLOWED.get() && !player.hasPermission(Perms.BYPASS_RELEASE_DISABLED)) {
-            Lang.ERROR_NO_PERMISSION.getMessage().send(player);
+            CoreLang.ERROR_NO_PERMISSION.withPrefix(this.plugin).send(player);
             return false;
         }
 
         if (Config.PET_RELEASE_DISABLED_WORLDS.get().contains(player.getWorld().getName())) {
-            Lang.PET_RELEASE_ERROR_BAD_WORLD.getMessage().send(player);
+            Lang.PET_RELEASE_ERROR_BAD_WORLD.message().send(player);
             return false;
         }
 
@@ -581,7 +577,7 @@ public class PetManager extends AbstractManager<PetsPlugin> {
             BlockPlaceEvent placeEvent = new BlockPlaceEvent(placed, placed.getState(), against, item, player, true, EquipmentSlot.HAND);
             plugin.getPluginManager().callEvent(placeEvent);
             if (placeEvent.isCancelled()) {
-                Lang.PET_RELEASE_ERROR_PROTECTED_AREA.getMessage().send(player);
+                Lang.PET_RELEASE_ERROR_PROTECTED_AREA.message().send(player);
                 return false;
             }
 
@@ -596,7 +592,7 @@ public class PetManager extends AbstractManager<PetsPlugin> {
         }
 
         this.removeFromCollection(plugin.getUserManager().getOrFetch(player), tier, template);
-        Lang.PET_RELEASE_SUCCESS.getMessage().replace(petData.replacePlaceholders()).send(player);
+        Lang.PET_RELEASE_SUCCESS.message().send(player, replacer -> replacer.replace(petData.replacePlaceholders()));
         return true;
     }
 
@@ -605,7 +601,7 @@ public class PetManager extends AbstractManager<PetsPlugin> {
         if (petHolder == null) return false;
 
         if (!petHolder.isOwner(player)) {
-            Lang.PET_ERROR_NOT_YOUR.getMessage().send(player);
+            Lang.PET_ERROR_NOT_YOUR.message().send(player);
             return true;
         }
 
@@ -666,20 +662,20 @@ public class PetManager extends AbstractManager<PetsPlugin> {
 
     public boolean startRename(@NotNull Player player) {
         if (!this.hasActivePet(player)) {
-            Lang.PET_ERROR_NO_ACTIVE_PET.getMessage().send(player);
+            Lang.PET_ERROR_NO_ACTIVE_PET.message().send(player);
             return false;
         }
 
         boolean nametagRequired = Config.PET_NAME_RENAME_MENU_REQUIRES_NAMETAG.get();
         if (nametagRequired) {
             if (Players.countItem(player, Material.NAME_TAG) < 1) {
-                Lang.PET_RENAME_ERROR_NO_NAMETAG.getMessage().send(player);
+                Lang.PET_RENAME_ERROR_NO_NAMETAG.message().send(player);
                 return false;
             }
             Players.takeItem(player, Material.NAME_TAG, 1);
         }
 
-        Lang.PET_RENAME_PROMPT.getMessage().send(player);
+        Lang.PET_RENAME_PROMPT.message().send(player);
         Dialog.create(player, (dialog, input) -> {
             this.plugin.runTask(task -> {
                 if (!this.tryRename(player, input.getText()) && nametagRequired) {
@@ -695,7 +691,7 @@ public class PetManager extends AbstractManager<PetsPlugin> {
     public boolean tryRename(@NotNull Player player, @NotNull String name) {
         ActivePet holder = this.getPlayerPet(player);
         if (holder == null) {
-            Lang.PET_ERROR_NO_ACTIVE_PET.getMessage().send(player);
+            Lang.PET_ERROR_NO_ACTIVE_PET.message().send(player);
             return false;
         }
 
@@ -704,7 +700,7 @@ public class PetManager extends AbstractManager<PetsPlugin> {
 
         if (!player.hasPermission(Perms.BYPASS_NAME_WORDS)) {
             if (Config.PET_NAME_BLOCKED_WORDS.get().stream().anyMatch(rawName::contains)) {
-                Lang.PET_RENAME_ERROR_FORBIDDEN.getMessage().send(player);
+                Lang.PET_RENAME_ERROR_FORBIDDEN.message().send(player);
                 return false;
             }
         }
@@ -712,19 +708,19 @@ public class PetManager extends AbstractManager<PetsPlugin> {
         if (!player.hasPermission(Perms.BYPASS_NAME_LENGTH)) {
             int max = Config.PET_NAME_LENGTH_MAX.get();
             if (rawName.length() > max) {
-                Lang.PET_RENAME_ERROR_TOO_LONG.getMessage().replace(Placeholders.GENERIC_AMOUNT, max).send(player);
+                Lang.PET_RENAME_ERROR_TOO_LONG.message().send(player, replacer -> replacer.replace(Placeholders.GENERIC_AMOUNT, max));
                 return false;
             }
 
             int min = Config.PET_NAME_LENGTH_MIN.get();
             if (rawName.length() < min) {
-                Lang.PET_RENAME_ERROR_TOO_SHORT.getMessage().replace(Placeholders.GENERIC_AMOUNT, min).send(player);
+                Lang.PET_RENAME_ERROR_TOO_SHORT.message().send(player, replacer -> replacer.replace(Placeholders.GENERIC_AMOUNT, min));
                 return false;
             }
         }
 
         holder.setName(name);
-        Lang.PET_RENAME_SUCCESS.getMessage().replace(Placeholders.PET_NAME, holder.getName()).send(player);
+        Lang.PET_RENAME_SUCCESS.message().send(player, replacer -> replacer.replace(Placeholders.PET_NAME, holder.getName()));
         return true;
     }
 

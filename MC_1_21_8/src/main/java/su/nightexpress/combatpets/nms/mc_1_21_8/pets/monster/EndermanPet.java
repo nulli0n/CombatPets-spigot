@@ -18,7 +18,7 @@ import su.nightexpress.nightcore.util.Reflex;
 
 public class EndermanPet extends EnderMan implements PetEntity {
 
-    private static final String TARGET_CHANGE_TIME = "bM";
+    private static final String TARGET_CHANGE_TIME = "co";
 
     private boolean teleportAllowed;
 

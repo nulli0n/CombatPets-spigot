@@ -12,7 +12,7 @@ import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.util.PetUtils;
 import su.nightexpress.combatpets.shop.ShopManager;
 import su.nightexpress.combatpets.shop.data.EggPrice;
-import su.nightexpress.economybridge.api.Currency;
+import su.nightexpress.nightcore.bridge.currency.Currency;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
 import su.nightexpress.nightcore.menu.MenuOptions;
@@ -73,21 +73,21 @@ public class EggConfirmMenu extends ConfigMenu<PetsPlugin> implements Linked<Egg
 
             double balance = currency.getBalance(player);
             if (balance < cost) {
-                Lang.SHOP_PURCHASE_ERROR_NOT_ENOUGH_FUNDS.getMessage()
+                Lang.SHOP_PURCHASE_ERROR_NOT_ENOUGH_FUNDS.message().send(player, replacer -> replacer
                     .replace(GENERIC_PRICE, currency.format(cost))
                     .replace(template.replacePlaceholders())
                     .replace(tier.replacePlaceholders())
-                    .send(player);
+                );
             }
             else {
                 currency.take(player, cost);
                 Players.addItem(player, template.createEgg(tier));
 
-                Lang.SHOP_PURCHASE_SUCCESS.getMessage()
+                Lang.SHOP_PURCHASE_SUCCESS.message().send(player, replacer -> replacer
                     .replace(GENERIC_PRICE, currency.format(cost))
                     .replace(template.replacePlaceholders())
                     .replace(tier.replacePlaceholders())
-                    .send(player);
+                );
             }
 
             this.runNextTick(player::closeInventory);

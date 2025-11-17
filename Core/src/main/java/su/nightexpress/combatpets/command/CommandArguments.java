@@ -6,8 +6,12 @@ import su.nightexpress.combatpets.api.pet.FoodCategory;
 import su.nightexpress.combatpets.api.pet.Template;
 import su.nightexpress.combatpets.api.pet.Tier;
 import su.nightexpress.combatpets.config.Lang;
-import su.nightexpress.nightcore.command.experimental.argument.CommandArgument;
-import su.nightexpress.nightcore.command.experimental.builder.ArgumentBuilder;
+import su.nightexpress.nightcore.commands.Commands;
+import su.nightexpress.nightcore.commands.builder.ArgumentNodeBuilder;
+import su.nightexpress.nightcore.commands.exceptions.CommandSyntaxException;
+import su.nightexpress.nightcore.core.config.CoreLang;
+
+import java.util.Optional;
 
 public class CommandArguments {
 
@@ -19,26 +23,29 @@ public class CommandArguments {
     public static final String TYPE   = "type";
 
     @NotNull
-    public static ArgumentBuilder<Tier> tierArgument(@NotNull PetsPlugin plugin) {
-        return CommandArgument.builder(CommandArguments.TIER, (string, context) -> plugin.getPetManager().getTier(string))
+    public static ArgumentNodeBuilder<Tier> tierArgument(@NotNull PetsPlugin plugin) {
+        return Commands.argument(CommandArguments.TIER, (context, string) -> Optional.ofNullable(plugin.getPetManager().getTier(string))
+                .orElseThrow(() -> CommandSyntaxException.custom(Lang.ERROR_COMMAND_INVALID_TIER_ARGUMENT))
+            )
             .localized(Lang.COMMAND_ARGUMENT_NAME_TIER)
-            .customFailure(Lang.ERROR_COMMAND_INVALID_TIER_ARGUMENT)
-            .withSamples(context -> plugin.getPetManager().getTierIds());
+            .suggestions((reader, context) -> plugin.getPetManager().getTierIds());
     }
 
     @NotNull
-    public static ArgumentBuilder<Template> templateArgument(@NotNull PetsPlugin plugin) {
-        return CommandArgument.builder(CommandArguments.PET, (string, context) -> plugin.getPetManager().getTemplate(string))
+    public static ArgumentNodeBuilder<Template> templateArgument(@NotNull PetsPlugin plugin) {
+        return Commands.argument(CommandArguments.PET, (context, string) -> Optional.ofNullable(plugin.getPetManager().getTemplate(string))
+                .orElseThrow(() -> CommandSyntaxException.custom(Lang.ERROR_COMMAND_INVALID_PET_ARGUMENT))
+            )
             .localized(Lang.COMMAND_ARGUMENT_NAME_PET)
-            .customFailure(Lang.ERROR_COMMAND_INVALID_PET_ARGUMENT)
-            .withSamples(context -> plugin.getPetManager().getTemplateIds());
+            .suggestions((reader, context) -> plugin.getPetManager().getTemplateIds());
     }
 
     @NotNull
-    public static ArgumentBuilder<FoodCategory> foodCategoryArgument(@NotNull PetsPlugin plugin) {
-        return CommandArgument.builder(CommandArguments.TYPE, (string, context) -> plugin.getPetManager().getFoodCategory(string))
-            .localized(Lang.COMMAND_ARGUMENT_NAME_TYPE)
-            .customFailure(Lang.ERROR_COMMAND_INVALID_FOOD_CATEGORY_ARGUMENT)
-            .withSamples(context -> plugin.getPetManager().getFoodCategoryNames());
+    public static ArgumentNodeBuilder<FoodCategory> foodCategoryArgument(@NotNull PetsPlugin plugin) {
+        return Commands.argument(CommandArguments.TYPE, (context, string) -> Optional.ofNullable(plugin.getPetManager().getFoodCategory(string))
+                .orElseThrow(() -> CommandSyntaxException.custom(Lang.ERROR_COMMAND_INVALID_FOOD_CATEGORY_ARGUMENT))
+            )
+            .localized(CoreLang.COMMAND_ARGUMENT_NAME_TYPE)
+            .suggestions((reader, context) -> plugin.getPetManager().getFoodCategoryNames());
     }
 }

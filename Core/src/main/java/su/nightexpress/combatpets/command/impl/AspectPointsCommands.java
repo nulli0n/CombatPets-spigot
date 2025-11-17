@@ -12,14 +12,15 @@ import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.config.Perms;
 import su.nightexpress.combatpets.data.impl.PetData;
 import su.nightexpress.combatpets.data.impl.PetUser;
-import su.nightexpress.nightcore.command.experimental.CommandContext;
-import su.nightexpress.nightcore.command.experimental.argument.ArgumentTypes;
-import su.nightexpress.nightcore.command.experimental.argument.ParsedArguments;
-import su.nightexpress.nightcore.command.experimental.builder.DirectNodeBuilder;
-import su.nightexpress.nightcore.command.experimental.node.ChainedNode;
-import su.nightexpress.nightcore.language.entry.LangString;
-import su.nightexpress.nightcore.language.entry.LangText;
-import su.nightexpress.nightcore.util.CommandUtil;
+import su.nightexpress.nightcore.commands.Arguments;
+import su.nightexpress.nightcore.commands.Commands;
+import su.nightexpress.nightcore.commands.builder.HubNodeBuilder;
+import su.nightexpress.nightcore.commands.builder.LiteralNodeBuilder;
+import su.nightexpress.nightcore.commands.context.CommandContext;
+import su.nightexpress.nightcore.commands.context.ParsedArguments;
+import su.nightexpress.nightcore.core.config.CoreLang;
+import su.nightexpress.nightcore.locale.entry.MessageLocale;
+import su.nightexpress.nightcore.locale.entry.TextLocale;
 import su.nightexpress.nightcore.util.Lists;
 import su.nightexpress.nightcore.util.NumberUtil;
 import su.nightexpress.nightcore.util.wrapper.UniPermission;
@@ -32,17 +33,16 @@ public class AspectPointsCommands {
         ADD, SET, REMOVE
     }
 
-    public static void load(@NotNull PetsPlugin plugin) {
-        ChainedNode rootNode = plugin.getRootNode();
+    public static void load(@NotNull PetsPlugin plugin, @NotNull HubNodeBuilder rootNode) {
 
-        rootNode.addChildren(ChainedNode.builder(plugin, ASPECT_POINTS)
+        rootNode.branch(Commands.hub(ASPECT_POINTS)
             .description(Lang.COMMAND_APOINTS_DESC)
             .permission(Perms.COMMAND_ASPECT_POINTS)
-            .addDirect("add", builder -> builderChange(plugin, builder, Mode.ADD))
-            .addDirect("set", builder -> builderChange(plugin, builder, Mode.SET))
-            .addDirect("remove", builder -> builderChange(plugin, builder, Mode.REMOVE))
-            .addDirect("reward", builder -> builderReward(plugin, builder, Mode.ADD))
-            .addDirect("penalty", builder -> builderReward(plugin, builder, Mode.REMOVE))
+            .branch(Commands.literal("add", builder -> builderChange(plugin, builder, Mode.ADD)))
+            .branch(Commands.literal("set", builder -> builderChange(plugin, builder, Mode.SET)))
+            .branch(Commands.literal("remove", builder -> builderChange(plugin, builder, Mode.REMOVE)))
+            .branch(Commands.literal("reward", builder -> builderReward(plugin, builder, Mode.ADD)))
+            .branch(Commands.literal("penalty", builder -> builderReward(plugin, builder, Mode.REMOVE)))
         );
     }
 
@@ -52,8 +52,8 @@ public class AspectPointsCommands {
 //        rootNode.removeChildren(ASPECT_POINTS);
 //    }
 
-    private static DirectNodeBuilder builderChange(@NotNull PetsPlugin plugin, @NotNull DirectNodeBuilder builder, @NotNull Mode mode) {
-        LangString description = null;
+    private static LiteralNodeBuilder builderChange(@NotNull PetsPlugin plugin, @NotNull LiteralNodeBuilder builder, @NotNull Mode mode) {
+        TextLocale description = null;
         UniPermission permission = null;
         switch (mode) {
             case ADD -> {
@@ -73,46 +73,48 @@ public class AspectPointsCommands {
         return builder
             .description(description)
             .permission(permission)
-            .withArgument(ArgumentTypes.integerAbs(CommandArguments.AMOUNT).required()
-                .localized(Lang.COMMAND_ARGUMENT_NAME_AMOUNT)
-                .withSamples(context -> Lists.newList("1", "10", "100"))
+            .withArguments(
+                Arguments.integer(CommandArguments.AMOUNT, 1)
+                .localized(CoreLang.COMMAND_ARGUMENT_NAME_AMOUNT)
+                .suggestions((reader, context) -> Lists.newList("1", "10", "100")),
+                CommandArguments.tierArgument(plugin),
+                CommandArguments.templateArgument(plugin),
+                Arguments.playerName(CommandArguments.PLAYER).optional()
             )
-            .withArgument(CommandArguments.tierArgument(plugin).required())
-            .withArgument(CommandArguments.templateArgument(plugin).required())
-            .withArgument(ArgumentTypes.playerName(CommandArguments.PLAYER))
             .executes((context, arguments) -> changePoints(plugin, context, arguments, mode));
     }
 
-    private static DirectNodeBuilder builderReward(@NotNull PetsPlugin plugin, @NotNull DirectNodeBuilder builder, @NotNull Mode mode) {
-        LangString description = mode == Mode.ADD ? Lang.COMMAND_ASPECT_POINTS_REWARD_DESC : Lang.COMMAND_ASPECT_POINTS_PENALTY_DESC;
+    private static LiteralNodeBuilder builderReward(@NotNull PetsPlugin plugin, @NotNull LiteralNodeBuilder builder, @NotNull Mode mode) {
+        TextLocale description = mode == Mode.ADD ? Lang.COMMAND_ASPECT_POINTS_REWARD_DESC : Lang.COMMAND_ASPECT_POINTS_PENALTY_DESC;
         UniPermission permission = mode == Mode.ADD ? Perms.COMMAND_ASPECT_POINTS_REWARD : Perms.COMMAND_ASPECT_POINTS_PENALTY;
 
         return builder
             .description(description)
             .permission(permission)
-            .withArgument(ArgumentTypes.integerAbs(CommandArguments.AMOUNT).required()
-                .localized(Lang.COMMAND_ARGUMENT_NAME_AMOUNT)
-                .withSamples(context -> Lists.newList("1", "10", "100"))
+            .withArguments(
+                Arguments.integer(CommandArguments.AMOUNT)
+                    .localized(CoreLang.COMMAND_ARGUMENT_NAME_AMOUNT)
+                    .suggestions((reader, context) -> Lists.newList("1", "10", "100")),
+                Arguments.player(CommandArguments.PLAYER)
             )
-            .withArgument(ArgumentTypes.player(CommandArguments.PLAYER))
             .executes((context, arguments) -> rewardPoints(plugin, context, arguments, mode));
     }
 
     public static boolean changePoints(@NotNull PetsPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments, @NotNull Mode mode) {
-        plugin.getUserManager().manageUser(arguments.getStringArgument(CommandArguments.PLAYER, context.getSender().getName()), user -> {
+        plugin.getUserManager().manageUser(arguments.getString(CommandArguments.PLAYER, context.getSender().getName()), user -> {
             if (user == null) {
                 context.errorBadPlayer();
                 return;
             }
             if (!user.isLoaded()) return;
 
-            int amount = arguments.getIntArgument(CommandArguments.AMOUNT);
-            Tier tier = arguments.getArgument(CommandArguments.TIER, Tier.class);
-            Template template = arguments.getArgument(CommandArguments.PET, Template.class);
+            int amount = arguments.getInt(CommandArguments.AMOUNT);
+            Tier tier = arguments.get(CommandArguments.TIER, Tier.class);
+            Template template = arguments.get(CommandArguments.PET, Template.class);
 
             PetData data = user.getPet(template, tier);
             if (data == null) {
-                Lang.PET_USER_ERROR_NOT_COLLECTED.getMessage().send(context.getSender());
+                Lang.PET_USER_ERROR_NOT_COLLECTED.message().send(context.getSender());
                 return;
             }
 
@@ -125,7 +127,7 @@ public class AspectPointsCommands {
 //                data.addAspectPoints(amount);
 //            }
 
-            LangText message = null;
+            MessageLocale message = null;
 
             switch (mode) {
                 case ADD -> {
@@ -157,23 +159,24 @@ public class AspectPointsCommands {
     public static boolean rewardPoints(@NotNull PetsPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments, @NotNull Mode mode) {
         if (mode == Mode.SET) return false;
 
-        Player player = CommandUtil.getPlayerOrSender(context, arguments, CommandArguments.PLAYER);
-        if (player == null) {
-            context.errorBadPlayer();
+        if (!context.isPlayer() && !arguments.contains(CommandArguments.PLAYER)) {
+            context.printUsage();
             return false;
         }
 
-        int amount = arguments.getIntArgument(CommandArguments.AMOUNT);
+        Player player = context.isPlayer() ? context.getPlayerOrThrow() : arguments.getPlayer(CommandArguments.PLAYER);
+
+        int amount = arguments.getInt(CommandArguments.AMOUNT);
         if (amount == 0) return false;
 
         PetUser user = plugin.getUserManager().getOrFetch(player);
         ActivePet activePet = plugin.getPetManager().getPlayerPet(player);
         if (activePet == null) {
-            Lang.PET_USER_ERROR_NOT_SUMMONED.getMessage().send(context.getSender());
+            Lang.PET_USER_ERROR_NOT_SUMMONED.message().send(context.getSender());
             return false;
         }
 
-        LangText message;
+        MessageLocale message;
         if (mode == Mode.ADD) {
             message = Lang.COMMAND_ASPECT_POINTS_REWARD_DONE;
             activePet.addAspectPoints(amount);

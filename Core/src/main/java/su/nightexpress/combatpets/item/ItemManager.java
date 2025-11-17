@@ -141,9 +141,9 @@ public class ItemManager extends AbstractManager<PetsPlugin> {
 
         UniParticle.of(Particle.WITCH).play(player.getLocation().add(0, 0.5, 0), 0.1, 0.5, 50);
 
-        Lang.PET_MYSTERY_EGG_HATCH.getMessage()
+        Lang.PET_MYSTERY_EGG_HATCH.message().send(player, replacer -> replacer
             .replace(tier.replacePlaceholders())
             .replace(template.replacePlaceholders())
-            .send(player);
+        );
     }
 }

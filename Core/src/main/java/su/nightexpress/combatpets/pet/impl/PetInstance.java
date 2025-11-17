@@ -135,7 +135,7 @@ public final class PetInstance implements ActivePet {
         }
 
         if (!PetUtils.isAllowedPetZone(this.entity.getLocation())) {
-            Lang.PET_ERROR_BAD_WORLD.getMessage().send(this.getOwner());
+            Lang.PET_ERROR_BAD_WORLD.message().send(this.getOwner());
             this.plugin.getPetManager().removePetAndSave(this);
             return;
         }
@@ -209,7 +209,7 @@ public final class PetInstance implements ActivePet {
 
                 if (toLoss > 0) {
                     this.removeXP(toLoss);
-                    Lang.LEVELING_XP_LOSE_DEATH.getMessage().replace(Placeholders.GENERIC_AMOUNT, NumberUtil.format(toLoss)).send(this.owner);
+                    Lang.LEVELING_XP_LOSE_DEATH.message().send(this.owner, replacer -> replacer.replace(Placeholders.GENERIC_AMOUNT, NumberUtil.format(toLoss)));
                 }
             }
         }
@@ -217,7 +217,7 @@ public final class PetInstance implements ActivePet {
         this.remove();
         this.data.setHealth(0D);
         this.data.setReviveDate(PetUtils.createTimestamp(this.getTier().getAutoRespawnTime()));
-        Lang.PET_DESPAWN_DEATH.getMessage().send(this.owner);
+        Lang.PET_DESPAWN_DEATH.message().send(this.owner);
     }
 
     @Override
@@ -264,7 +264,7 @@ public final class PetInstance implements ActivePet {
 
         this.update();
 
-        Lang.LEVELING_LEVEL_UP.getMessage().replace(this.data.replacePlaceholders()).send(this.owner);
+        Lang.LEVELING_LEVEL_UP.message().send(this.owner, replacer -> replacer.replace(this.data.replacePlaceholders()));
     }
 
     @Override
@@ -274,7 +274,7 @@ public final class PetInstance implements ActivePet {
 
         this.update();
 
-        Lang.LEVELING_LEVEL_DOWN.getMessage().replace(this.data.replacePlaceholders()).send(this.owner);
+        Lang.LEVELING_LEVEL_DOWN.message().send(this.owner, replacer -> replacer.replace(this.data.replacePlaceholders()));
     }
 
     @Override

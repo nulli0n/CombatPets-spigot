@@ -9,46 +9,48 @@ import su.nightexpress.combatpets.capture.CaptureManager;
 import su.nightexpress.combatpets.command.CommandArguments;
 import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.config.Perms;
-import su.nightexpress.nightcore.command.experimental.CommandContext;
-import su.nightexpress.nightcore.command.experimental.argument.ArgumentTypes;
-import su.nightexpress.nightcore.command.experimental.argument.ParsedArguments;
-import su.nightexpress.nightcore.command.experimental.node.ChainedNode;
-import su.nightexpress.nightcore.command.experimental.node.DirectNode;
+import su.nightexpress.nightcore.commands.Arguments;
+import su.nightexpress.nightcore.commands.Commands;
+import su.nightexpress.nightcore.commands.builder.HubNodeBuilder;
+import su.nightexpress.nightcore.commands.context.CommandContext;
+import su.nightexpress.nightcore.commands.context.ParsedArguments;
+import su.nightexpress.nightcore.core.config.CoreLang;
 import su.nightexpress.nightcore.util.*;
 
 public class CaptureCommands {
 
     private static final String CAPTURE_ITEM = "captureitem";
 
-    public static void load(@NotNull PetsPlugin plugin, @NotNull CaptureManager manager) {
-        ChainedNode rootNode = plugin.getRootNode();
-
-        rootNode.addChildren(DirectNode.builder(plugin, CAPTURE_ITEM)
+    public static void load(@NotNull PetsPlugin plugin, @NotNull CaptureManager manager, @NotNull HubNodeBuilder rootNode) {
+        rootNode.branch(Commands.literal(CAPTURE_ITEM)
             .description(Lang.COMMAND_CAPTURE_ITEM_DESC)
             .permission(Perms.COMMAND_CAPTURE_ITEM)
-            .withArgument(ArgumentTypes.integerAbs(CommandArguments.AMOUNT)
-                .localized(Lang.COMMAND_ARGUMENT_NAME_AMOUNT)
-                .withSamples(context -> Lists.newList("1", "8", "16"))
+            .withArguments(
+                Arguments.integer(CommandArguments.AMOUNT)
+                    .localized(CoreLang.COMMAND_ARGUMENT_NAME_AMOUNT)
+                    .suggestions((reader, context) -> Lists.newList("1", "8", "16")).optional(),
+                Arguments.player(CommandArguments.PLAYER).optional()
             )
-            .withArgument(ArgumentTypes.player(CommandArguments.PLAYER))
             .executes((context, arguments) -> giveItem(plugin, manager, context, arguments))
         );
     }
 
+    @Deprecated
     public static void unload(@NotNull PetsPlugin plugin) {
-        ChainedNode rootNode = plugin.getRootNode();
+        /*ChainedNode rootNode = plugin.getRootNode();
 
-        rootNode.removeChildren(CAPTURE_ITEM);
+        rootNode.removeChildren(CAPTURE_ITEM);*/
     }
 
     public static boolean giveItem(@NotNull PetsPlugin plugin, @NotNull CaptureManager manager, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
-        Player player = CommandUtil.getPlayerOrSender(context, arguments, CommandArguments.PLAYER);
-        if (player == null) {
-            context.errorBadPlayer();
+        if (!context.isPlayer() && !arguments.contains(CommandArguments.PLAYER)) {
+            context.printUsage();
             return false;
         }
 
-        int amount = arguments.getIntArgument(CommandArguments.AMOUNT, 1);
+        Player player = context.isPlayer() ? context.getPlayerOrThrow() : arguments.getPlayer(CommandArguments.PLAYER);
+
+        int amount = arguments.getInt(CommandArguments.AMOUNT, 1);
         if (amount == 0) return false;
 
         ItemStack captureItem = manager.createCaptureItem();

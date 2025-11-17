@@ -30,6 +30,7 @@ public interface PetNMS {
 
     void sneak(@NotNull LivingEntity entity, boolean value);
 
+    @Deprecated
     void setLeashedTo(@NotNull LivingEntity entity, @Nullable Entity holder);
 
     boolean hasNavigationPath(@NotNull LivingEntity entity);

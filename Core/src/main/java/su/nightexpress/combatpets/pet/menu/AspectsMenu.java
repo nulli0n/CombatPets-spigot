@@ -15,6 +15,7 @@ import su.nightexpress.combatpets.pet.AttributeRegistry;
 import su.nightexpress.combatpets.util.PetUtils;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.core.config.CoreLang;
 import su.nightexpress.nightcore.menu.MenuOptions;
 import su.nightexpress.nightcore.menu.MenuSize;
 import su.nightexpress.nightcore.menu.MenuViewer;
@@ -196,19 +197,19 @@ public class AspectsMenu extends ConfigMenu<PetsPlugin> implements AutoFilled<As
 
         ItemStack backItem = ItemUtil.getSkinHead(SKIN_ARROW_DOWN);
         ItemUtil.editMeta(backItem, meta -> {
-            meta.setDisplayName(Lang.EDITOR_ITEM_RETURN.getDefaultName());
+            meta.setDisplayName(CoreLang.MENU_ICON_BACK.getName());
         });
         list.add(new MenuItem(backItem).setSlots(40).setPriority(10).setHandler(this.returnHandler));
 
         ItemStack prevPage = ItemUtil.getSkinHead(SKIN_ARROW_LEFT);
         ItemUtil.editMeta(prevPage, meta -> {
-            meta.setDisplayName(Lang.EDITOR_ITEM_PREVIOUS_PAGE.getDefaultName());
+            meta.setDisplayName(CoreLang.MENU_ICON_PREVIOUS_PAGE.getName());
         });
         list.add(new MenuItem(prevPage).setSlots(36).setPriority(10).setHandler(ItemHandler.forPreviousPage(this)));
 
         ItemStack nextPage = ItemUtil.getSkinHead(SKIN_ARROW_RIGHT);
         ItemUtil.editMeta(nextPage, meta -> {
-            meta.setDisplayName(Lang.EDITOR_ITEM_NEXT_PAGE.getDefaultName());
+            meta.setDisplayName(CoreLang.MENU_ICON_NEXT_PAGE.getName());
         });
         list.add(new MenuItem(nextPage).setSlots(44).setPriority(10).setHandler(ItemHandler.forNextPage(this)));
 

@@ -12,15 +12,15 @@ import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.config.Perms;
 import su.nightexpress.combatpets.data.impl.PetData;
 import su.nightexpress.combatpets.data.impl.PetUser;
-import su.nightexpress.nightcore.command.experimental.CommandContext;
-import su.nightexpress.nightcore.command.experimental.argument.ArgumentTypes;
-import su.nightexpress.nightcore.command.experimental.argument.ParsedArguments;
-import su.nightexpress.nightcore.command.experimental.builder.DirectNodeBuilder;
-import su.nightexpress.nightcore.command.experimental.node.ChainedNode;
-import su.nightexpress.nightcore.command.experimental.node.DirectNode;
-import su.nightexpress.nightcore.language.entry.LangString;
-import su.nightexpress.nightcore.language.entry.LangText;
-import su.nightexpress.nightcore.util.CommandUtil;
+import su.nightexpress.nightcore.commands.Arguments;
+import su.nightexpress.nightcore.commands.Commands;
+import su.nightexpress.nightcore.commands.builder.HubNodeBuilder;
+import su.nightexpress.nightcore.commands.builder.LiteralNodeBuilder;
+import su.nightexpress.nightcore.commands.context.CommandContext;
+import su.nightexpress.nightcore.commands.context.ParsedArguments;
+import su.nightexpress.nightcore.core.config.CoreLang;
+import su.nightexpress.nightcore.locale.entry.MessageLocale;
+import su.nightexpress.nightcore.locale.entry.TextLocale;
 import su.nightexpress.nightcore.util.Lists;
 import su.nightexpress.nightcore.util.NumberUtil;
 import su.nightexpress.nightcore.util.wrapper.UniPermission;
@@ -34,38 +34,31 @@ public class LevelingCommands {
         ADD, SET, REMOVE
     }
 
-    public static void load(@NotNull PetsPlugin plugin) {
-        ChainedNode rootNode = plugin.getRootNode();
-
-        rootNode.addChildren(ChainedNode.builder(plugin, XP)
+    public static void load(@NotNull PetsPlugin plugin, @NotNull HubNodeBuilder rootNode) {
+        rootNode.branch(Commands.hub(XP)
             .description(Lang.COMMAND_XP_DESC)
             .permission(Perms.COMMAND_XP)
-            .addDirect("add", builder -> builderXPChange(plugin, builder, Mode.ADD))
-            .addDirect("set", builder -> builderXPChange(plugin, builder, Mode.SET))
-            .addDirect("remove", builder -> builderXPChange(plugin, builder, Mode.REMOVE))
-            .addDirect("reward", builder -> builderXPReward(plugin, builder, Mode.ADD))
-            .addDirect("penalty", builder -> builderXPReward(plugin, builder, Mode.REMOVE))
+            .branch(Commands.literal("add", builder -> builderXPChange(plugin, builder, Mode.ADD)))
+            .branch(Commands.literal("set", builder -> builderXPChange(plugin, builder, Mode.SET)))
+            .branch(Commands.literal("remove", builder -> builderXPChange(plugin, builder, Mode.REMOVE)))
+            .branch(Commands.literal("reward", builder -> builderXPReward(plugin, builder, Mode.ADD)))
+            .branch(Commands.literal("penalty", builder -> builderXPReward(plugin, builder, Mode.REMOVE)))
         );
 
-        rootNode.addChildren(DirectNode.builder(plugin, RESET_PROGRESS)
+        rootNode.branch(Commands.literal(RESET_PROGRESS)
             .description(Lang.COMMAND_RESET_PROGRESS_DESC)
             .permission(Perms.COMMAND_RESET_PROGRESS)
-            .withArgument(CommandArguments.tierArgument(plugin).required())
-            .withArgument(CommandArguments.templateArgument(plugin).required())
-            .withArgument(ArgumentTypes.playerName(CommandArguments.PLAYER))
+            .withArguments(
+                CommandArguments.tierArgument(plugin),
+                CommandArguments.templateArgument(plugin),
+                Arguments.playerName(CommandArguments.PLAYER).optional()
+            )
             .executes((context, arguments) -> resetLeveling(plugin, context, arguments))
         );
     }
 
-    public static void unload(@NotNull PetsPlugin plugin) {
-        ChainedNode rootNode = plugin.getRootNode();
-
-        rootNode.removeChildren(XP);
-        rootNode.removeChildren(RESET_PROGRESS);
-    }
-
-    private static DirectNodeBuilder builderXPChange(@NotNull PetsPlugin plugin, @NotNull DirectNodeBuilder builder, @NotNull Mode mode) {
-        LangString description = null;
+    private static LiteralNodeBuilder builderXPChange(@NotNull PetsPlugin plugin, @NotNull LiteralNodeBuilder builder, @NotNull Mode mode) {
+        TextLocale description = null;
         UniPermission permission = null;
         switch (mode) {
             case ADD -> {
@@ -85,47 +78,49 @@ public class LevelingCommands {
         return builder
             .description(description)
             .permission(permission)
-            .withArgument(ArgumentTypes.integerAbs(CommandArguments.AMOUNT).required()
-                .localized(Lang.COMMAND_ARGUMENT_NAME_AMOUNT)
-                .withSamples(context -> Lists.newList("1", "10", "100"))
+            .withArguments(
+                Arguments.integer(CommandArguments.AMOUNT)
+                    .localized(CoreLang.COMMAND_ARGUMENT_NAME_AMOUNT)
+                    .suggestions((reader, context) -> Lists.newList("1", "10", "100")),
+                CommandArguments.tierArgument(plugin),
+                CommandArguments.templateArgument(plugin),
+                Arguments.playerName(CommandArguments.PLAYER).optional()
             )
-            .withArgument(CommandArguments.tierArgument(plugin).required())
-            .withArgument(CommandArguments.templateArgument(plugin).required())
-            .withArgument(ArgumentTypes.playerName(CommandArguments.PLAYER))
             .executes((context, arguments) -> changeXP(plugin, context, arguments, mode));
     }
 
-    private static DirectNodeBuilder builderXPReward(@NotNull PetsPlugin plugin, @NotNull DirectNodeBuilder builder, @NotNull Mode mode) {
-        LangString description = mode == Mode.ADD ? Lang.COMMAND_XP_REWARD_DESC : Lang.COMMAND_XP_PENALTY_DESC;
+    private static LiteralNodeBuilder builderXPReward(@NotNull PetsPlugin plugin, @NotNull LiteralNodeBuilder builder, @NotNull Mode mode) {
+        TextLocale description = mode == Mode.ADD ? Lang.COMMAND_XP_REWARD_DESC : Lang.COMMAND_XP_PENALTY_DESC;
         UniPermission permission = mode == Mode.ADD ? Perms.COMMAND_XP_REWARD : Perms.COMMAND_XP_PENALTY;
 
         return builder
             .description(description)
             .permission(permission)
-            .withArgument(ArgumentTypes.integerAbs(CommandArguments.AMOUNT).required()
-                .localized(Lang.COMMAND_ARGUMENT_NAME_AMOUNT)
-                .withSamples(context -> Lists.newList("1", "10", "100"))
+            .withArguments(
+                Arguments.integer(CommandArguments.AMOUNT)
+                    .localized(CoreLang.COMMAND_ARGUMENT_NAME_AMOUNT)
+                    .suggestions((reader, context) -> Lists.newList("1", "10", "100")),
+                Arguments.player(CommandArguments.PLAYER).optional()
             )
-            .withArgument(ArgumentTypes.player(CommandArguments.PLAYER))
             .executes((context, arguments) -> rewardXP(plugin, context, arguments, mode));
     }
 
     public static boolean changeXP(@NotNull PetsPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments, @NotNull Mode mode) {
-        plugin.getUserManager().manageUser(arguments.getStringArgument(CommandArguments.PLAYER, context.getSender().getName()), user -> {
+        plugin.getUserManager().manageUser(arguments.getString(CommandArguments.PLAYER, context.getSender().getName()), user -> {
             if (user == null) {
                 context.errorBadPlayer();
                 return;
             }
             if (!user.isLoaded()) return;
 
-            int amount = arguments.getIntArgument(CommandArguments.AMOUNT);
+            int amount = arguments.getInt(CommandArguments.AMOUNT);
 
-            Tier tier = arguments.getArgument(CommandArguments.TIER, Tier.class);
-            Template template = arguments.getArgument(CommandArguments.PET, Template.class);
+            Tier tier = arguments.get(CommandArguments.TIER, Tier.class);
+            Template template = arguments.get(CommandArguments.PET, Template.class);
 
             PetData data = user.getPet(template, tier);
             if (data == null) {
-                Lang.PET_USER_ERROR_NOT_COLLECTED.getMessage().send(context.getSender());
+                Lang.PET_USER_ERROR_NOT_COLLECTED.message().send(context.getSender());
                 return;
             }
 
@@ -141,7 +136,7 @@ public class LevelingCommands {
 //                data.addXP(amount);
 //            }
 
-            LangText message = null;
+            MessageLocale message = null;
 
             switch (mode) {
                 case ADD -> {
@@ -160,11 +155,11 @@ public class LevelingCommands {
 
             plugin.getUserManager().save(user);
 
-            message.getMessage()
+            message.message().send(context.getSender(), replacer -> replacer
                 .replace(Placeholders.PLAYER_NAME, user.getName())
                 .replace(Placeholders.PET_NAME, data.getName())
                 .replace(Placeholders.GENERIC_AMOUNT, NumberUtil.format(amount))
-                .send(context.getSender());
+            );
         });
 
 
@@ -174,23 +169,24 @@ public class LevelingCommands {
     public static boolean rewardXP(@NotNull PetsPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments, @NotNull Mode mode) {
         if (mode == Mode.SET) return false;
 
-        Player player = CommandUtil.getPlayerOrSender(context, arguments, CommandArguments.PLAYER);
-        if (player == null) {
-            context.errorBadPlayer();
+        if (!context.isPlayer() && !arguments.contains(CommandArguments.PLAYER)) {
+            context.printUsage();
             return false;
         }
 
-        int amount = arguments.getIntArgument(CommandArguments.AMOUNT);
+        Player player = context.isPlayer() ? context.getPlayerOrThrow() : arguments.getPlayer(CommandArguments.PLAYER);
+
+        int amount = arguments.getInt(CommandArguments.AMOUNT);
         if (amount == 0) return false;
 
         PetUser user = plugin.getUserManager().getOrFetch(player);
         ActivePet activePet = plugin.getPetManager().getPlayerPet(player);
         if (activePet == null) {
-            Lang.PET_USER_ERROR_NOT_SUMMONED.getMessage().send(context.getSender());
+            Lang.PET_USER_ERROR_NOT_SUMMONED.message().send(context.getSender());
             return false;
         }
 
-        LangText message;
+        MessageLocale message;
         if (mode == Mode.ADD) {
             message = Lang.COMMAND_XP_REWARD_DONE;
             activePet.addXP(amount);
@@ -202,29 +198,29 @@ public class LevelingCommands {
 
         plugin.getUserManager().save(user);
 
-        message.getMessage()
+        message.message().send(context.getSender(), replacer -> replacer
             .replace(Placeholders.forPlayer(player))
             .replace(Placeholders.PET_NAME, activePet.getName())
             .replace(Placeholders.GENERIC_AMOUNT, NumberUtil.format(amount))
-            .send(context.getSender());
+        );
 
         return true;
     }
 
     public static boolean resetLeveling(@NotNull PetsPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
-        plugin.getUserManager().manageUser(arguments.getStringArgument(CommandArguments.PLAYER, context.getSender().getName()), user -> {
+        plugin.getUserManager().manageUser(arguments.getString(CommandArguments.PLAYER, context.getSender().getName()), user -> {
             if (user == null) {
                 context.errorBadPlayer();
                 return;
             }
             if (!user.isLoaded()) return;
 
-            Tier tier = arguments.getArgument(CommandArguments.TIER, Tier.class);
-            Template template = arguments.getArgument(CommandArguments.PET, Template.class);
+            Tier tier = arguments.get(CommandArguments.TIER, Tier.class);
+            Template template = arguments.get(CommandArguments.PET, Template.class);
 
             PetData data = user.getPet(template, tier);
             if (data == null) {
-                Lang.PET_USER_ERROR_NOT_COLLECTED.getMessage().send(context.getSender());
+                Lang.PET_USER_ERROR_NOT_COLLECTED.message().send(context.getSender());
                 return;
             }
 
@@ -237,10 +233,10 @@ public class LevelingCommands {
 
             plugin.getUserManager().save(user);
 
-            Lang.COMMAND_RESET_PROGRESS_DONE.getMessage()
+            Lang.COMMAND_RESET_PROGRESS_DONE.message().send(context.getSender(), replacer -> replacer
                 .replace(Placeholders.PLAYER_NAME, user.getName())
                 .replace(Placeholders.PET_NAME, data.getName())
-                .send(context.getSender());
+            );
         });
 
         return true;

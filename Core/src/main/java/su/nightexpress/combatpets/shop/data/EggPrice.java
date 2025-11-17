@@ -1,7 +1,7 @@
 package su.nightexpress.combatpets.shop.data;
 
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.economybridge.api.Currency;
+import su.nightexpress.nightcore.bridge.currency.Currency;
 
 public class EggPrice {
 

@@ -11,7 +11,6 @@ import su.nightexpress.combatpets.config.Keys;
 import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.hook.HookId;
 import su.nightexpress.combatpets.hook.impl.MythicMobsHook;
-import su.nightexpress.combatpets.level.command.LevelingCommands;
 import su.nightexpress.combatpets.level.data.XPSource;
 import su.nightexpress.combatpets.level.listener.LevelingListener;
 import su.nightexpress.nightcore.config.FileConfig;
@@ -40,8 +39,6 @@ public class LevelingManager extends AbstractManager<PetsPlugin> {
         this.loadXPSources(config);
         config.saveChanges();
 
-        LevelingCommands.load(this.plugin);
-
         this.addListener(new LevelingListener(this.plugin, this));
 
         this.plugin.info("Loaded Leveling module.");
@@ -49,8 +46,6 @@ public class LevelingManager extends AbstractManager<PetsPlugin> {
 
     @Override
     protected void onShutdown() {
-        LevelingCommands.unload(this.plugin);
-
         if (this.xpSourceMap != null) {
             this.xpSourceMap.clear();
             this.xpSourceMap = null;
@@ -142,10 +137,11 @@ public class LevelingManager extends AbstractManager<PetsPlugin> {
 
         activePet.addXP(xpReward);
 
-        Lang.LEVELING_XP_GAIN.getMessage()
-            .replace(Placeholders.GENERIC_AMOUNT, NumberUtil.format(xpReward))
+        int finalXpReward = xpReward;
+        Lang.LEVELING_XP_GAIN.message().send(activePet.getOwner(), replacer -> replacer
+            .replace(Placeholders.GENERIC_AMOUNT, NumberUtil.format(finalXpReward))
             .replace(Placeholders.PET_NAME, activePet.getName())
-            .send(activePet.getOwner());
+        );
 
         return xpReward;
     }

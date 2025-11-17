@@ -11,157 +11,181 @@ import su.nightexpress.combatpets.config.Config;
 import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.config.Perms;
 import su.nightexpress.combatpets.data.impl.PetData;
-import su.nightexpress.nightcore.command.experimental.CommandContext;
-import su.nightexpress.nightcore.command.experimental.argument.ArgumentTypes;
-import su.nightexpress.nightcore.command.experimental.argument.ParsedArguments;
-import su.nightexpress.nightcore.command.experimental.impl.ReloadCommand;
-import su.nightexpress.nightcore.command.experimental.node.ChainedNode;
-import su.nightexpress.nightcore.command.experimental.node.DirectNode;
-import su.nightexpress.nightcore.language.entry.LangText;
-import su.nightexpress.nightcore.util.*;
+import su.nightexpress.nightcore.commands.Arguments;
+import su.nightexpress.nightcore.commands.Commands;
+import su.nightexpress.nightcore.commands.builder.HubNodeBuilder;
+import su.nightexpress.nightcore.commands.context.CommandContext;
+import su.nightexpress.nightcore.commands.context.ParsedArguments;
+import su.nightexpress.nightcore.core.config.CoreLang;
+import su.nightexpress.nightcore.locale.entry.MessageLocale;
+import su.nightexpress.nightcore.util.ItemUtil;
+import su.nightexpress.nightcore.util.Lists;
+import su.nightexpress.nightcore.util.NumberUtil;
+import su.nightexpress.nightcore.util.Players;
 
 import java.util.Collections;
 
 public class BaseCommands {
 
-    public static void load(@NotNull PetsPlugin plugin) {
-        ChainedNode rootNode = plugin.getRootNode();
+    public static void load(@NotNull PetsPlugin plugin, @NotNull HubNodeBuilder rootNode) {
+        rootNode.branch(Commands.literal("reload")
+            .description(CoreLang.COMMAND_RELOAD_DESC)
+            .permission(Perms.COMMAND_RELOAD)
+            .executes((context, arguments) -> {
+                plugin.doReload(context.getSender());
+                return true;
+            })
+        );
 
-        rootNode.addChildren(ReloadCommand.builder(plugin, Perms.COMMAND_RELOAD));
-
-        rootNode.addChildren(DirectNode.builder(plugin, "add")
+        rootNode.branch(Commands.literal("add")
             .description(Lang.COMMAND_ADD_DESC)
             .permission(Perms.COMMAND_ADD)
-            .withArgument(CommandArguments.tierArgument(plugin).required())
-            .withArgument(CommandArguments.templateArgument(plugin).required())
-            .withArgument(ArgumentTypes.playerName(CommandArguments.PLAYER))
+            .withArguments(
+                CommandArguments.tierArgument(plugin),
+                CommandArguments.templateArgument(plugin),
+                Arguments.playerName(CommandArguments.PLAYER).optional()
+            )
             .executes((context, arguments) -> addOrRemovePet(plugin, context, arguments, true))
         );
 
-        rootNode.addChildren(DirectNode.builder(plugin, "remove")
+        rootNode.branch(Commands.literal("remove")
             .description(Lang.COMMAND_REMOVE_DESC)
             .permission(Perms.COMMAND_REMOVE)
-            .withArgument(CommandArguments.tierArgument(plugin).required())
-            .withArgument(CommandArguments.templateArgument(plugin).required())
-            .withArgument(ArgumentTypes.playerName(CommandArguments.PLAYER))
+            .withArguments(
+                CommandArguments.tierArgument(plugin),
+                CommandArguments.templateArgument(plugin),
+                Arguments.playerName(CommandArguments.PLAYER).optional()
+            )
             .executes((context, arguments) -> addOrRemovePet(plugin, context, arguments, false))
         );
 
-        rootNode.addChildren(DirectNode.builder(plugin, "addall")
+        rootNode.branch(Commands.literal("addall")
             .description(Lang.COMMAND_ADD_ALL_DESC)
             .permission(Perms.COMMAND_ADD_ALL)
-            .withArgument(CommandArguments.tierArgument(plugin).required())
-            .withArgument(ArgumentTypes.playerName(CommandArguments.PLAYER))
+            .withArguments(
+                CommandArguments.tierArgument(plugin),
+                Arguments.playerName(CommandArguments.PLAYER).optional()
+            )
             .executes((context, arguments) -> addOrRemoveAll(plugin, context, arguments, true))
         );
 
-        rootNode.addChildren(DirectNode.builder(plugin, "removeall")
+        rootNode.branch(Commands.literal("removeall")
             .description(Lang.COMMAND_REMOVE_ALL_DESC)
             .permission(Perms.COMMAND_REMOVE_ALL)
-            .withArgument(CommandArguments.tierArgument(plugin).required())
-            .withArgument(ArgumentTypes.playerName(CommandArguments.PLAYER))
+            .withArguments(
+                CommandArguments.tierArgument(plugin),
+                Arguments.playerName(CommandArguments.PLAYER).optional()
+            )
             .executes((context, arguments) -> addOrRemoveAll(plugin, context, arguments, false))
         );
 
-        rootNode.addChildren(DirectNode.builder(plugin, "egg")
+        rootNode.branch(Commands.literal("egg")
             .description(Lang.COMMAND_EGG_DESC)
             .permission(Perms.COMMAND_EGG)
-            .withArgument(CommandArguments.tierArgument(plugin).required())
-            .withArgument(CommandArguments.templateArgument(plugin).required())
-            .withArgument(ArgumentTypes.player(CommandArguments.PLAYER))
+            .withArguments(
+                CommandArguments.tierArgument(plugin),
+                CommandArguments.templateArgument(plugin),
+                Arguments.playerName(CommandArguments.PLAYER).optional()
+            )
             .executes((context, arguments) -> addEgg(plugin, context, arguments))
         );
 
-        rootNode.addChildren(DirectNode.builder(plugin, "mysteryegg")
+        rootNode.branch(Commands.literal("mysteryegg")
             .description(Lang.COMMAND_MYSTERY_EGG_DESC)
             .permission(Perms.COMMAND_MYSTERY_EGG)
-            .withArgument(CommandArguments.templateArgument(plugin).required())
-            .withArgument(ArgumentTypes.player(CommandArguments.PLAYER))
+            .withArguments(
+                CommandArguments.templateArgument(plugin),
+                Arguments.player(CommandArguments.PLAYER).optional()
+            )
             .executes((context, arguments) -> addMysteryEgg(plugin, context, arguments))
         );
 
-        rootNode.addChildren(DirectNode.builder(plugin, "food")
+        rootNode.branch(Commands.literal("food")
             .description(Lang.COMMAND_FOOD_DESC)
             .permission(Perms.COMMAND_FOOD)
-            .withArgument(CommandArguments.foodCategoryArgument(plugin).required())
-            .withArgument(ArgumentTypes.string(CommandArguments.NAME)
-                .required()
-                .localized(Lang.COMMAND_ARGUMENT_NAME_NAME)
-                .withSamples(context -> {
-                    FoodCategory category = plugin.getPetManager().getFoodCategory(context.getArgs()[context.getArgs().length - 2]);
-                    if (category == null) return Collections.emptyList();
+            .withArguments(
+                CommandArguments.foodCategoryArgument(plugin),
+                Arguments.string(CommandArguments.NAME)
+                    .localized(CoreLang.COMMAND_ARGUMENT_NAME_NAME)
+                    .suggestions((reader, context) -> {
+                        FoodCategory category = plugin.getPetManager().getFoodCategory(reader.getArgs()[reader.getArgs().length - 2]);
+                        if (category == null) return Collections.emptyList();
 
-                    return category.getItemNames();
-                })
+                        return category.getItemNames();
+                    }),
+                Arguments.integer(CommandArguments.AMOUNT, 1).localized(CoreLang.COMMAND_ARGUMENT_NAME_AMOUNT)
+                    .suggestions((reader, context) -> Lists.newList("1", "8", "16", "32", "64")).optional(),
+                Arguments.player(CommandArguments.PLAYER).optional()
             )
-            .withArgument(ArgumentTypes.integerAbs(CommandArguments.AMOUNT).localized(Lang.COMMAND_ARGUMENT_NAME_AMOUNT)
-                .withSamples(context -> Lists.newList("1", "8", "16", "32", "64"))
-            )
-            .withArgument(ArgumentTypes.player(CommandArguments.PLAYER))
             .executes((context, arguments) -> giveFood(plugin, context, arguments))
         );
-
-        DirectNode collectionNode = DirectNode.builder(plugin, "collection")
+        
+        rootNode.branch(Commands.literal("collection")
             .description(Lang.COMMAND_COLLECTION_DESC)
             .permission(Perms.COMMAND_COLLECTION)
             .playerOnly()
-            .withArgument(CommandArguments.tierArgument(plugin))
-            .executes((context, arguments) -> openCollection(plugin, context, arguments)).build();
+            .withArguments(CommandArguments.tierArgument(plugin).optional())
+            .executes((context, arguments) -> openCollection(plugin, context, arguments))
+        );
 
         if (Config.GENERAL_COLLECTION_DEFAULT_COMMAND.get()) {
-            rootNode.setFallback(collectionNode);
+            rootNode.executes((context, arguments) -> openCollection(plugin, context, arguments));
         }
 
-        rootNode.addChildren(collectionNode);
-
-        rootNode.addChildren(DirectNode.builder(plugin, "menu")
+        rootNode.branch(Commands.literal("menu")
             .description(Lang.COMMAND_MENU_DESC)
             .permission(Perms.COMMAND_MENU)
             .playerOnly()
             .executes((context, arguments) -> openPetMenu(plugin, context, arguments))
         );
 
-        rootNode.addChildren(DirectNode.builder(plugin, "rename")
+        rootNode.branch(Commands.literal("rename")
             .description(Lang.COMMAND_RENAME_DESC)
             .permission(Perms.COMMAND_RENAME)
-            .withArgument(ArgumentTypes.playerName(CommandArguments.PLAYER).required())
-            .withArgument(CommandArguments.tierArgument(plugin).required())
-            .withArgument(CommandArguments.templateArgument(plugin).required())
-            .withArgument(ArgumentTypes.string(CommandArguments.NAME).required().complex().localized(Lang.COMMAND_ARGUMENT_NAME_NAME))
+            .withArguments(
+                Arguments.playerName(CommandArguments.PLAYER),
+                CommandArguments.tierArgument(plugin),
+                CommandArguments.templateArgument(plugin),
+                Arguments.string(CommandArguments.NAME).localized(CoreLang.COMMAND_ARGUMENT_NAME_NAME)
+            )
             .executes((context, arguments) -> renamePet(plugin, context, arguments))
         );
 
-        rootNode.addChildren(DirectNode.builder(plugin, "revive")
+        rootNode.branch(Commands.literal("revive")
             .description(Lang.COMMAND_REVIVE_DESC)
             .permission(Perms.COMMAND_REVIVE)
-            .withArgument(ArgumentTypes.playerName(CommandArguments.PLAYER).required())
-            .withArgument(CommandArguments.tierArgument(plugin).required())
-            .withArgument(CommandArguments.templateArgument(plugin).required())
+            .withArguments(
+                Arguments.playerName(CommandArguments.PLAYER),
+                CommandArguments.tierArgument(plugin),
+                CommandArguments.templateArgument(plugin)
+            )
             .executes((context, arguments) -> revivePet(plugin, context, arguments))
         );
 
-        rootNode.addChildren(DirectNode.builder(plugin, "clearinventory")
+        rootNode.branch(Commands.literal("clearinventory")
             .description(Lang.COMMAND_CLEAR_INVENTORY_DESC)
             .permission(Perms.COMMAND_CLEAR_INVENTORY)
-            .withArgument(ArgumentTypes.playerName(CommandArguments.PLAYER).required())
-            .withArgument(CommandArguments.tierArgument(plugin).required())
-            .withArgument(CommandArguments.templateArgument(plugin).required())
+            .withArguments(
+                Arguments.playerName(CommandArguments.PLAYER),
+                CommandArguments.tierArgument(plugin),
+                CommandArguments.templateArgument(plugin)
+            )
             .executes((context, arguments) -> clearInventory(plugin, context, arguments))
         );
     }
 
     public static boolean addOrRemovePet(@NotNull PetsPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments, boolean add) {
-        plugin.getUserManager().manageUser(arguments.getStringArgument(CommandArguments.PLAYER, context.getSender().getName()), user -> {
+        plugin.getUserManager().manageUser(arguments.getString(CommandArguments.PLAYER, context.getSender().getName()), user -> {
             if (user == null) {
                 context.errorBadPlayer();
                 return;
             }
             if (!user.isLoaded()) return;
 
-            Tier tier = arguments.getArgument(CommandArguments.TIER, Tier.class);
-            Template template = arguments.getArgument(CommandArguments.PET, Template.class);
+            Tier tier = arguments.get(CommandArguments.TIER, Tier.class);
+            Template template = arguments.get(CommandArguments.PET, Template.class);
             boolean hasPet = user.hasPet(template, tier);
-            LangText message;
+            MessageLocale message;
 
             if (add) {
                 if (!hasPet) {
@@ -190,15 +214,15 @@ public class BaseCommands {
     }
 
     public static boolean addOrRemoveAll(@NotNull PetsPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments, boolean add) {
-        plugin.getUserManager().manageUser(arguments.getStringArgument(CommandArguments.PLAYER, context.getSender().getName()), user -> {
+        plugin.getUserManager().manageUser(arguments.getString(CommandArguments.PLAYER, context.getSender().getName()), user -> {
             if (user == null) {
                 context.errorBadPlayer();
                 return;
             }
             if (!user.isLoaded()) return;
 
-            Tier tier = arguments.getArgument(CommandArguments.TIER, Tier.class);
-            LangText message = add ? Lang.COMMAND_ADD_ALL_DONE : Lang.COMMAND_REMOVE_ALL_DONE;
+            Tier tier = arguments.get(CommandArguments.TIER, Tier.class);
+            MessageLocale message = add ? Lang.COMMAND_ADD_ALL_DONE : Lang.COMMAND_REMOVE_ALL_DONE;
 
             plugin.getPetManager().getTemplates().forEach(template -> {
                 if (add) {
@@ -218,14 +242,15 @@ public class BaseCommands {
     }
 
     public static boolean addEgg(@NotNull PetsPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
-        Player player = CommandUtil.getPlayerOrSender(context, arguments, CommandArguments.PLAYER);
-        if (player == null) {
-            context.errorBadPlayer();
+        if (!context.isPlayer() && !arguments.contains(CommandArguments.PLAYER)) {
+            context.printUsage();
             return false;
         }
 
-        Tier tier = arguments.getArgument(CommandArguments.TIER, Tier.class);
-        Template template = arguments.getArgument(CommandArguments.PET, Template.class);
+        Player player = context.isPlayer() ? context.getPlayerOrThrow() : arguments.getPlayer(CommandArguments.PLAYER);
+
+        Tier tier = arguments.get(CommandArguments.TIER, Tier.class);
+        Template template = arguments.get(CommandArguments.PET, Template.class);
 
         Players.addItem(player, template.createEgg(tier));
 
@@ -237,13 +262,14 @@ public class BaseCommands {
     }
 
     public static boolean addMysteryEgg(@NotNull PetsPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
-        Player player = CommandUtil.getPlayerOrSender(context, arguments, CommandArguments.PLAYER);
-        if (player == null) {
-            context.errorBadPlayer();
+        if (!context.isPlayer() && !arguments.contains(CommandArguments.PLAYER)) {
+            context.printUsage();
             return false;
         }
 
-        Template template = arguments.getArgument(CommandArguments.PET, Template.class);
+        Player player = context.isPlayer() ? context.getPlayerOrThrow() : arguments.getPlayer(CommandArguments.PLAYER);
+
+        Template template = arguments.get(CommandArguments.PET, Template.class);
         ItemStack itemStack = plugin.getItemManager().createMysteryEgg(template);
         Players.addItem(player, itemStack);
 
@@ -254,22 +280,23 @@ public class BaseCommands {
     }
 
     public static boolean giveFood(@NotNull PetsPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
-        Player player = CommandUtil.getPlayerOrSender(context, arguments, CommandArguments.PLAYER);
-        if (player == null) {
-            context.errorBadPlayer();
+        if (!context.isPlayer() && !arguments.contains(CommandArguments.PLAYER)) {
+            context.printUsage();
             return false;
         }
 
-        FoodCategory category = arguments.getArgument(CommandArguments.TYPE, FoodCategory.class);
+        Player player = context.isPlayer() ? context.getPlayerOrThrow() : arguments.getPlayer(CommandArguments.PLAYER);
 
-        String itemName = arguments.getStringArgument(CommandArguments.NAME);
+        FoodCategory category = arguments.get(CommandArguments.TYPE, FoodCategory.class);
+
+        String itemName = arguments.getString(CommandArguments.NAME);
         FoodItem foodItem = category.getItem(itemName);
         if (foodItem == null) {
             context.send(Lang.ERROR_COMMAND_INVALID_FOOD_ITEM_ARGUMENT, replacer -> replacer.replace(Placeholders.GENERIC_VALUE, itemName));
             return false;
         }
 
-        int amount = arguments.getIntArgument(CommandArguments.AMOUNT, 1);
+        int amount = arguments.getInt(CommandArguments.AMOUNT, 1);
 
         ItemStack itemStack = foodItem.getItem();
         itemStack.setAmount(amount);
@@ -285,7 +312,7 @@ public class BaseCommands {
 
     public static boolean openCollection(@NotNull PetsPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
-        Tier tier = arguments.hasArgument(CommandArguments.TIER) ? arguments.getArgument(CommandArguments.TIER, Tier.class) : null;
+        Tier tier = arguments.contains(CommandArguments.TIER) ? arguments.get(CommandArguments.TIER, Tier.class) : null;
 
         if (tier != null) {
             plugin.getPetManager().openPetsCollection(player, tier);
@@ -303,20 +330,20 @@ public class BaseCommands {
     }
 
     public static boolean renamePet(@NotNull PetsPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
-        plugin.getUserManager().manageUser(arguments.getStringArgument(CommandArguments.PLAYER, context.getSender().getName()), user -> {
+        plugin.getUserManager().manageUser(arguments.getString(CommandArguments.PLAYER, context.getSender().getName()), user -> {
             if (user == null) {
                 context.errorBadPlayer();
                 return;
             }
             if (!user.isLoaded()) return;
 
-            Tier tier = arguments.getArgument(CommandArguments.TIER, Tier.class);
-            Template template = arguments.getArgument(CommandArguments.PET, Template.class);
-            String name = arguments.getStringArgument(CommandArguments.NAME);
+            Tier tier = arguments.get(CommandArguments.TIER, Tier.class);
+            Template template = arguments.get(CommandArguments.PET, Template.class);
+            String name = arguments.getString(CommandArguments.NAME);
 
             PetData petData = user.getPet(template, tier);
             if (petData == null) {
-                Lang.PET_USER_ERROR_NOT_COLLECTED.getMessage().send(context.getSender());
+                Lang.PET_USER_ERROR_NOT_COLLECTED.message().send(context.getSender());
                 return;
             }
 
@@ -344,7 +371,7 @@ public class BaseCommands {
     }
 
     public static boolean revivePet(@NotNull PetsPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
-        String name = arguments.getStringArgument(CommandArguments.PLAYER, context.getSender().getName());
+        String name = arguments.getString(CommandArguments.PLAYER, context.getSender().getName());
 
         plugin.getUserManager().manageUser(name, user -> {
             if (user == null) {
@@ -353,12 +380,12 @@ public class BaseCommands {
             }
             if (!user.isLoaded()) return;
 
-            Tier tier = arguments.getArgument(CommandArguments.TIER, Tier.class);
-            Template template = arguments.getArgument(CommandArguments.PET, Template.class);
+            Tier tier = arguments.get(CommandArguments.TIER, Tier.class);
+            Template template = arguments.get(CommandArguments.PET, Template.class);
 
             PetData petData = user.getPet(template, tier);
             if (petData == null) {
-                Lang.PET_USER_ERROR_NOT_COLLECTED.getMessage().send(context.getSender());
+                Lang.PET_USER_ERROR_NOT_COLLECTED.message().send(context.getSender());
                 return;
             }
 
@@ -383,7 +410,7 @@ public class BaseCommands {
     }
 
     public static boolean clearInventory(@NotNull PetsPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
-        String name = arguments.getStringArgument(CommandArguments.PLAYER, context.getSender().getName());
+        String name = arguments.getString(CommandArguments.PLAYER, context.getSender().getName());
 
         plugin.getUserManager().manageUser(name, user -> {
             if (user == null) {
@@ -392,12 +419,12 @@ public class BaseCommands {
             }
             if (!user.isLoaded()) return;
 
-            Tier tier = arguments.getArgument(CommandArguments.TIER, Tier.class);
-            Template template = arguments.getArgument(CommandArguments.PET, Template.class);
+            Tier tier = arguments.get(CommandArguments.TIER, Tier.class);
+            Template template = arguments.get(CommandArguments.PET, Template.class);
 
             PetData petData = user.getPet(template, tier);
             if (petData == null) {
-                Lang.PET_USER_ERROR_NOT_COLLECTED.getMessage().send(context.getSender());
+                Lang.PET_USER_ERROR_NOT_COLLECTED.message().send(context.getSender());
                 return;
             }
 

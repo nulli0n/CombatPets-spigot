@@ -12,7 +12,6 @@ import su.nightexpress.combatpets.Placeholders;
 import su.nightexpress.combatpets.api.pet.Template;
 import su.nightexpress.combatpets.api.pet.Tier;
 import su.nightexpress.combatpets.api.pet.event.capture.PetCaptureStartEvent;
-import su.nightexpress.combatpets.capture.command.CaptureCommands;
 import su.nightexpress.combatpets.capture.config.CaptureConfig;
 import su.nightexpress.combatpets.config.Keys;
 import su.nightexpress.combatpets.config.Lang;
@@ -47,7 +46,6 @@ public class CaptureManager extends AbstractManager<PetsPlugin> {
     @Override
     protected void onLoad() {
         this.loadConfig();
-        this.loadCommands();
 
         this.addListener(new CaptureListener(this.plugin, this));
 
@@ -56,8 +54,6 @@ public class CaptureManager extends AbstractManager<PetsPlugin> {
 
     @Override
     protected void onShutdown() {
-        CaptureCommands.unload(this.plugin);
-
         this.captureMap.values().forEach(CaptureTask::stop);
         this.captureMap.clear();
     }
@@ -71,10 +67,6 @@ public class CaptureManager extends AbstractManager<PetsPlugin> {
         FileConfig config = this.getConfig();
         config.initializeOptions(CaptureConfig.class);
         config.saveChanges();
-    }
-
-    private void loadCommands() {
-        CaptureCommands.load(this.plugin, this);
     }
 
     public void tickCaptures() {
@@ -102,7 +94,7 @@ public class CaptureManager extends AbstractManager<PetsPlugin> {
         String localized = name == null ? LangAssets.get(entity.getType()) : name;
 
         if (!this.canBeCaptured(entity)) {
-            Lang.CAPTURE_ERROR_NOT_CAPTURABLE.getMessage().send(player, replacer -> replacer.replace(Placeholders.GENERIC_NAME, localized));
+            Lang.CAPTURE_ERROR_NOT_CAPTURABLE.message().send(player, replacer -> replacer.replace(Placeholders.GENERIC_NAME, localized));
             return false;
         }
 
@@ -110,12 +102,12 @@ public class CaptureManager extends AbstractManager<PetsPlugin> {
         if (template == null || !template.isCapturable()) return false;
 
         if (!player.hasPermission(Perms.CAPTURE) && !player.hasPermission(template.getCapturePermission())) {
-            Lang.CAPTURE_ERROR_PERMISSION.getMessage().send(player, replacer -> replacer.replace(Placeholders.GENERIC_NAME, localized));
+            Lang.CAPTURE_ERROR_PERMISSION.message().send(player, replacer -> replacer.replace(Placeholders.GENERIC_NAME, localized));
             return false;
         }
 
         if (!this.isReadyToCapture(entity)) {
-            Lang.CAPTURE_ERROR_NOT_READY.getMessage().send(player, replacer -> replacer.replace(Placeholders.GENERIC_NAME, localized));
+            Lang.CAPTURE_ERROR_NOT_READY.message().send(player, replacer -> replacer.replace(Placeholders.GENERIC_NAME, localized));
             return false;
         }
 

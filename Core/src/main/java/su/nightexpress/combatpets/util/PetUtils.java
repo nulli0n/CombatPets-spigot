@@ -8,19 +8,16 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.damage.DamageSource;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nightexpress.combatpets.PetAPI;
 import su.nightexpress.combatpets.api.pet.Stat;
 import su.nightexpress.combatpets.api.pet.Template;
 import su.nightexpress.combatpets.api.pet.Tier;
 import su.nightexpress.combatpets.config.Config;
 import su.nightexpress.combatpets.data.impl.PetData;
-import su.nightexpress.combatpets.hook.HookId;
 import su.nightexpress.nightcore.menu.MenuOptions;
 import su.nightexpress.nightcore.menu.MenuViewer;
 import su.nightexpress.nightcore.menu.item.MenuItem;
@@ -33,10 +30,6 @@ import java.util.Base64;
 public class PetUtils {
 
     private static final EquipmentSlot[] ARMOR_SLOTS = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.BODY};
-
-    public static boolean hasEconomyBridge() {
-        return Plugins.isInstalled(HookId.ECONOMY_BRIDGE);
-    }
 
     @Nullable
     public static String extractBase64TextureURL(@NotNull String headTexture) {

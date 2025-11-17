@@ -25,7 +25,7 @@ import java.util.EnumSet;
 
 public class BlazePet extends Blaze implements PetEntity {
 
-    private static final Method SET_CHARGED = Reflex.getMethod(Blaze.class, "w", Boolean.TYPE);
+    private static final Method SET_CHARGED = Reflex.safeMethod(Blaze.class,  "setCharged", "x", Boolean.TYPE);
 
     public BlazePet(@NotNull ServerLevel world) {
         super(EntityType.BLAZE, world);

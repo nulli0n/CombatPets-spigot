@@ -2,6 +2,7 @@ package su.nightexpress.combatpets;
 
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.combatpets.capture.CaptureManager;
+import su.nightexpress.combatpets.capture.command.CaptureCommands;
 import su.nightexpress.combatpets.command.impl.AspectPointsCommands;
 import su.nightexpress.combatpets.command.impl.BaseCommands;
 import su.nightexpress.combatpets.config.Config;
@@ -10,25 +11,27 @@ import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.config.Perms;
 import su.nightexpress.combatpets.data.DataHandler;
 import su.nightexpress.combatpets.data.UserManager;
-import su.nightexpress.combatpets.hook.HookId;
 import su.nightexpress.combatpets.hook.impl.PlaceholderHook;
 import su.nightexpress.combatpets.item.ItemManager;
 import su.nightexpress.combatpets.level.LevelingManager;
+import su.nightexpress.combatpets.level.command.LevelingCommands;
 import su.nightexpress.combatpets.nms.PetNMS;
+import su.nightexpress.combatpets.nms.mc_1_21_10.MC_1_21_10;
 import su.nightexpress.combatpets.nms.mc_1_21_3.MC_1_21_4;
 import su.nightexpress.combatpets.nms.mc_1_21_5.MC_1_21_5;
 import su.nightexpress.combatpets.nms.mc_1_21_8.MC_1_21_8;
 import su.nightexpress.combatpets.pet.PetManager;
 import su.nightexpress.combatpets.shop.ShopManager;
-import su.nightexpress.combatpets.util.PetUtils;
+import su.nightexpress.combatpets.shop.command.ShopCommands;
 import su.nightexpress.combatpets.wardrobe.WardrobeManager;
+import su.nightexpress.combatpets.wardrobe.command.WardrobeCommands;
 import su.nightexpress.nightcore.NightPlugin;
-import su.nightexpress.nightcore.command.experimental.ImprovedCommands;
+import su.nightexpress.nightcore.commands.command.NightCommand;
 import su.nightexpress.nightcore.config.PluginDetails;
 import su.nightexpress.nightcore.util.Plugins;
 import su.nightexpress.nightcore.util.Version;
 
-public class PetsPlugin extends NightPlugin implements ImprovedCommands {
+public class PetsPlugin extends NightPlugin {
 
     private DataHandler dataHandler;
     private UserManager userManager;
@@ -47,8 +50,19 @@ public class PetsPlugin extends NightPlugin implements ImprovedCommands {
     protected PluginDetails getDefaultDetails() {
         return PluginDetails.create("Pets", new String[]{"pets", "pet", "combatpets"})
             .setConfigClass(Config.class)
-            .setLangClass(Lang.class)
             .setPermissionsClass(Perms.class);
+    }
+
+    @Override
+    protected void addRegistries() {
+        super.addRegistries();
+
+        this.registerLang(Lang.class);
+    }
+
+    @Override
+    protected boolean disableCommandManager() {
+        return true;
     }
 
     @Override
@@ -63,7 +77,7 @@ public class PetsPlugin extends NightPlugin implements ImprovedCommands {
 
         Keys.load(this);
 
-        this.loadCommands();
+
 
         this.dataHandler = new DataHandler(this);
         this.dataHandler.setup();
@@ -93,21 +107,12 @@ public class PetsPlugin extends NightPlugin implements ImprovedCommands {
         }
 
         if (Config.isShopEnabled()) {
-            this.loadShop();
+            this.shopManager = new ShopManager(this);
+            this.shopManager.setup();
         }
 
         this.loadHooks();
-    }
-
-    private boolean loadShop() {
-        if (!PetUtils.hasEconomyBridge()) {
-            this.error("You must install " + HookId.ECONOMY_BRIDGE + " to use shop features!");
-            return false;
-        }
-
-        this.shopManager = new ShopManager(this);
-        this.shopManager.setup();
-        return true;
+        this.loadCommands();
     }
 
     private void loadHooks() {
@@ -135,8 +140,23 @@ public class PetsPlugin extends NightPlugin implements ImprovedCommands {
     }
 
     private void loadCommands() {
-        BaseCommands.load(this);
-        AspectPointsCommands.load(this);
+        this.rootCommand = NightCommand.forPlugin(this, builder -> {
+            BaseCommands.load(this, builder);
+            AspectPointsCommands.load(this, builder);
+
+            if (this.captureManager != null) {
+                CaptureCommands.load(this, this.captureManager, builder);
+            }
+            if (this.levelingManager != null) {
+                LevelingCommands.load(this, builder);
+            }
+            if (this.shopManager != null) {
+                ShopCommands.load(this, this.shopManager, builder);
+            }
+            if (this.wardrobeManager != null) {
+                WardrobeCommands.load(this, this.wardrobeManager, builder);
+            }
+        });
     }
 
     private boolean setupNMS() {
@@ -144,6 +164,7 @@ public class PetsPlugin extends NightPlugin implements ImprovedCommands {
             case MC_1_21_4 -> this.petNMS = new MC_1_21_4();
             case MC_1_21_5 -> this.petNMS = new MC_1_21_5();
             case MC_1_21_8 -> this.petNMS = new MC_1_21_8();
+            case MC_1_21_10 -> this.petNMS = new MC_1_21_10();
         }
         return this.petNMS != null;
     }

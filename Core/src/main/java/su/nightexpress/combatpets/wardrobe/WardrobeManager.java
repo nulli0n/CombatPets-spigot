@@ -9,9 +9,8 @@ import org.jetbrains.annotations.Nullable;
 import su.nightexpress.combatpets.PetsPlugin;
 import su.nightexpress.combatpets.Placeholders;
 import su.nightexpress.combatpets.api.pet.ActivePet;
-import su.nightexpress.combatpets.config.Lang;
-import su.nightexpress.combatpets.wardrobe.command.WardrobeCommands;
 import su.nightexpress.combatpets.config.Keys;
+import su.nightexpress.combatpets.config.Lang;
 import su.nightexpress.combatpets.wardrobe.config.WardrobeConfig;
 import su.nightexpress.combatpets.wardrobe.handler.*;
 import su.nightexpress.combatpets.wardrobe.listener.WardrobeListener;
@@ -38,7 +37,6 @@ public class WardrobeManager extends AbstractManager<PetsPlugin> {
     protected void onLoad() {
         FileConfig config = this.getConfig();
 
-        this.loadCommands();
         this.loadConfig(config);
         this.loadVariants(config);
 
@@ -49,18 +47,12 @@ public class WardrobeManager extends AbstractManager<PetsPlugin> {
 
     @Override
     protected void onShutdown() {
-        WardrobeCommands.unload(this.plugin, this);
-
         VariantRegistry.clear();
     }
 
     @NotNull
     public FileConfig getConfig() {
         return FileConfig.loadOrExtract(this.plugin, FILE_NAME);
-    }
-
-    private void loadCommands() {
-        WardrobeCommands.load(this.plugin, this);
     }
 
     private void loadConfig(@NotNull FileConfig config) {
@@ -105,17 +97,17 @@ public class WardrobeManager extends AbstractManager<PetsPlugin> {
         if (petHolder == null) return false;
 
         if (!petHolder.isOwner(player)) {
-            Lang.ACCESSORY_APPLY_ERROR_NOT_YOURS.getMessage().send(player);
+            Lang.ACCESSORY_APPLY_ERROR_NOT_YOURS.message().send(player);
             return false;
         }
 
         if (variant.getHandler().alreadyHas(entity, value)) {
-            Lang.ACCESSORY_APPLY_ERROR_ALREADY_HAS.getMessage().send(player);
+            Lang.ACCESSORY_APPLY_ERROR_ALREADY_HAS.message().send(player);
             return false;
         }
 
         if (!variant.getHandler().apply(entity, value)) {
-            Lang.ACCESSORY_APPLY_ERROR_WRONG_TYPE.getMessage().send(player);
+            Lang.ACCESSORY_APPLY_ERROR_WRONG_TYPE.message().send(player);
             return false;
         }
 

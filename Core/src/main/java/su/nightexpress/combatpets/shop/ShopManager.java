@@ -6,16 +6,15 @@ import org.jetbrains.annotations.Nullable;
 import su.nightexpress.combatpets.PetsPlugin;
 import su.nightexpress.combatpets.api.pet.Template;
 import su.nightexpress.combatpets.api.pet.Tier;
-import su.nightexpress.combatpets.shop.command.ShopCommands;
 import su.nightexpress.combatpets.shop.data.EggPrice;
 import su.nightexpress.combatpets.shop.menu.EggConfirmMenu;
 import su.nightexpress.combatpets.shop.menu.ShopEggsMenu;
 import su.nightexpress.combatpets.shop.menu.ShopTiersMenu;
-import su.nightexpress.economybridge.EconomyBridge;
-import su.nightexpress.economybridge.api.Currency;
-import su.nightexpress.economybridge.currency.CurrencyId;
+import su.nightexpress.nightcore.bridge.currency.Currency;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.integration.currency.CurrencyId;
+import su.nightexpress.nightcore.integration.currency.EconomyBridge;
 import su.nightexpress.nightcore.manager.AbstractManager;
 
 import java.util.Collections;
@@ -44,7 +43,6 @@ public class ShopManager extends AbstractManager<PetsPlugin> {
     protected void onLoad() {
         FileConfig config = this.getConfig();
 
-        this.loadCommands();
         this.loadPrices(config);
         this.loadUI();
 
@@ -53,17 +51,11 @@ public class ShopManager extends AbstractManager<PetsPlugin> {
 
     @Override
     protected void onShutdown() {
-        ShopCommands.unload(this.plugin);
-
         if (this.eggConfirmMenu != null) this.eggConfirmMenu.clear();
         if (this.tiersMenu != null) this.tiersMenu.clear();
         if (this.eggsMenu != null) this.eggsMenu.clear();
 
         this.eggPriceMap.clear();
-    }
-
-    private void loadCommands() {
-        ShopCommands.load(this.plugin, this);
     }
 
     private void loadPrices(@NotNull FileConfig config) {

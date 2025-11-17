@@ -80,7 +80,7 @@ public final class CaptureTask {
         }
 
         if (this.player.getLocation().distance(this.entity.getLocation()) > CaptureConfig.CAPTURE_MAX_DISTANCE.get()) {
-            Lang.CAPTURE_FAIL_DISTANCE.getMessage().send(this.player);
+            Lang.CAPTURE_FAIL_DISTANCE.message().send(this.player);
             this.stop();
             return;
         }
@@ -107,7 +107,7 @@ public final class CaptureTask {
 
         UniParticle.of(Particle.SMOKE).play(this.entity.getLocation(), 0.5, 0.1, 10);
 
-        Lang.CAPTURE_PROGRESS.getMessage().send(this.player, replacer -> replacer
+        Lang.CAPTURE_PROGRESS.message().send(this.player, replacer -> replacer
             .replace(Placeholders.GENERIC_SUCCESS, String.valueOf(this.success))
             .replace(Placeholders.GENERIC_FAILURE, String.valueOf(this.failure)));
     }
@@ -145,7 +145,7 @@ public final class CaptureTask {
         PetCaptureSuccessEvent event = new PetCaptureSuccessEvent(player, entity, template, tier);
         plugin.getPluginManager().callEvent(event);
 
-        Lang.CAPTURE_SUCCESS.getMessage().send(this.player, replacer -> replacer
+        Lang.CAPTURE_SUCCESS.message().send(this.player, replacer -> replacer
             .replace(Placeholders.TEMPLATE_DEFAULT_NAME, this.template.getDefaultName())
             .replace(Placeholders.TIER_NAME, this.tier.getName()));
     }
@@ -160,7 +160,7 @@ public final class CaptureTask {
         PetCaptureFailureEvent event = new PetCaptureFailureEvent(player, entity, template, tier);
         plugin.getPluginManager().callEvent(event);
 
-        Lang.CAPTURE_FAIL_UNLUCK.getMessage().send(this.player, replacer -> replacer
+        Lang.CAPTURE_FAIL_UNLUCK.message().send(this.player, replacer -> replacer
             .replace(Placeholders.TEMPLATE_DEFAULT_NAME, this.template.getDefaultName())
             .replace(Placeholders.TIER_NAME, this.tier.getName()));
     }
@@ -178,7 +178,7 @@ public final class CaptureTask {
             PetEscapeCaptureEvent event = new PetEscapeCaptureEvent(player, entity, template, tier);
             plugin.getPluginManager().callEvent(event);
 
-            Lang.CAPTURE_FAIL_ESCAPED.getMessage().send(this.player, replacer -> replacer
+            Lang.CAPTURE_FAIL_ESCAPED.message().send(this.player, replacer -> replacer
                 .replace(Placeholders.TEMPLATE_DEFAULT_NAME, this.template.getDefaultName())
                 .replace(Placeholders.TIER_NAME, this.tier.getName()));
             return true;
@@ -189,7 +189,8 @@ public final class CaptureTask {
 
     public void stop() {
         if (this.running) {
-            this.plugin.getPetNMS().setLeashedTo(this.entity, null);
+            this.entity.setLeashHolder(null);
+            //this.plugin.getPetNMS().setLeashedTo(this.entity, null);
             this.entity.setAI(true);
             this.running = false;
         }

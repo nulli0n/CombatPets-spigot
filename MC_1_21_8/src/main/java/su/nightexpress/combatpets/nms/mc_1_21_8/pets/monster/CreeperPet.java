@@ -32,6 +32,8 @@ import java.lang.reflect.Method;
 
 public class CreeperPet extends Creeper implements PetEntity {
 
+    private static final Method SPAWN_LINGERING_CLOUD = Reflex.safeMethod(Creeper.class, "spawnLingeringCloud", "gN");
+
     private int explodeCooldown = 0;
 
     public CreeperPet(@NotNull ServerLevel world) {
@@ -69,7 +71,7 @@ public class CreeperPet extends Creeper implements PetEntity {
             }
 
             if (this.explodeCooldown-- <= 0) {
-                Reflex.setFieldValue(this, "bJ", this.swell);
+                Reflex.setFieldValue(this, "cl", this.swell);
 
                 if (this.isIgnited()) {
                     this.setSwellDir(1);
@@ -113,8 +115,7 @@ public class CreeperPet extends Creeper implements PetEntity {
             this.level().explode(this, this.getX(), this.getY(), this.getZ(), event.getRadius(), event.getFire(), interaction);
             this.dead = false;
             //this.die();
-            Method m = Reflex.getMethod(this.getClass(), "gB");
-            if (m != null) Reflex.invokeMethod(m, this);
+            Reflex.invokeMethod(SPAWN_LINGERING_CLOUD, this);
 
             LivingEntity li = (LivingEntity) this.getBukkitEntity();
             li.setVelocity(li.getEyeLocation().add(1, 1, 1).getDirection().multiply(-1.5));

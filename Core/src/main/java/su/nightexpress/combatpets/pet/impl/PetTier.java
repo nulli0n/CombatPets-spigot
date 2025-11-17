@@ -7,11 +7,10 @@ import su.nightexpress.combatpets.PetsPlugin;
 import su.nightexpress.combatpets.Placeholders;
 import su.nightexpress.combatpets.api.pet.Aspect;
 import su.nightexpress.combatpets.api.pet.Tier;
-import su.nightexpress.combatpets.util.PetUtils;
-import su.nightexpress.economybridge.EconomyBridge;
-import su.nightexpress.economybridge.currency.CurrencyId;
 import su.nightexpress.nightcore.config.ConfigValue;
 import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.nightcore.integration.currency.CurrencyId;
+import su.nightexpress.nightcore.integration.currency.EconomyBridge;
 import su.nightexpress.nightcore.manager.AbstractFileData;
 import su.nightexpress.nightcore.util.StringUtil;
 import su.nightexpress.nightcore.util.placeholder.PlaceholderMap;
@@ -100,16 +99,11 @@ public class PetTier extends AbstractFileData<PetsPlugin> implements Tier {
             "Set this to -1 to disable auto-respawn."
         ).read(config);
 
-        if (PetUtils.hasEconomyBridge()) {
-            this.setReviveCurrency(ConfigValue.create("Death.Revive_Currency",
-                CurrencyId.VAULT,
-                "Sets currency for pet revive.",
-                "Available currencies: [" + String.join(", ", EconomyBridge.getCurrencyIds()) + "]"
-            ).read(config));
-        }
-        else {
-            this.setReviveCurrency("null");
-        }
+        this.setReviveCurrency(ConfigValue.create("Death.Revive_Currency",
+            CurrencyId.VAULT,
+            "Sets currency for pet revive.",
+            "Available currencies: [" + String.join(", ", EconomyBridge.getCurrencyIds()) + "]"
+        ).read(config));
 
         this.setReviveCost(ConfigValue.create("Death.Revive_Cost",
             2000D,

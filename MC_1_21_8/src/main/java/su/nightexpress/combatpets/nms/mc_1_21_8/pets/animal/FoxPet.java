@@ -29,8 +29,8 @@ import java.util.EnumSet;
 
 public class FoxPet extends Fox implements PetEntity {
 
-    private static final Method SET_FACEPLANTED = Reflex.getMethod(Fox.class, "A", boolean.class);
-    private static final Method CLEAR_STATES    = Reflex.getMethod(Fox.class, "gL");
+    private static final Method SET_FACEPLANTED = Reflex.safeMethod(Fox.class, "B", boolean.class);
+    private static final Method CLEAR_STATES    = Reflex.safeMethod(Fox.class, "gY");
 
     public FoxPet(@NotNull ServerLevel world) {
         super(EntityType.FOX, world);
